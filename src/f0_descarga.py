@@ -109,6 +109,10 @@ def meses(desde: str, hasta: str) -> list[str]:
     return out
 
 
+def meses_ant(mes: str) -> str:
+    return (dt.date.fromisoformat(mes + "-01") - dt.timedelta(days=1)).strftime("%Y-%m")
+
+
 def dias_del_mes(mes: str) -> list[str]:
     d = dt.date.fromisoformat(mes + "-01")
     ayer = dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=1)
@@ -197,32 +201,66 @@ def huecos_1m(df: pl.DataFrame, mes: str) -> dict:
 
 # ───────────────────────────── aggTrades ─────────────────────────────
 
-def proc_aggtrades(mes: str, klines: pl.DataFrame) -> dict:
-    csvs = [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes)]
-    con = duckdb.connect()
-    con.execute("SET memory_limit='6GB'; SET preserve_insertion_order=false;")
-    cols = ("{'agg_trade_id':'BIGINT','price':'DOUBLE','quantity':'DOUBLE','first_trade_id':'BIGINT',"
+AGG_COLS = ("{'agg_trade_id':'BIGINT','price':'DOUBLE','quantity':'DOUBLE','first_trade_id':'BIGINT',"
             "'last_trade_id':'BIGINT','transact_time':'BIGINT','is_buyer_maker':'BOOLEAN'}")
+
+
+def cargar_aggtrades(con: duckdb.DuckDBPyConnection, csvs: list[Path], tabla: str) -> dict:
+    """Carga los CSV en `tabla` descartando filas duplicadas exactas y devuelve el chequeo de ids."""
     partes = " UNION ALL ".join(
-        f"SELECT * FROM read_csv('{c}', header={str(tiene_header(c)).lower()}, columns={cols})" for c in csvs)
-    con.execute(f"""CREATE TABLE a AS SELECT agg_trade_id id, CAST(round(price*{ESCALA_P}) AS INTEGER) p,
-        CAST(round(quantity*{ESCALA_Q}) AS BIGINT) q, last_trade_id-first_trade_id+1 ntr, first_trade_id,
-        transact_time t, NOT is_buyer_maker buy, price, quantity FROM ({partes})""")
+        f"SELECT * FROM read_csv('{c}', header={str(tiene_header(c)).lower()}, columns={AGG_COLS})" for c in csvs)
+    n_crudo = con.execute(f"SELECT count(*) FROM ({partes})").fetchone()[0]
+    con.execute(f"""CREATE OR REPLACE TABLE {tabla} AS SELECT DISTINCT agg_trade_id id,
+        CAST(round(price*{ESCALA_P}) AS INTEGER) p, CAST(round(quantity*{ESCALA_Q}) AS BIGINT) q,
+        last_trade_id-first_trade_id+1 ntr, first_trade_id, transact_time t, NOT is_buyer_maker buy, price, quantity
+        FROM ({partes})""")
     for c in csvs:
         c.unlink()
+    r = dict(zip(["n", "min_id", "max_id", "ids_con_contenido_distinto", "saltos_agg_id", "ids_faltantes",
+                  "saltos_trade_id"], con.execute(f"""
+        WITH s AS (SELECT id, first_trade_id f, first_trade_id+ntr-1 l,
+                   lag(id) OVER (ORDER BY id) pid, lag(first_trade_id+ntr-1) OVER (ORDER BY id) pl FROM {tabla})
+        SELECT count(*), min(id), max(id), count(*)-count(DISTINCT id), count(*) FILTER (WHERE id-pid>1),
+               coalesce(sum(id-pid-1) FILTER (WHERE id-pid>1), 0), count(*) FILTER (WHERE f-pl>1) FROM s""").fetchone()))
+    r["filas_duplicadas_descartadas"] = n_crudo - r["n"]
+    r["huecos"] = [
+        {"ids": int(n), "desde_utc": dt.datetime.fromtimestamp(a / 1000, dt.timezone.utc).isoformat(),
+         "hasta_utc": dt.datetime.fromtimestamp(b / 1000, dt.timezone.utc).isoformat()}
+        for n, a, b in con.execute(f"""WITH s AS (SELECT id, t, lag(id) OVER (ORDER BY id) pid, lag(t) OVER (ORDER BY id) pt
+            FROM {tabla}) SELECT id-pid-1, pt, t FROM s WHERE id-pid>1 ORDER BY id-pid DESC LIMIT 20""").fetchall()]
+    return r
 
+
+def proc_aggtrades(mes: str, klines: pl.DataFrame, id_previo: int | None = None) -> dict:
+    con = duckdb.connect()
+    (RAW / "duckdb_tmp").mkdir(parents=True, exist_ok=True)
+    con.execute(f"SET memory_limit='10GB'; SET preserve_insertion_order=false; "
+                f"SET temp_directory='{RAW / 'duckdb_tmp'}';")
     integ: dict = {}
+    ids = cargar_aggtrades(con, [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes)], "a")
+    ids["fuente"] = "monthly" if mes_cerrado(mes) else "daily"
+    problemas = lambda r: r["ids_faltantes"] + r["filas_duplicadas_descartadas"] + r["ids_con_contenido_distinto"] \
+        + (r["min_id"] - id_previo - 1 if id_previo is not None else 0)
+    if mes_cerrado(mes) and problemas(ids) > 0:
+        # el archivo mensual de Binance a veces viene roto (días faltantes o repetidos): se rehace con los diarios.
+        # Se descarta el mensual antes de cargar los diarios para no tener dos meses en memoria.
+        integ["ids_monthly_descartado"] = ids
+        con.execute("DROP TABLE a")
+        ids = cargar_aggtrades(con, [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes, solo_daily=True)], "a")
+        ids["fuente"] = "daily"
+        if problemas(ids) > problemas(integ["ids_monthly_descartado"]):
+            raise ValueError(f"{mes}: los diarios tienen más problemas que el mensual")
+    if id_previo is not None:
+        ids["ids_faltantes_vs_mes_anterior"] = ids["min_id"] - id_previo - 1
+    integ["ids"] = ids
+    if ids["ids_con_contenido_distinto"]:
+        raise ValueError(f"{mes}: agg_trade_id repetido con contenido distinto")
+
     # precios y cantidades alineados a la grilla (si no, la codificación entera perdería información)
     integ["fuera_de_grilla"] = con.execute(f"""SELECT count(*) FILTER (WHERE abs(price*{ESCALA_P}-p)>1e-6),
         count(*) FILTER (WHERE abs(quantity*{ESCALA_Q}-q)>1e-6) FROM a""").fetchone()
     if any(integ["fuera_de_grilla"]):  # la codificación entera perdería información: no seguir
         raise ValueError(f"{mes}: precios/cantidades fuera de grilla {integ['fuera_de_grilla']}")
-    # continuidad de ids
-    integ["ids"] = dict(zip(["n", "min_id", "max_id", "ids_duplicados", "saltos_agg_id", "saltos_trade_id"], con.execute("""
-        WITH s AS (SELECT id, first_trade_id f, first_trade_id+ntr-1 l,
-                   lag(id) OVER (ORDER BY id) pid, lag(first_trade_id+ntr-1) OVER (ORDER BY id) pl FROM a)
-        SELECT count(*), min(id), max(id), count(*)-count(DISTINCT id),
-               count(*) FILTER (WHERE id-pid>1), count(*) FILTER (WHERE f-pl>1) FROM s""").fetchone()))
     con.execute("ALTER TABLE a DROP price; ALTER TABLE a DROP quantity; ALTER TABLE a DROP first_trade_id;")
 
     ini_mes = int(dt.datetime.fromisoformat(mes + "-01").replace(tzinfo=dt.timezone.utc).timestamp())
@@ -370,7 +408,9 @@ def procesar_mes(mes: str, solo: set[str]) -> None:
     if "liq" in solo and "2023-06" <= mes <= "2024-10":
         integ["liq_coinm"] = proc_liq_coinm(mes)
     if "aggtrades" in solo:
-        integ.update(proc_aggtrades(mes, klines))
+        previo = INTEG / f"{meses_ant(mes)}.json"
+        id_previo = json.loads(previo.read_text()).get("ids", {}).get("max_id") if previo.exists() else None
+        integ.update(proc_aggtrades(mes, klines, id_previo))
     integ["segundos_proceso"] = round(time.time() - t0, 1)
     f_integ.write_text(json.dumps(integ, indent=1, ensure_ascii=False, default=str))
     print(f"{mes} ok ({integ['segundos_proceso']} s)", flush=True)

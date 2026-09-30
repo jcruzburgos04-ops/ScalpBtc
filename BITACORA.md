@@ -39,3 +39,19 @@
   período y el control de "fuera de grilla" ahora aborta el proceso en vez de solo registrarlo. Se rehízo todo.
 - Polars divide un entero por un escalar multiplicando por el recíproco (error de 1 ulp: 4628920/100 ≠ 46289.2).
   `datos.py` decodifica con la división de pyarrow (IEEE exacta) para que las comparaciones exactas funcionen.
+
+### Descarga completa 2022-01 → 2026-09 (57 meses, 2,0 GB en `data/proc/`)
+- **Archivos mensuales de aggTrades rotos en Binance**: 2022-08, 2022-09, 2022-10, 2022-11 y 2023-05 vienen con
+  días enteros faltantes (p. ej. 2022-09 no tiene el 09-01 ni el 09-10) y 2022-09 además trae 4,3 M de filas
+  duplicadas exactas. Los archivos diarios de esos meses están completos. El pipeline ahora descarta
+  duplicados exactos siempre y, si el mensual tiene huecos o duplicados, lo rehace con los diarios.
+- Hueco real (también en los diarios): 2022-09-06 17:14–17:20 UTC, ~31,6 k aggTrades que no están en el archivo.
+- **Klines oficiales rotas**: 308 minutos en 11 tramos con velas planas (O=H=L=C, volumen 0, count 0) mientras
+  aggTrades tiene los trades reales. Los más largos: 2023-11-10 15:07 (99 min), 2024-10-28 20:00 (74 min),
+  2022-05-28 16:40 (35 min), 2022-05-01 22:26 (29 min), 2023-09-12 08:34 (19 min). Ver DECISIONES.
+- Mark/index/premium: días enteros faltantes sueltos (mark: 2022-07-31, 2022-10-02, 2023-02-24, 2026-06-29;
+  index: además 2022-04-27, varios de 2022-07, 2023-02-13, 2023-04-07/08). Afecta el disparo del SL por mark en esos días.
+- Desde 2025-08 los saltos de trade_id pasan de ~10–20 k/mes a 130–340 k/mes (trades que no están en aggTrades,
+  probablemente un tipo de orden nuevo de Binance). Los volúmenes siguen cerrando contra las klines. A vigilar.
+- Incidentes de la descarga (reintentos de red, un `quote_volume` "0.00000000" que rompía la inferencia de tipos,
+  archivo temporal de DuckDB corrupto con dos procesos en paralelo) corregidos en el código.
