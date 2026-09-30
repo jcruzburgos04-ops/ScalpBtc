@@ -63,3 +63,14 @@
   (mechas del last) → sesgo conservador en el SL. Detalle en `reports/f0/reparaciones.md`.
 - 6 tramos sin trades en ninguna fuente (2022-05-01 22:26 29 min, 2022-05-28 16:40 35 min, 2023-09-12 08:34 19 min,
   2024-10-28 16:21 15 min, 2025-08-29 06:19 18 min): pausas del exchange, quedan planos.
+
+## F1 · Réplica de indicadores (2026-09-30)
+- `src/indicadores.py` (numba): EMA/RMA/SMA con la semilla de Pine, ASH RSI 16/4 EMA, XO 11/25, RVOL 20, ATR 14,
+  VWAP sesión/semana ±σ1/σ2 (hl2, `f_vwap`), perfil diario 24 filas 70 % (dVWAP/dPOC/dVAH/dVAL), rolling 24h
+  (rVWAP ± σ), pwVWAP y m/pm (60m), pq e y (diario), 7D/30D/90D/365D (diario, hlc3), DO/WO/MO/YO, PWH/PWL,
+  PQH/PQL, MNDAY-H/L, ASH y EMAs de 5m (vivo y cerrada). 2,5 M velas en ~50 s; caché en `data/cache/` (no versionada).
+- `tests/test_indicadores.py`: 9 tests contra implementaciones de referencia independientes, todos pasan.
+  Prueba de mutación: sacando 60 velas del perfil, 33/33 casos detectados.
+- Semilla (§3.2): arrancar la historia en 2022-07 en vez de 2022-01 cambia EMA 25 y ASH en 2023-01-01 < 1e-9.
+- Hallazgo del .pine: dVAH/dVAL/dPOC/rVAH/rVAL y todas las etiquetas se calculan SOLO en la última vela
+  (`barstate.islast`): en TV no tienen historial en la ventana de datos; para validarlas hay que usar Bar Replay.

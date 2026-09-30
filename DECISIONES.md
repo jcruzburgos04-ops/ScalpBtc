@@ -32,3 +32,14 @@ con y sin · variantes de calendario A–D.
 - [2026-09-30] CONFIRMADA · Liquidaciones: se usa Tardis.dev gratis (1.er día de cada mes, BTCUSDT USD-M) además del
   COIN-M 2023–2024 de Binance. `src/f0_tardis.py` listo; el host todavía está bloqueado en el contenedor.
 - [2026-09-30] CONFIRMADA · **F0 aprobada por Juan.**
+
+## F1 · supuestos (a confirmar en la validación de F1)
+- [2026-09-30] SUPUESTO · Lo que en Pine sale de `request.security(..., lookahead_off)` (7D/30D/90D/365D, pwVWAP,
+  m/pm/pq/y, MNDAY, ASH/EMAs de 5m) se calcula en dos versiones: **vivo** (vela mayor en formación, lo que se ve en
+  tiempo real, §3.3) e **hist** (última vela mayor cerrada, lo que muestra TV en el historial). Para la estrategia se
+  propone usar **vivo**, que es lo que Juan ve al operar.
+- [2026-09-30] SUPUESTO · XO 11/25 (confirmado por Juan) aunque el default del .pine es 12/25.
+- [2026-09-30] SUPUESTO · Rolling 24h: velas de 1m con open_time > t − 24h, incluida la vela actual (1440 velas),
+  como en el .pine (§10). 7D/30D: ventana inclusiva del .pine = vela diaria actual + N anteriores (N+1 velas).
+- [2026-09-30] SUPUESTO · El volumen es el de las klines de Binance (base, BTC). Si el feed de TV difiere, las VWAP
+  y el RVOL difieren un poco; se ve en la tabla de F1.
