@@ -51,3 +51,13 @@ con y sin · variantes de calendario A–D.
   como en el .pine (§10). 7D/30D: ventana inclusiva del .pine = vela diaria actual + N anteriores (N+1 velas).
 - [2026-09-30] SUPUESTO · El volumen es el de las klines de Binance (base, BTC). Si el feed de TV difiere, las VWAP
   y el RVOL difieren un poco; se ve en la tabla de F1.
+
+## Estudio de etiquetas (F5) · a partir de los trades de referencia
+- [2026-09-30] PENDIENTE · Separar F5 en dos: (a) **importancia descriptiva** de cada nivel (reacción vs placebo,
+  corrección BH) sobre todo 2025–2026 fuera de la reserva, **sin walk-forward** (ya lo permite §6c); (b) walk-forward
+  solo cuando un nivel pase a ser una REGLA de la estrategia (filtro de entrada, TP, umbral de tolerancia).
+- [2026-09-30] PENDIENTE · Catalogar los trades de referencia (fecha, lado, entrada, salida, niveles citados),
+  ubicarlos en nuestros datos y usarlos para GENERAR hipótesis de niveles. Como salen de feb–may 2026, esas
+  hipótesis se miden en 2023–2025 (fuera de ese tramo) para no validar con los mismos datos que las sugirieron.
+- [2026-09-30] PENDIENTE · Niveles de su gráfico que no están en el indicador de Juan: EMAs de 4h 13/34/100 (§8 dice
+  EMA 200 de 4h), pwVAL, aVWAP anclados a swings, S/R horizontales, eventos de horario (DO, futures open, NYO, IB).

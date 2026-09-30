@@ -74,3 +74,13 @@
 - Semilla (§3.2): arrancar la historia en 2022-07 en vez de 2022-01 cambia EMA 25 y ASH en 2023-01-01 < 1e-9.
 - Hallazgo del .pine: dVAH/dVAL/dPOC/rVAH/rVAL y todas las etiquetas se calculan SOLO en la última vela
   (`barstate.islast`): en TV no tienen historial en la ventana de datos; para validarlas hay que usar Bar Replay.
+
+### Trades de referencia de otro trader (PDFs de Juan, 2026-09-30)
+- 9 reviews (feb–may 2026, BTC 1m, Asia/NYO): estilo **reversión a la media en rango** ("edge to edge": banda
+  ±2σ → banda opuesta; "mean to edge": dVWAP → ±1σ/±2σ; "momentum loss"; "first test best test"), con lectura de
+  orderflow en Aggr 10s. Niveles que más nombra: dVWAP ("the mean") y sus bandas 1σ/2σ (por lejos), S/R manuales
+  (70k, 71.8k…), aVWAP anclados, DO / futures open / NYO / IB (eventos de horario), bandas semanales, dVAL,
+  cinta de EMAs. Etiquetas en su gráfico: MDAY-L/H, dVAL, pwVAL, pwVWAP, rVAL, pdVAL, H4 13/34/100 EMA.
+- Cruce con nuestra réplica (TW1, 2026-02-20; su gráfico está en UTC+1): entradas long 67 127,32 y 67 135,84 a las
+  ~01:26 UTC; nuestro **dVAL = 67 129,0** y VWAP −1σ = 67 121–67 134; salida ~67 311 ≈ dVAH 67 321 / +1σ 67 327.
+  Rango 00:30–02:50 UTC entre dVAL y dVAH. Primer control de paridad contra un gráfico de TV: coincide.
