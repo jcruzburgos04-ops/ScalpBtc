@@ -103,3 +103,8 @@
   la barrida aparece en 36 % de los sí contra 12–14 % del resto; se deja para el estudio de niveles/volumen (F5–F6).
 - Tipo continuación/rebote con d ≤ 1 ATR de 5m: coincide 34/40.
 - SL: riesgo mediana 2,65 ATR; extremo de las últimas 2–5 velas + 0,3–0,7 ATR.
+- Filtros sumados a `senales.py`. Con ellos pasan 16 288 de 25 346 señales amplias de 2023–2024. Verificado que el
+  código reproduce las medidas de la ronda 1 caso por caso (40/40) y el resultado 23/25 sí · 0/7 no · 6/8 dudosas.
+- Ronda 2 publicada (https://claude.ai/artifact/WpAyVTCgDANQB8Bpfhrpav): 30 casos de días nuevos, 20 que pasan los
+  filtros y 10 que no (5 por ubicación, 5 por rango), orden mezclado; qué grupo es cada uno queda solo en
+  `reports/f2/ronda2/casos.json`.
