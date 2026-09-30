@@ -65,3 +65,10 @@ con y sin · variantes de calendario A–D.
   - **Grupo 2 (aparte y con menos peso):** S/R horizontales. Son más visuales que codificables: se prueba solo un
     proxy objetivo (máximos/mínimos de sesiones previas con reacción, números redondos, HVN/LVN) y sus resultados
     se reportan separados, sin mezclarlos con el grupo 1.
+
+## Calibración de la señal (F2)
+- [2026-09-30] PENDIENTE · Juan no operó en 2023–2024 y no puede ver ese período en TV gratis, así que no hay marcas
+  propias. Propuesta: en vez de marcar desde cero, Juan revisa ~40 señales generadas por el código en 2023–2024,
+  dibujadas con sus indicadores, y responde "la tomaría / no la tomaría" (y dónde pondría el SL). Con eso se
+  ajustan los umbrales de "próximo a ponerse verde" / "por cruzarse". Alternativa sin Juan: fijar a priori 3–4
+  variantes objetivas de la señal y elegir entre ellas solo con 2023–2024.
