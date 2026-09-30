@@ -1,0 +1,9 @@
+bars_1s (una fila por segundo CON trades; los segundos sin trades no existen):
+  dt       int32  segundos desde la fila anterior (la 1.ª fila: segundos desde el inicio del mes UTC)
+  do       int32  open − close de la fila anterior, en 0,01 USDT (la 1.ª fila: open absoluto)
+  dh, dl   int32  high − open y open − low, en 0,01 USDT
+  dc       int32  close − open, en 0,01 USDT
+  v, vb    int32  volumen total y volumen taker buy, en 0.001 BTC
+  n_agg    int32  n.º de aggTrades;  ntx = n.º de trades − n_agg
+  ms_first, ms_last int16  ms dentro del segundo del primer y último trade
+Decodificar con src/datos.py:leer_1s() -> ts (ms), o/h/l/c (float), v, vb (BTC), n_agg, n_trades, ms_first, ms_last.
