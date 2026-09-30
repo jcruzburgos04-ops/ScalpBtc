@@ -87,6 +87,18 @@ def bajar(ruta: str, destino: Path, reintentos: int = 5) -> Path:
     raise RuntimeError("inalcanzable")
 
 
+def existe(ruta: str, reintentos: int = 5) -> bool:
+    for i in range(reintentos):
+        try:
+            return requests.head(f"{S3}/{ruta}", timeout=30).status_code == 200
+        except requests.RequestException as e:
+            if i == reintentos - 1:
+                raise
+            print(f"  reintento {i + 1} HEAD {ruta}: {e}")
+            time.sleep(2 ** (i + 1))
+    return False
+
+
 def meses(desde: str, hasta: str) -> list[str]:
     d = dt.date.fromisoformat(desde + "-01")
     h = dt.date.fromisoformat(hasta + "-01")
@@ -313,7 +325,7 @@ def proc_liq_coinm(mes: str) -> dict:
     csvs = []
     for dia in dias_del_mes(mes):
         ruta = f"data/futures/cm/daily/liquidationSnapshot/BTCUSD_PERP/BTCUSD_PERP-liquidationSnapshot-{dia}.zip"
-        if requests.head(f"{S3}/{ruta}", timeout=30).status_code != 200:
+        if existe(ruta) is False:
             continue
         csvs.append(csv_de_zip(bajar(ruta, RAW / Path(ruta).name)))
     if not csvs:
