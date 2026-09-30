@@ -55,3 +55,11 @@
   probablemente un tipo de orden nuevo de Binance). Los volúmenes siguen cerrando contra las klines. A vigilar.
 - Incidentes de la descarga (reintentos de red, un `quote_volume` "0.00000000" que rompía la inferencia de tipos,
   archivo temporal de DuckDB corrupto con dos procesos en paralelo) corregidos en el código.
+
+### Reparaciones (tras aprobación de F0)
+- `src/f0_reparar.py`: 192 minutos de klines rotas reemplazados por velas desde aggTrades; 5762 minutos de mark
+  reconstruidos (4 días enteros + 2 min). Validación del mark tapando 40 días reales de 2025–2026: error del close
+  mediana 2,08 USD, p95 19,3 USD (0,02 %). High/low reconstruidos exceden al real en ~70 % de los minutos
+  (mechas del last) → sesgo conservador en el SL. Detalle en `reports/f0/reparaciones.md`.
+- 6 tramos sin trades en ninguna fuente (2022-05-01 22:26 29 min, 2022-05-28 16:40 35 min, 2023-09-12 08:34 19 min,
+  2024-10-28 16:21 15 min, 2025-08-29 06:19 18 min): pausas del exchange, quedan planos.

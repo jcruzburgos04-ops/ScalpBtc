@@ -24,8 +24,11 @@ con y sin · variantes de calendario A–D.
 - [2026-09-30] SUPUESTO (a confirmar) · Órdenes grandes: se guardan solo las órdenes reconstruidas (ms, lado) con
   nocional ≥ 100.000 USD (~p95 en mar-2025). El umbral de "grande" (§6b, percentil móvil) tiene que caer por
   encima de ese piso; si hiciera falta uno más bajo, se reprocesa desde Binance.
-- [2026-09-30] PENDIENTE · Klines oficiales rotas (308 min en 11 tramos, velas planas con volumen 0). Recomendación:
-  usar para indicadores y motor velas 1m **reconstruidas desde aggTrades** en esos minutos (son los trades reales) y
-  verificar en F1 qué muestra TradingView en esos tramos (si TV también las muestra planas, sus EMAs/VWAP difieren ahí).
-- [2026-09-30] PENDIENTE · Días sin mark price (2022-07-31, 2022-10-02, 2023-02-24, 2026-06-29). Opciones: no operar
-  esos días, o reconstruir el mark con last + premium/index cuando existan. 2026-06-29 cae en 2025–2026.
+- [2026-09-30] CONFIRMADA · Klines oficiales rotas: se usan las velas 1m **reconstruidas desde aggTrades**
+  (`datos.leer_velas_1m()`). 192 minutos reemplazados. Otros 116 minutos en 6 tramos no tienen trades en ninguna
+  fuente (pausas del exchange): quedan planos.
+- [2026-09-30] CONFIRMADA · Días sin mark price: se **reconstruye** el mark (last + base interpolada,
+  `datos.leer_mark_1m()`, validación en `reports/f0/reparaciones.md`). Los trades en minutos reconstruidos se marcan.
+- [2026-09-30] CONFIRMADA · Liquidaciones: se usa Tardis.dev gratis (1.er día de cada mes, BTCUSDT USD-M) además del
+  COIN-M 2023–2024 de Binance. `src/f0_tardis.py` listo; el host todavía está bloqueado en el contenedor.
+- [2026-09-30] CONFIRMADA · **F0 aprobada por Juan.**

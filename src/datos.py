@@ -49,3 +49,28 @@ def leer(carpeta: str, desde: str | None = None, hasta: str | None = None) -> pl
     archivos = sorted((PROC / carpeta).glob("*.parquet"))
     archivos = [a for a in archivos if (desde is None or a.stem >= desde) and (hasta is None or a.stem <= hasta)]
     return pl.concat([pl.read_parquet(a) for a in archivos])
+
+
+def leer_velas_1m(desde: str | None = None, hasta: str | None = None) -> pl.DataFrame:
+    """Velas 1m de last price con las velas oficiales rotas (count = 0) reemplazadas por las reconstruidas
+    desde aggTrades (decisión de Juan 2026-09-30). Columna `reparada` = True en esos minutos."""
+    k = leer("klines_1m", desde, hasta).with_columns(reparada=pl.lit(False))
+    f = PROC / "velas_1m_reparadas.parquet"
+    if f.exists():
+        rep = pl.read_parquet(f).with_columns(reparada=pl.lit(True))
+        k = k.update(rep, on="open_time")
+    return k
+
+
+def leer_mark_1m(desde: str | None = None, hasta: str | None = None) -> pl.DataFrame:
+    """Mark price 1m con los minutos faltantes reconstruidos (mark ≈ last + base interpolada, ver f0_reparar.py).
+    Columna `reconstruido` = True en esos minutos."""
+    m = leer("mark_1m", desde, hasta).with_columns(reconstruido=pl.lit(False))
+    f = PROC / "mark_1m_reconstruido.parquet"
+    if f.exists():
+        rec = pl.read_parquet(f).with_columns(reconstruido=pl.lit(True))
+        if desde or hasta:
+            meses = pl.from_epoch("open_time", time_unit="ms").dt.strftime("%Y-%m")
+            rec = rec.filter((meses >= (desde or "0000")) & (meses <= (hasta or "9999")))
+        m = pl.concat([m, rec]).sort("open_time")
+    return m
