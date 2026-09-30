@@ -10,6 +10,14 @@ import pyarrow.compute as pc
 
 PROC = Path(__file__).resolve().parent.parent / "data" / "proc"
 ESCALA_P = 100
+# Tramo de reserva (CLAUDE.md §6c, aprobado por Juan 2026-09-30): no se mira, no se grafica ni se usa hasta F8.
+RESERVA = ("2026-07", "2026-09")
+
+
+def sin_reserva(df: pl.DataFrame, col: str = "open_time") -> pl.DataFrame:
+    """Saca las filas del tramo de reserva. Todo estudio pasa por acá (indicadores.cargar lo aplica por defecto)."""
+    m = pl.from_epoch(col, time_unit="ms").dt.strftime("%Y-%m")
+    return df.filter((m < RESERVA[0]) | (m > RESERVA[1]))
 ESCALA_Q = 1000
 
 

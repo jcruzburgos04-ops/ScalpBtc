@@ -20,7 +20,7 @@ import numpy as np
 import polars as pl
 from numba import njit
 
-from datos import leer_velas_1m
+from datos import leer_velas_1m, sin_reserva
 
 MS_MIN = 60_000
 MS_DIA = 86_400_000
@@ -471,13 +471,18 @@ def calcular(desde: str | None = None, hasta: str | None = None) -> pl.DataFrame
 CACHE = Path(__file__).resolve().parent.parent / "data" / "cache"
 
 
-def cargar(desde: str | None = None, hasta: str | None = None, recalcular: bool = False) -> pl.DataFrame:
-    """Indicadores desde la caché (data/cache/indicadores_1m.parquet, no versionada); la arma si no existe."""
+def cargar(desde: str | None = None, hasta: str | None = None, recalcular: bool = False,
+           incluir_reserva: bool = False) -> pl.DataFrame:
+    """Indicadores desde la caché (data/cache/indicadores_1m.parquet, no versionada); la arma si no existe.
+    El tramo de reserva (jul–sep 2026) se saca siempre, salvo incluir_reserva=True (solo F8).
+    El cálculo usa todo el historial para que las EMAs y los rolling de octubre en adelante tengan su calentamiento."""
     f = CACHE / "indicadores_1m.parquet"
     if recalcular or not f.exists():
         CACHE.mkdir(parents=True, exist_ok=True)
         calcular().write_parquet(f, compression="zstd")
     df = pl.read_parquet(f)
+    if not incluir_reserva:
+        df = sin_reserva(df)
     if desde or hasta:
         m = pl.from_epoch("open_time", time_unit="ms").dt.strftime("%Y-%m")
         df = df.filter((m >= (desde or "0000")) & (m <= (hasta or "9999")))

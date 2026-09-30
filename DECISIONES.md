@@ -12,7 +12,10 @@ con y sin · variantes de calendario A–D.
 
 ## Pendientes
 
-- [2026-09-30] PENDIENTE · Tramo de reserva jul–sep 2026 sin mirar hasta F8 (§6c).
+- [2026-09-30] CONFIRMADA · Tramo de reserva **jul–sep 2026** sin mirar hasta F8 (§6c). `datos.sin_reserva()` y
+  `indicadores.cargar()` lo sacan por defecto. Aviso (regla 4): antes de aprobarse la reserva, el control de
+  integridad de F0 recorrió esos meses (huecos, duplicados, volumen vs klines; nada de precios, señales ni resultados)
+  y la caché de indicadores se calculó sobre todo el historial (necesario para el calentamiento de octubre).
 - [2026-09-30] PENDIENTE · Definición del swing del SL y buffer (se resuelve con las marcas, §4.1).
 - [2026-09-30] PENDIENTE · Invalidación: x y m (se calibran con las marcas, §5.1).
 - [2026-09-30] CONFIRMADA · Liquidaciones: solo fuentes **gratuitas** y con **datos reales** (Juan).
@@ -34,7 +37,12 @@ con y sin · variantes de calendario A–D.
 - [2026-09-30] CONFIRMADA · **F0 aprobada por Juan.**
 
 ## F1 · supuestos (a confirmar en la validación de F1)
-- [2026-09-30] SUPUESTO · Lo que en Pine sale de `request.security(..., lookahead_off)` (7D/30D/90D/365D, pwVWAP,
+- [2026-09-30] CONFIRMADA · Se usa la versión **vivo** (datos reales reconstruidos, lo que Juan ve en tiempo real).
+  El backtest es sobre historia, no en vivo.
+- [2026-09-30] CONFIRMADA · Tolerancias de F1: ±0,1 USD en precios y niveles, ±0,01 ASH, ±0,001 RVOL.
+- [2026-09-30] CONFIRMADA · La validación de F1 se hace con velas recientes (TV gratis solo muestra unos días de 1m),
+  de 2026-10-01 en adelante (fuera de la reserva), anotadas en vivo por Juan en `tests/paridad_tv.csv`.
+- [2026-09-30] (antes SUPUESTO) · Lo que en Pine sale de `request.security(..., lookahead_off)` (7D/30D/90D/365D, pwVWAP,
   m/pm/pq/y, MNDAY, ASH/EMAs de 5m) se calcula en dos versiones: **vivo** (vela mayor en formación, lo que se ve en
   tiempo real, §3.3) e **hist** (última vela mayor cerrada, lo que muestra TV en el historial). Para la estrategia se
   propone usar **vivo**, que es lo que Juan ve al operar.
