@@ -39,17 +39,16 @@ RAW = RAIZ / "data" / "raw" / str(os.getpid())
 PROC = RAIZ / "data" / "proc"
 INTEG = RAIZ / "reports" / "f0" / "integridad"
 
-TICK = 0.1  # tick de BTCUSDT perpetuo
-ESCALA_P = 10  # precio en ticks enteros = round(precio * 10)
+ESCALA_P = 100  # precio en centésimos: el tick de BTCUSDT fue 0,01 en 2022 y después 0,1; 0,01 cubre los dos
 ESCALA_Q = 1000  # cantidad en unidades de 0.001 BTC (step de BTCUSDT)
 PISO_ORDEN_USD = 100_000  # ~p95 del nocional por orden (mar-2025); el umbral "grande" se elige después por percentil móvil
 
 ESQUEMA_1S = """\
 bars_1s (una fila por segundo CON trades; los segundos sin trades no existen):
   dt       int32  segundos desde la fila anterior (la 1.ª fila: segundos desde el inicio del mes UTC)
-  do       int32  open − close de la fila anterior, en ticks (la 1.ª fila: open absoluto en ticks)
-  dh, dl   int16  high − open y open − low, en ticks
-  dc       int16  close − open, en ticks
+  do       int32  open − close de la fila anterior, en 0,01 USDT (la 1.ª fila: open absoluto)
+  dh, dl   int32  high − open y open − low, en 0,01 USDT
+  dc       int32  close − open, en 0,01 USDT
   v, vb    int32  volumen total y volumen taker buy, en 0.001 BTC
   n_agg    int32  n.º de aggTrades;  ntx = n.º de trades − n_agg
   ms_first, ms_last int16  ms dentro del segundo del primer y último trade
@@ -203,6 +202,8 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame) -> dict:
     # precios y cantidades alineados a la grilla (si no, la codificación entera perdería información)
     integ["fuera_de_grilla"] = con.execute(f"""SELECT count(*) FILTER (WHERE abs(price*{ESCALA_P}-p)>1e-6),
         count(*) FILTER (WHERE abs(quantity*{ESCALA_Q}-q)>1e-6) FROM a""").fetchone()
+    if any(integ["fuera_de_grilla"]):  # la codificación entera perdería información: no seguir
+        raise ValueError(f"{mes}: precios/cantidades fuera de grilla {integ['fuera_de_grilla']}")
     # continuidad de ids
     integ["ids"] = dict(zip(["n", "min_id", "max_id", "ids_duplicados", "saltos_agg_id", "saltos_trade_id"], con.execute("""
         WITH s AS (SELECT id, first_trade_id f, first_trade_id+ntr-1 l,
@@ -219,16 +220,13 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame) -> dict:
     enc = b.select(
         dt=pl.col("s").diff().fill_null(pl.col("s").first() - ini_mes).cast(pl.Int32),
         do=(pl.col("o") - pl.col("c").shift(1)).fill_null(pl.col("o").first()).cast(pl.Int32),
-        dh=(pl.col("h") - pl.col("o")).cast(pl.Int16), dl=(pl.col("o") - pl.col("l")).cast(pl.Int16),
-        dc=(pl.col("c") - pl.col("o")).cast(pl.Int16),
+        dh=(pl.col("h") - pl.col("o")).cast(pl.Int32), dl=(pl.col("o") - pl.col("l")).cast(pl.Int32),
+        dc=(pl.col("c") - pl.col("o")).cast(pl.Int32),
         v=pl.col("v").cast(pl.Int32), vb=pl.col("vb").cast(pl.Int32),
         n_agg=pl.col("n_agg").cast(pl.Int32), ntx=(pl.col("n_tr") - pl.col("n_agg")).cast(pl.Int32),
         ms_first=pl.col("ms_first").cast(pl.Int16), ms_last=pl.col("ms_last").cast(pl.Int16))
     # verificación de que la codificación es sin pérdida antes de escribir
-    for col, lim in [("h", 32767), ("v", 2**31 - 1)]:
-        dif = (b[col] - b["o"]).max() if col == "h" else b[col].max()
-        assert dif <= lim, f"desborde {col}"
-    assert (b["o"] - b["l"]).max() <= 32767 and (b["c"] - b["o"]).abs().max() <= 32767
+    assert b["v"].max() <= 2**31 - 1 and (b["h"] - b["l"]).max() <= 2**31 - 1, "desborde"
     (PROC / "bars_1s").mkdir(parents=True, exist_ok=True)
     enc.write_parquet(PROC / "bars_1s" / f"{mes}.parquet", compression="zstd", compression_level=19, statistics=False)
     integ["bars_1s"] = {"filas": b.height}
@@ -238,8 +236,8 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame) -> dict:
             FROM a GROUP BY t, buy
         HAVING sum(p*q) >= {PISO_ORDEN_USD * ESCALA_P * ESCALA_Q} ORDER BY t""").pl()
     o = o.select(ts=pl.col("t"), buy=pl.col("buy"), q=pl.col("q").cast(pl.Int32),
-                 pmin=pl.col("pmin").cast(pl.Int32), dp=(pl.col("pmax") - pl.col("pmin")).cast(pl.Int16),
-                 n_agg=pl.col("n_agg").cast(pl.Int16))
+                 pmin=pl.col("pmin").cast(pl.Int32), dp=(pl.col("pmax") - pl.col("pmin")).cast(pl.Int32),
+                 n_agg=pl.col("n_agg").cast(pl.Int32))
     (PROC / "ordenes_grandes").mkdir(parents=True, exist_ok=True)
     o.write_parquet(PROC / "ordenes_grandes" / f"{mes}.parquet", compression="zstd", compression_level=19)
     integ["ordenes_grandes"] = {"filas": o.height, "piso_usd": PISO_ORDEN_USD}
