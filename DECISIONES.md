@@ -53,11 +53,15 @@ con y sin · variantes de calendario A–D.
   y el RVOL difieren un poco; se ve en la tabla de F1.
 
 ## Estudio de etiquetas (F5) · a partir de los trades de referencia
-- [2026-09-30] PENDIENTE · Separar F5 en dos: (a) **importancia descriptiva** de cada nivel (reacción vs placebo,
-  corrección BH) sobre todo 2025–2026 fuera de la reserva, **sin walk-forward** (ya lo permite §6c); (b) walk-forward
-  solo cuando un nivel pase a ser una REGLA de la estrategia (filtro de entrada, TP, umbral de tolerancia).
-- [2026-09-30] PENDIENTE · Catalogar los trades de referencia (fecha, lado, entrada, salida, niveles citados),
-  ubicarlos en nuestros datos y usarlos para GENERAR hipótesis de niveles. Como salen de feb–may 2026, esas
-  hipótesis se miden en 2023–2025 (fuera de ese tramo) para no validar con los mismos datos que las sugirieron.
-- [2026-09-30] PENDIENTE · Niveles de su gráfico que no están en el indicador de Juan: EMAs de 4h 13/34/100 (§8 dice
-  EMA 200 de 4h), pwVAL, aVWAP anclados a swings, S/R horizontales, eventos de horario (DO, futures open, NYO, IB).
+- [2026-09-30] CONFIRMADA · F5 en dos partes: (a) **importancia descriptiva** de cada nivel (reacción vs placebo,
+  corrección BH) sobre todo 2025–2026 fuera de la reserva, **sin walk-forward**; (b) walk-forward solo cuando un
+  nivel pase a ser una REGLA de la estrategia (filtro de entrada, TP, umbral de tolerancia).
+- [2026-09-30] CONFIRMADA · Se catalogan los trades de referencia (fecha, lado, entrada, salida, niveles citados),
+  se ubican en nuestros datos y se usan para GENERAR hipótesis. Como salen de feb–may 2026, las hipótesis se miden
+  en 2023–2025.
+- [2026-09-30] CONFIRMADA · Niveles extra en dos grupos:
+  - **Grupo 1 (estudio principal, codificables sin ambigüedad):** EMAs de 4h 13/34/100 (además de la 200 del §8),
+    pwVAL (y pwVAH), VWAP anclados a swings, eventos de horario (DO, apertura de futuros, NYO, IB).
+  - **Grupo 2 (aparte y con menos peso):** S/R horizontales. Son más visuales que codificables: se prueba solo un
+    proxy objetivo (máximos/mínimos de sesiones previas con reacción, números redondos, HVN/LVN) y sus resultados
+    se reportan separados, sin mezclarlos con el grupo 1.

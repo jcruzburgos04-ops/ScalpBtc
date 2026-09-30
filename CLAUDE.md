@@ -400,6 +400,12 @@ con tolerancia de ±N minutos) y se muestran los falsos positivos/negativos dibu
 - **Niveles extra, fuera del indicador de Juan** (vistos en un gráfico de referencia de otro trader).
   **Confirmado: entran al estudio**, con la misma metodología: **pdVWAP, pdVAH, pdVAL** (perfil del día previo),
   **PYH/PYL** (máximo y mínimo del año previo), **EMA 200 de 4h**, **nPOC** (POCs diarios todavía no revisitados).
+- **Niveles del trader de referencia (confirmado 2026-09-30)**, en dos grupos. Grupo 1 (estudio principal):
+  **EMAs de 4h 13/34/100**, **pwVAL/pwVAH**, **VWAP anclados a swings**, **eventos de horario** (DO, apertura de
+  futuros, NYO, IB). Grupo 2 (aparte, menos peso): **S/R horizontales** vía proxy objetivo; se reporta separado.
+- **Dos partes (confirmado 2026-09-30)**: importancia descriptiva de los niveles (placebo + BH) sobre todo
+  2025–2026 sin walk-forward; walk-forward solo para las reglas que salgan de ahí. Los trades de referencia
+  (feb–may 2026) solo generan hipótesis, que se miden en 2023–2025.
 
 ---
 
