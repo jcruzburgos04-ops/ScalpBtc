@@ -15,10 +15,12 @@ con y sin · variantes de calendario A–D.
 - [2026-09-30] PENDIENTE · Tramo de reserva jul–sep 2026 sin mirar hasta F8 (§6c).
 - [2026-09-30] PENDIENTE · Definición del swing del SL y buffer (se resuelve con las marcas, §4.1).
 - [2026-09-30] PENDIENTE · Invalidación: x y m (se calibran con las marcas, §5.1).
-- [2026-09-30] PENDIENTE · Liquidaciones 2025–2026: el archivo público de Binance no tiene liquidationSnapshot
-  para USD-M; solo COIN-M BTCUSD_PERP 2023-06-25 → 2024-10-14. Opciones: (1) proveedor pago (Tardis.dev),
-  (2) agregador (Coinalyze), (3) proxy propio desde aggTrades + OI, validado contra BTCUSD_PERP 2023–2024
-  (ojo: es otro contrato, la validación sería indirecta).
-- [2026-09-30] PENDIENTE · Almacenamiento de aggTrades: ~31 GB en zip 2022-01 → hoy. El contenedor de trabajo es
-  efímero y tiene ~30 GB libres; `data/` no se versiona en git. Hace falta definir dónde viven las barras de 1s
-  (estimado: pocos GB en parquet) para no rehacer la descarga en cada sesión.
+- [2026-09-30] CONFIRMADA · Liquidaciones: solo fuentes **gratuitas** y con **datos reales** (Juan).
+- [2026-09-30] PENDIENTE · Liquidaciones: cuál de las fuentes gratuitas reales se usa y cómo (ver BITACORA 2026-09-30).
+  Ninguna fuente gratuita da liquidaciones intradía completas de BTCUSDT USD-M en 2025–2026.
+- [2026-09-30] CONFIRMADA · Almacenamiento: "optimizar y guardar donde se pueda" (Juan). Se guarda solo lo
+  procesado, comprimido, en el propio repo (`data/proc/`, parquet zstd). Los zips crudos no se guardan (se
+  pueden volver a bajar gratis de Binance).
+- [2026-09-30] SUPUESTO (a confirmar) · Órdenes grandes: se guardan solo las órdenes reconstruidas (ms, lado) con
+  nocional ≥ 100.000 USD (~p95 en mar-2025). El umbral de "grande" (§6b, percentil móvil) tiene que caer por
+  encima de ese piso; si hiciera falta uno más bajo, se reprocesa desde Binance.
