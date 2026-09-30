@@ -149,9 +149,10 @@ def leer_klines(csvs: list[Path]) -> pl.DataFrame:
     dfs = []
     for c in csvs:
         dfs.append(pl.read_csv(c, has_header=tiene_header(c), new_columns=KLINE_COLS,
-                               schema_overrides={"open_time": pl.Int64, "close_time": pl.Int64, "count": pl.Int64}))
+                               schema_overrides={c: (pl.Int64 if c in ("open_time", "close_time") else pl.Float64)
+                                                 for c in KLINE_COLS}))
         c.unlink()
-    return pl.concat(dfs).drop("ignore").sort("open_time")
+    return pl.concat(dfs).drop("ignore").with_columns(pl.col("count").cast(pl.Int64)).sort("open_time")
 
 
 def proc_velas(mes: str, dataset: str, carpeta: str, completas: bool) -> pl.DataFrame:
