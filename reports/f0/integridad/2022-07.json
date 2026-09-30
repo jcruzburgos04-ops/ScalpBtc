@@ -1,0 +1,211 @@
+{
+ "klines_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 44640,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-07-31": 1440
+  },
+  "desacople": {
+   "max_pct": 0.5402,
+   "min_>0.1%": 143,
+   "min_>0.5%": 1
+  }
+ },
+ "index_1m": {
+  "esperados": 44640,
+  "presentes": 35995,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-07-12": 5,
+   "2022-07-24": 1440,
+   "2022-07-25": 1440,
+   "2022-07-27": 1440,
+   "2022-07-28": 1440,
+   "2022-07-30": 1440,
+   "2022-07-31": 1440
+  }
+ },
+ "premium_1m": {
+  "esperados": 44640,
+  "presentes": 44590,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-07-12": 49,
+   "2022-07-13": 1
+  }
+ },
+ "metrics_5m": {
+  "filas": 8928,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "ids": {
+  "n": 62336640,
+  "min_id": 1326913280,
+  "max_id": 1389249919,
+  "ids_duplicados": 0,
+  "saltos_agg_id": 0,
+  "saltos_trade_id": 10284
+ },
+ "bars_1s": {
+  "filas": 2672455
+ },
+ "ordenes_grandes": {
+  "filas": 823532,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 44640,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 282,
+  "minutos_open_distinto": 5699,
+  "minutos_volumen_distinto": 13892,
+  "minutos_count_distinto": 13815,
+  "rachas_corrimiento_borde": 4585,
+  "rachas_residuales": 490,
+  "residual_total_btc": 142.515,
+  "residual_total_trades": 12960,
+  "residuales": [
+   {
+    "desde_utc": "2022-07-04T11:54:00+00:00",
+    "minutos": 3,
+    "dv_btc": 114.447,
+    "dn": 744
+   },
+   {
+    "desde_utc": "2022-07-16T05:57:00+00:00",
+    "minutos": 5,
+    "dv_btc": 28.044,
+    "dn": 130
+   },
+   {
+    "desde_utc": "2022-07-03T10:14:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.032,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2022-07-03T10:17:00+00:00",
+    "minutos": 3,
+    "dv_btc": -0.032,
+    "dn": -3
+   },
+   {
+    "desde_utc": "2022-07-06T10:08:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.032,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2022-07-06T10:10:00+00:00",
+    "minutos": 4,
+    "dv_btc": -0.032,
+    "dn": -3
+   },
+   {
+    "desde_utc": "2022-07-13T14:15:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.032,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2022-07-13T14:17:00+00:00",
+    "minutos": 2,
+    "dv_btc": -0.032,
+    "dn": -3
+   },
+   {
+    "desde_utc": "2022-07-05T00:34:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.024,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-05T00:36:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.024,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-07-31T23:57:00+00:00",
+    "minutos": 3,
+    "dv_btc": 0.024,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-20T10:42:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.015,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-20T10:44:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.015,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-07-18T13:19:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.013,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-18T13:21:00+00:00",
+    "minutos": 2,
+    "dv_btc": -0.013,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-07-08T03:04:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.011,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-08T03:06:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.011,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-07-31T23:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.006,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-07-31T23:07:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.006,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-07-15T03:17:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.004,
+    "dn": 1
+   }
+  ],
+  "volumen_total_klines_btc": 20582376.022,
+  "volumen_total_aggtrades_btc": 20582518.537
+ },
+ "segundos_proceso": 153.0
+}

@@ -1,0 +1,221 @@
+{
+ "klines_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {},
+  "desacople": {
+   "max_pct": 0.3432,
+   "min_>0.1%": 49,
+   "min_>0.5%": 0
+  }
+ },
+ "index_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "premium_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "metrics_5m": {
+  "filas": 8928,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "ids": {
+  "n": 44534075,
+  "min_id": 1389249920,
+  "max_id": 1433783994,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 0,
+  "ids_faltantes": 0,
+  "saltos_trade_id": 12402,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [],
+  "fuente": "daily",
+  "ids_faltantes_vs_mes_anterior": 0
+ },
+ "bars_1s": {
+  "filas": 2662816
+ },
+ "ordenes_grandes": {
+  "filas": 814907,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 44640,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 209,
+  "minutos_open_distinto": 4843,
+  "minutos_volumen_distinto": 12488,
+  "minutos_count_distinto": 12339,
+  "rachas_corrimiento_borde": 4308,
+  "rachas_residuales": 393,
+  "residual_total_btc": 563.317,
+  "residual_total_trades": 20998,
+  "residuales": [
+   {
+    "desde_utc": "2022-08-21T08:10:00+00:00",
+    "minutos": 1,
+    "dv_btc": 496.208,
+    "dn": 2584
+   },
+   {
+    "desde_utc": "2022-08-19T00:21:00+00:00",
+    "minutos": 5,
+    "dv_btc": 67.133,
+    "dn": 344
+   },
+   {
+    "desde_utc": "2022-08-08T06:21:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.034,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2022-08-08T06:23:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.034,
+    "dn": -3
+   },
+   {
+    "desde_utc": "2022-08-19T08:14:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.029,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-08-19T08:17:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.029,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-08-01T00:00:00+00:00",
+    "minutos": 3,
+    "dv_btc": -0.024,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-08-03T08:18:00+00:00",
+    "minutos": 6,
+    "dv_btc": 0.002,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-08-03T08:25:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-08-23T06:35:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.002,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-08-23T06:38:00+00:00",
+    "minutos": 9,
+    "dv_btc": -0.002,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-08-30T01:48:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-08-30T01:50:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-08-30T17:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-08-30T17:07:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-08-01T08:32:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.001,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-08-01T08:37:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.001,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-08-01T17:03:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.001,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-08-01T17:06:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.001,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-08-01T17:40:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.001,
+    "dn": 1
+   }
+  ],
+  "volumen_total_klines_btc": 17221358.216,
+  "volumen_total_aggtrades_btc": 17221921.533
+ },
+ "segundos_proceso": 220.5,
+ "ids_monthly_descartado": {
+  "n": 40556504,
+  "min_id": 1389249920,
+  "max_id": 1433783994,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 1,
+  "ids_faltantes": 3977571,
+  "saltos_trade_id": 11962,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [
+   {
+    "ids": 3977571,
+    "desde_utc": "2022-08-27T23:59:59.923000+00:00",
+    "hasta_utc": "2022-08-31T00:00:00.081000+00:00"
+   }
+  ],
+  "fuente": "monthly"
+ }
+}

@@ -1,0 +1,204 @@
+{
+ "klines_1m": {
+  "esperados": 43200,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 43200,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-06-29": 1440
+  },
+  "desacople": {
+   "max_pct": 0.3397,
+   "min_>0.1%": 38,
+   "min_>0.5%": 0
+  }
+ },
+ "index_1m": {
+  "esperados": 43200,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-06-29": 1440
+  }
+ },
+ "premium_1m": {
+  "esperados": 43200,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-06-29": 1440
+  }
+ },
+ "metrics_5m": {
+  "filas": 8640,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "ids": {
+  "n": 58149575,
+  "min_id": 3307171206,
+  "max_id": 3365320780,
+  "ids_duplicados": 0,
+  "saltos_agg_id": 0,
+  "saltos_trade_id": 170447
+ },
+ "bars_1s": {
+  "filas": 2506808
+ },
+ "ordenes_grandes": {
+  "filas": 733480,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 43200,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 211,
+  "minutos_open_distinto": 1912,
+  "minutos_volumen_distinto": 6242,
+  "minutos_count_distinto": 14283,
+  "rachas_corrimiento_borde": 465,
+  "rachas_residuales": 5584,
+  "residual_total_btc": -4390.738,
+  "residual_total_trades": -9080,
+  "residuales": [
+   {
+    "desde_utc": "2026-06-04T01:42:00+00:00",
+    "minutos": 58,
+    "dv_btc": -368.152,
+    "dn": -3741
+   },
+   {
+    "desde_utc": "2026-06-07T08:04:00+00:00",
+    "minutos": 3,
+    "dv_btc": -345.688,
+    "dn": -90
+   },
+   {
+    "desde_utc": "2026-06-02T19:22:00+00:00",
+    "minutos": 35,
+    "dv_btc": -305.748,
+    "dn": -599
+   },
+   {
+    "desde_utc": "2026-06-05T06:12:00+00:00",
+    "minutos": 28,
+    "dv_btc": -229.482,
+    "dn": -3446
+   },
+   {
+    "desde_utc": "2026-06-02T16:55:00+00:00",
+    "minutos": 7,
+    "dv_btc": -223.696,
+    "dn": -35
+   },
+   {
+    "desde_utc": "2026-06-03T20:41:00+00:00",
+    "minutos": 9,
+    "dv_btc": -134.015,
+    "dn": -137
+   },
+   {
+    "desde_utc": "2026-06-02T14:08:00+00:00",
+    "minutos": 35,
+    "dv_btc": -127.294,
+    "dn": -1391
+   },
+   {
+    "desde_utc": "2026-06-03T00:06:00+00:00",
+    "minutos": 3,
+    "dv_btc": -123.548,
+    "dn": -41
+   },
+   {
+    "desde_utc": "2026-06-01T11:58:00+00:00",
+    "minutos": 19,
+    "dv_btc": -122.554,
+    "dn": -109
+   },
+   {
+    "desde_utc": "2026-06-04T01:14:00+00:00",
+    "minutos": 27,
+    "dv_btc": -116.804,
+    "dn": -632
+   },
+   {
+    "desde_utc": "2026-06-04T11:29:00+00:00",
+    "minutos": 14,
+    "dv_btc": -112.83,
+    "dn": -251
+   },
+   {
+    "desde_utc": "2026-06-04T10:54:00+00:00",
+    "minutos": 4,
+    "dv_btc": -112.125,
+    "dn": -76
+   },
+   {
+    "desde_utc": "2026-06-05T05:54:00+00:00",
+    "minutos": 12,
+    "dv_btc": -105.517,
+    "dn": -358
+   },
+   {
+    "desde_utc": "2026-06-02T15:15:00+00:00",
+    "minutos": 29,
+    "dv_btc": -86.567,
+    "dn": -1115
+   },
+   {
+    "desde_utc": "2026-06-02T23:47:00+00:00",
+    "minutos": 3,
+    "dv_btc": -84.054,
+    "dn": -101
+   },
+   {
+    "desde_utc": "2026-06-02T12:37:00+00:00",
+    "minutos": 7,
+    "dv_btc": -79.545,
+    "dn": -70
+   },
+   {
+    "desde_utc": "2026-06-03T03:27:00+00:00",
+    "minutos": 30,
+    "dv_btc": -69.008,
+    "dn": -187
+   },
+   {
+    "desde_utc": "2026-06-04T00:24:00+00:00",
+    "minutos": 28,
+    "dv_btc": -62.706,
+    "dn": -885
+   },
+   {
+    "desde_utc": "2026-06-05T15:35:00+00:00",
+    "minutos": 19,
+    "dv_btc": -54.851,
+    "dn": 34
+   },
+   {
+    "desde_utc": "2026-06-03T12:24:00+00:00",
+    "minutos": 4,
+    "dv_btc": -46.017,
+    "dn": -94
+   }
+  ],
+  "volumen_total_klines_btc": 6082397.959,
+  "volumen_total_aggtrades_btc": 6078007.221
+ },
+ "segundos_proceso": 132.3
+}

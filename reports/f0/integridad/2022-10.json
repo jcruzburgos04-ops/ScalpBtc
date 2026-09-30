@@ -1,0 +1,227 @@
+{
+ "klines_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 44640,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-10-02": 1440
+  },
+  "desacople": {
+   "max_pct": 1.1151,
+   "min_>0.1%": 34,
+   "min_>0.5%": 3
+  }
+ },
+ "index_1m": {
+  "esperados": 44640,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-10-02": 1440
+  }
+ },
+ "premium_1m": {
+  "esperados": 44640,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2022-10-02": 1440
+  }
+ },
+ "metrics_5m": {
+  "filas": 8928,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "ids": {
+  "n": 28597576,
+  "min_id": 1476178541,
+  "max_id": 1504776116,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 0,
+  "ids_faltantes": 0,
+  "saltos_trade_id": 8975,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [],
+  "fuente": "daily",
+  "ids_faltantes_vs_mes_anterior": 0
+ },
+ "bars_1s": {
+  "filas": 2639805
+ },
+ "ordenes_grandes": {
+  "filas": 663557,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 44640,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 187,
+  "minutos_open_distinto": 3271,
+  "minutos_volumen_distinto": 9427,
+  "minutos_count_distinto": 9404,
+  "rachas_corrimiento_borde": 3405,
+  "rachas_residuales": 300,
+  "residual_total_btc": 0.0,
+  "residual_total_trades": 10619,
+  "residuales": [
+   {
+    "desde_utc": "2022-10-09T04:53:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.207,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-10-09T04:55:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.207,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-10-27T14:46:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.141,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-10-27T14:48:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.141,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-10-03T00:06:00+00:00",
+    "minutos": 6,
+    "dv_btc": 0.033,
+    "dn": 4
+   },
+   {
+    "desde_utc": "2022-10-03T00:13:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.033,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-10-26T10:19:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.032,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2022-10-26T10:21:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.032,
+    "dn": -3
+   },
+   {
+    "desde_utc": "2022-10-04T14:08:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.031,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-10-04T14:11:00+00:00",
+    "minutos": 2,
+    "dv_btc": -0.031,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-10-07T16:20:00+00:00",
+    "minutos": 3,
+    "dv_btc": 0.017,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-10-07T16:24:00+00:00",
+    "minutos": 4,
+    "dv_btc": -0.017,
+    "dn": 100
+   },
+   {
+    "desde_utc": "2022-10-17T10:30:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.014,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-10-17T10:32:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.014,
+    "dn": -2
+   },
+   {
+    "desde_utc": "2022-10-17T15:28:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.007,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-10-17T15:31:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.007,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-10-06T04:11:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.005,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-10-06T04:13:00+00:00",
+    "minutos": 4,
+    "dv_btc": -0.005,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-10-07T07:03:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2022-10-07T07:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -2
+   }
+  ],
+  "volumen_total_klines_btc": 16625843.584,
+  "volumen_total_aggtrades_btc": 16625843.584
+ },
+ "segundos_proceso": 173.8,
+ "ids_monthly_descartado": {
+  "n": 27752738,
+  "min_id": 1476178541,
+  "max_id": 1504776116,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 1,
+  "ids_faltantes": 844838,
+  "saltos_trade_id": 8786,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [
+   {
+    "ids": 844838,
+    "desde_utc": "2022-10-28T23:59:59.828000+00:00",
+    "hasta_utc": "2022-10-30T00:00:00.065000+00:00"
+   }
+  ],
+  "fuente": "monthly"
+ }
+}

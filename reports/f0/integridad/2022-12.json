@@ -1,0 +1,198 @@
+{
+ "klines_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {},
+  "desacople": {
+   "max_pct": 0.3631,
+   "min_>0.1%": 24,
+   "min_>0.5%": 0
+  }
+ },
+ "index_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "premium_1m": {
+  "esperados": 44640,
+  "presentes": 44640,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "metrics_5m": {
+  "filas": 8928,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "ids": {
+  "n": 16952163,
+  "min_id": 1541661868,
+  "max_id": 1558614030,
+  "ids_duplicados": 0,
+  "saltos_agg_id": 0,
+  "saltos_trade_id": 4398
+ },
+ "bars_1s": {
+  "filas": 2573875
+ },
+ "ordenes_grandes": {
+  "filas": 342993,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 44640,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 111,
+  "minutos_open_distinto": 1753,
+  "minutos_volumen_distinto": 5445,
+  "minutos_count_distinto": 5468,
+  "rachas_corrimiento_borde": 2155,
+  "rachas_residuales": 184,
+  "residual_total_btc": 0.0,
+  "residual_total_trades": 7853,
+  "residuales": [
+   {
+    "desde_utc": "2022-12-27T07:09:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.072,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-27T07:11:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.072,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-23T09:03:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.043,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-23T09:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.043,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-24T16:03:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.03,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-24T16:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.03,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-30T11:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.016,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-30T11:07:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.016,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-29T15:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.008,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-29T15:07:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.008,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-02T09:03:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-02T09:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-06T12:02:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-06T12:05:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-06T22:02:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-06T22:04:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-12T16:03:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.002,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-12T16:05:00+00:00",
+    "minutos": 4,
+    "dv_btc": -0.002,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2022-12-01T06:25:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.001,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2022-12-01T06:27:00+00:00",
+    "minutos": 3,
+    "dv_btc": -0.001,
+    "dn": -1
+   }
+  ],
+  "volumen_total_klines_btc": 9702408.711,
+  "volumen_total_aggtrades_btc": 9702408.711
+ },
+ "segundos_proceso": 85.6
+}
