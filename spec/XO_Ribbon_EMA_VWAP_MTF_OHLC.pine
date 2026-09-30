@@ -1,0 +1,1207 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//  XO / Ribbon / Combos EMA  ·  VWAP  ·  Perfil diario  ·  Niveles MTF
+//  Pine Script v6
+//
+//  Base: Trader XO Macro Trend Scanner — © btc_charlie / @TheParagonGrp (MPL 2.0)
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  REPARTO POR VISIÓN (§1). Los tres cortes son inputs; los defaults dejan:
+//
+//    BAJA     1m … 30m    medias: Trader XO 12/25
+//                         curvas VWAP: sesión + semana (las ÚNICAS con bandas σ)
+//                         + curva rolling VWAP 24h
+//    MEDIA    45m … 12h   medias: cinta 13/21/34 (sin anclar)
+//    DIARIA   1D          medias: 21/34 · 55/115 (acciones) o 100/200
+//                         (cripto) · 300/600 ancladas a 1D
+//    SEMANAL  2D …        medias: 63/123 ancladas a 1W
+//
+//  Las etiquetas usan los mismos cortes, con MEDIA = 45m … 12h y ALTA = 1D
+//  en adelante (diaria + semanal). Qué etiqueta va en cada visión está fijado
+//  en §12, cada una con su propio interruptor por visión:
+//
+//    BAJA   dVWAP dVAH dVAL (perfil) · DO · WO · MNDAY-H/L · PWH PWL · pwVWAP
+//           rVAH rVAL (rolling 24h) · mVWAP mVAH mVAL · 7D 30D 90D 365D
+//    MEDIA  PQH PQL · MO · yVWAP yVAH yVAL · pqVWAP pqVAH pqVAL
+//           pmVWAP pmVAH pmVAL · mVWAP mVAH mVAL · 7D 30D 90D 365D
+//    ALTA   yVWAP · YO · 7D 30D 90D 365D
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  AUDITORÍA DE LAS ETIQUETAS ("sólo aparecen los rolling")
+//
+//  En la versión anterior las 60 etiquetas pasaban por el MISMO camino de
+//  dibujo; la única diferencia entre los rolling 7D/30D/90D/365D y el resto
+//  eran los interruptores maestros: todo lo VWAP colgaba de "Activar módulo"
+//  del §11, todo lo OHLC de "Activar módulo" del §10, y los rolling de ninguno
+//  de los dos. Que en TODAS las visiones sobrevivan sólo los rolling es la
+//  firma exacta de esos dos maestros evaluando falso en la instancia del
+//  gráfico — TradingView conserva los valores guardados de la instancia
+//  cuando se reemplaza el código en el mismo indicador, y la v2 metió ~30
+//  inputs nuevos delante. Además rVAH/rVAL colgaban de "Activar" del rolling
+//  24h, que venía APAGADO por default: ésos no aparecían nunca.
+//
+//  Qué cambia: no hay más interruptores maestros. Cada etiqueta tiene su
+//  propio interruptor dentro de su visión, y el rolling 24h se calcula
+//  siempre en la baja (la curva es opcional; las etiquetas no dependen de
+//  ella). Como la lista de inputs cambió otra vez, hay que QUITAR el
+//  indicador del gráfico y agregarlo de nuevo (o Predeterminados →
+//  Restablecer configuración) para que arranque de los defaults.
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  dVAH / dVAL DE PERFIL (§10)
+//
+//  VWAP ± 1σ y el área de valor de un perfil de volumen NO son lo mismo:
+//
+//    · ±1σ es simétrico alrededor del VWAP: sólo mide dispersión.
+//    · El área de valor sale de un histograma de volumen por precio: arranca
+//      en el POC (la fila de más volumen) y se expande fila a fila hacia el
+//      lado con más volumen hasta juntar el 70 % del total. Es asimétrica y
+//      está centrada en el POC, no en el VWAP.
+//
+//  El anclaje es el mismo (inicio del día); lo que cambia es el método, y en
+//  un día con volumen cargado hacia un extremo la diferencia es de varias
+//  décimas de σ. El VWAP en cambio es UNO solo: el VWAP anclado al inicio del
+//  día y el VWAP de los datos del perfil son el mismo número. Lo que el
+//  perfil aporta como centro es el POC (etiqueta dPOC, opcional).
+//
+//  Para que las tres etiquetas valgan lo mismo en 1m, 5m o 30m el perfil se
+//  arma siempre con velas de 1m vía request.security_lower_tf (resolución
+//  configurable), repartiendo el volumen de cada vela proporcionalmente a la
+//  porción de su rango que cae en cada fila. Defaults 24 filas y 70 %, que
+//  son los del Volume Profile de TradingView.
+//
+//  Las curvas VWAP del §8 siguen con sus bandas σ: el σ1 de la curva de
+//  sesión y la etiqueta dVAH ya no coinciden, y es a propósito.
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  CONSISTENCIA ENTRE TIMEFRAMES
+//
+//  Todo nivel se calcula en un TF fijo, nunca en el del gráfico:
+//    · DO WO MO YO / PWH PWL / PQH PQL: request.security contra D, W, M, 12M
+//      y 3M (open con lookahead_on y high[1]/low[1] con lookahead_on: los dos
+//      idiomas no repintan). Antes DO/WO/PW salían de las velas del gráfico,
+//      y en 1m con 5000 velas de historial la semana previa no entra.
+//    · MNDAY-H/L: velas diarias. pwVWAP y m/pm: 60m. y/pq: diario.
+//    · Perfil diario: velas de 1m.
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  COMBOS DE EMAs (§4)
+//
+//  De cada combo se dibuja SÓLO la lenta como línea; la rápida se plotea con
+//  color `na` y sólo existe para armar la nube. La nube del 21/34 es la única
+//  que vira: verde con la 21 arriba de la 34, roja con la 21 abajo. Vía exacta
+//  (request.security contra el TF ancla) cuando el gráfico llega o supera el
+//  ancla; vía escalada sólo por debajo.
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  PRESUPUESTO DE PLOT COUNTS (límite duro = 64)
+//
+//    Cinta Trader XO (§5) ..........  7
+//    Flechas Bull / Bear del XO .....  4
+//    Banco de 3 pares (§6) ......... 15   ← 6 plots + 3 fills
+//    VWAP curva 1 .................. 13   (VWAP + σ1 + σ2 + 3 nubes)
+//    VWAP curva 2 .................. 13
+//    Rolling VWAP 24h ..............  2
+//    Rolling VWAP 365d .............  2
+//    ──────────────────────────────────
+//    TOTAL ......................... 56   → 8 de margen
+//
+//  BANCO DE TRES PARES (§6). Ribbon, combos diarios y combo semanal son
+//  excluyentes, así que comparten seis slots de plot y tres fills:
+//
+//    slot       Ribbon      Combos diarios   Semanal    línea
+//    ─────────────────────────────────────────────────────────
+//    1 rápida   EMA 13      EMA 21           EMA 63     no
+//    1 lenta    EMA 21      EMA 34           EMA 123    sí
+//    2 rápida   EMA 21      EMA 55 / 100     —          no
+//    2 lenta    EMA 34      EMA 115 / 200    —          sí
+//    3 rápida   —           EMA 300          —          no
+//    3 lenta    —           EMA 600          —          sí
+//    fill 1     nube 13-21  NUBE 21/34 ↑↓    nube
+//    fill 2     nube 21-34  nube combo 2     —
+//    fill 3     —           nube 300/600     —
+//
+// ───────────────────────────────────────────────────────────────────────────
+//  ROLLING VWAP MULTI-DÍA (§9b)
+//
+//  Ventana por TIEMPO CALENDARIO (time ≥ time − días·86400000, borde
+//  inclusivo), la misma semántica del script de referencia "rVWAP x4", sobre
+//  velas diarias y fuente hlc3. Contar N velas diarias en una acción abarca
+//  ~1,4 veces N días calendario (365 velas ≈ 511 días). Mientras no haya
+//  historial para la ventana llena el valor es el VWAP anclado al inicio del
+//  histórico, con asterisco, y la transición es continua.
+// ═══════════════════════════════════════════════════════════════════════════
+
+//@version=6
+// max_bars_back: el puntero del §9b referencia _cpv[_n] con _n de tipo serie
+// dentro de request.security, y el autodetector de buffer no propaga ese
+// offset a través del contexto pedido.
+indicator('XO/Ribbon/EMA + VWAP + Perfil + Niveles', overlay = true, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §0 · NÚCLEO TEMPORAL
+// ═══════════════════════════════════════════════════════════════════════════
+chgD = timeframe.change("D")
+
+tfSec = timeframe.in_seconds()
+isHTF = tfSec >= 86400
+isLTF = not isHTF
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §1 · VISIONES Y MOTOR DE MEDIAS
+// ═══════════════════════════════════════════════════════════════════════════
+g01      = "① Visiones y motor de medias"
+tfB1     = input.timeframe("45", "Corte BAJA → MEDIA",  group = g01, inline = "bd", tooltip = "Por debajo de este TF manda la visión baja. Default 45m: 1m…30m quedan en la baja.")
+tfB2     = input.timeframe("D",  "MEDIA → DIARIA",      group = g01, inline = "bd", tooltip = "Desde este TF manda la visión diaria. Default 1D: la cinta 13/21/34 cubre 45m…12h.")
+tfB3     = input.timeframe("2D", "DIARIA → SEMANAL",    group = g01, inline = "bd", tooltip = "Desde este TF manda la visión semanal. Default 2D: apenas pasás de 1D se apagan los tres combos diarios y aparece el 63/123 semanal.")
+motor    = input.string("Automático por visión", "Sistema de medias", options = ["Automático por visión", "Trader XO", "Ribbon 13/21/34", "Combos diarios 21/34 · combo 2 · 300/600", "Combo semanal 63/123", "Ninguno"], group = g01, tooltip = "Automático: XO en la baja, cinta 13/21/34 en la media, los tres combos en la diaria y el 63/123 en la semanal. Excluyente siempre.")
+hardGate = input.bool(true, "Respetar las visiones aunque se fuerce el sistema", group = g01, tooltip = "Encendido, cada sistema sólo se dibuja dentro de su visión aunque lo elijas a mano.")
+
+secB1 = timeframe.in_seconds(tfB1)
+secB2 = timeframe.in_seconds(tfB2)
+secB3 = timeframe.in_seconds(tfB3)
+
+bandA = tfSec <  secB1                                  // baja    · 1m … 30m
+bandB = tfSec >= secB1 and tfSec < secB2                // media   · 45m … 12h
+bandC = tfSec >= secB2 and tfSec < secB3                // diaria  · 1D
+bandD = tfSec >= secB3                                  // semanal · 2D …
+
+auto   = motor == "Automático por visión"
+wantXO = motor == "Trader XO"                                or (auto and bandA)
+wantRb = motor == "Ribbon 13/21/34"                          or (auto and bandB)
+wantDy = motor == "Combos diarios 21/34 · combo 2 · 300/600"  or (auto and bandC)
+wantWk = motor == "Combo semanal 63/123"                     or (auto and bandD)
+
+useXO  = wantXO and (not hardGate or bandA)
+useRib = wantRb and (not hardGate or bandB)
+useDay = wantDy and (not hardGate or bandC)
+useWk  = wantWk and (not hardGate or bandD)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §2 · TRADER XO — cálculo y señales                       [4 plot counts]
+//      Las líneas y la cinta se dibujan en §5.
+// ═══════════════════════════════════════════════════════════════════════════
+g02      = "② Trader XO · visión BAJA"
+xoSrc    = input.source(close, "Fuente", group = g02)
+xoFast   = input.int(12, "EMA rápida", minval = 1, group = g02, inline = "xl")
+xoSlow   = input.int(25, "lenta",      minval = 1, group = g02, inline = "xl")
+xoBoth   = input.bool(true, "Mostrar ambas EMAs (si no, sólo la consolidada)", group = g02)
+xoCons   = input.int(25, "EMA consolidada", minval = 1, group = g02)
+xoRibbon = input.bool(true, "Rellenar la cinta", group = g02, inline = "xr")
+xoRibTr  = input.int(85, "Transp.", minval = 0, maxval = 100, group = g02, inline = "xr")
+xoMid    = input.bool(false, "Línea media de la cinta", group = g02)
+xoUpC    = input.color(#26A69A, "Alcista", group = g02, inline = "xc")
+xoDnC    = input.color(#EF5350, "Bajista", group = g02, inline = "xc")
+xoNeuC   = input.color(#FF530D, "Neutral", group = g02, inline = "xc")
+xoSig    = input.bool(true, "Señales Bull / Bear", group = g02)
+
+xoF = ta.ema(xoSrc, xoFast)
+xoS = ta.ema(xoSrc, xoSlow)
+xoB = ta.ema(xoSrc, xoCons)
+
+xoCol = xoF > xoS ? xoUpC : xoF < xoS ? xoDnC : xoNeuC
+
+// Auditoría: countBuy/countSell del original equivalen a un cruce simple.
+xoUp = ta.crossover(xoF, xoS)
+xoDn = ta.crossunder(xoF, xoS)
+
+plotshape(useXO and xoSig and xoUp, title = "XO · Bull", text = "Bull", style = shape.triangleup,   location = location.belowbar, color = xoUpC, textcolor = color.black, size = size.tiny)  // 2
+plotshape(useXO and xoSig and xoDn, title = "XO · Bear", text = "Bear", style = shape.triangledown, location = location.abovebar, color = xoDnC, textcolor = color.black, size = size.tiny)  // 2
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §3 · CINTA 13 / 21 / 34 — visión MEDIA                    [0 plot counts]
+//      Fibonacci clásico sobre el TF del gráfico. A diferencia de los combos
+//      del §4 NO está anclada: en la visión media el punto es justamente leer
+//      la estructura del timeframe que estás mirando.
+// ═══════════════════════════════════════════════════════════════════════════
+g03    = "③ Cinta 13/21/34 · visión MEDIA"
+rbSrc  = input.source(close, "Fuente", group = g03)
+rbF    = input.int(13, "Rápida", minval = 1, group = g03, inline = "rl")
+rbP    = input.int(21, "Pivote", minval = 1, group = g03, inline = "rl")
+rbS    = input.int(34, "Lenta",  minval = 1, group = g03, inline = "rl")
+rbUpC  = input.color(#26A69A, "Alcista", group = g03, inline = "rc")
+rbDnC  = input.color(#EF5350, "Bajista", group = g03, inline = "rc")
+rbLnC  = input.color(color.new(#D1D4DC, 25), "Líneas", group = g03, inline = "rc")
+rbTr1  = input.int(70, "Transp. nube rápida", minval = 0, maxval = 100, group = g03, inline = "rt")
+rbTr2  = input.int(85, "lenta",               minval = 0, maxval = 100, group = g03, inline = "rt")
+
+rb1 = ta.ema(rbSrc, rbF)
+rb2 = ta.ema(rbSrc, rbP)
+rb3 = ta.ema(rbSrc, rbS)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §4 · COMBOS DE EMAs — visiones DIARIA y SEMANAL            [0 plot counts]
+//
+//  CONVERSIÓN DE LONGITUD ENTRE TIMEFRAMES. La conversión intuitiva
+//  (L × ratio) es sólo una aproximación de primer orden. Lo que hay que
+//  preservar es la TASA DE DECAIMIENTO por unidad de tiempo calendario, y esa
+//  es multiplicativa:
+//
+//      α_gráfico = 1 − (1 − α_ancla)^k      k = velas del ancla por vela
+//      L_gráfico = 2/α_gráfico − 1
+//
+//  Para k chico las dos coinciden (EMA 21 diaria en 6h: 84,0 lineal contra
+//  83,95 exacta). Para k grande divergen y cambia el redondeo.
+//
+//  RE10004. ta.ema se siembra con ta.sma, que usa ta.sum, y ta.sum no mira
+//  más de 5000 velas atrás. Una EMA 600 diaria escalada a 45m son 19192
+//  velas: el script explota en la barra 0 aunque esa curva no se dibuje
+//  nunca, porque Pine evalúa TODAS las series haya o no plot. Si un combo no
+//  entra, sus longitudes pasan a 2 y ese combo no se dibuja.
+// ═══════════════════════════════════════════════════════════════════════════
+g04     = "④ Combos de EMAs · visiones DIARIA y SEMANAL"
+emaMode = input.string("Automático (exacto donde se puede)", "Cálculo", options = ["Automático (exacto donde se puede)", "Escalado (suave)", "Exacto (TF ancla)"], group = g04, tooltip = "Automático (recomendado): vía exacta cuando el TF del gráfico llega o supera el ancla, escalada sólo por debajo. Es lo único que garantiza que la curva caiga en el MISMO precio en 12h, 1D y 1W.")
+emaDTF  = input.timeframe("D", "TF ancla de los combos diarios", group = g04)
+emaWTF  = input.timeframe("W", "TF ancla del combo semanal",     group = g04)
+emaSrc  = input.source(close, "Fuente", group = g04)
+emaFast = input.bool(false, "Mostrar también las líneas rápidas de cada combo", group = g04, tooltip = "Apagado (default): de cada combo se ve sólo la lenta, y la rápida existe nada más que para armar la nube.")
+
+c1On  = input.bool(true, "Combo 1", group = g04, inline = "c1")
+c1F   = input.int(21, "rápida", minval = 2, maxval = 4000, group = g04, inline = "c1")
+c1S   = input.int(34, "lenta",  minval = 2, maxval = 4000, group = g04, inline = "c1")
+c1LnC = input.color(color.new(#D1D4DC, 10), "Línea", group = g04, inline = "c1c")
+c1Up  = input.color(#26A69A, "Nube ↑", group = g04, inline = "c1c")
+c1Dn  = input.color(#EF5350, "↓",      group = g04, inline = "c1c")
+c1Tr  = input.int(78, "Transp.", minval = 0, maxval = 100, group = g04, inline = "c1c", tooltip = "La nube del combo 1 es la única que vira de color: verde mientras la rápida va arriba de la lenta, roja mientras va abajo.")
+
+c2On  = input.bool(true, "Combo 2", group = g04)
+c2FSt = input.int(55,  "Acciones · rápida", minval = 2, maxval = 4000, group = g04, inline = "c2s")
+c2SSt = input.int(115, "lenta",             minval = 2, maxval = 4000, group = g04, inline = "c2s")
+c2FCr = input.int(100, "Cripto · rápida",   minval = 2, maxval = 4000, group = g04, inline = "c2c")
+c2SCr = input.int(200, "lenta",             minval = 2, maxval = 4000, group = g04, inline = "c2c")
+astMd = input.string("Automático", "Tipo de activo", options = ["Automático", "Acciones", "Cripto"], group = g04, tooltip = "Automático: se toma como cripto si TradingView lo clasifica como crypto, si el ticker es un perpetuo (termina en .P) o si cotiza contra USDT / USDC / BUSD / FDUSD. Todo lo demás (acciones, CEDEARs, índices, futuros, forex) usa el par de acciones. Forzalo a mano si algún símbolo cae del lado equivocado.")
+
+// Detección del tipo de activo. syminfo.* es "simple": se resuelve una vez
+// al cargar, así que las longitudes siguen siendo simple int para ta.ema.
+isCryptoAuto = syminfo.type == "crypto" or str.endswith(syminfo.ticker, ".P") or syminfo.currency == "USDT" or syminfo.currency == "USDC" or syminfo.currency == "BUSD" or syminfo.currency == "FDUSD"
+isCrypto = astMd == "Cripto" or (astMd == "Automático" and isCryptoAuto)
+c2F = isCrypto ? c2FCr : c2FSt
+c2S = isCrypto ? c2SCr : c2SSt
+c2LnC = input.color(#42A5F5, "Línea", group = g04, inline = "c2c")
+c2CldC= input.color(#42A5F5, "Nube",  group = g04, inline = "c2c")
+c2Tr  = input.int(88, "Transp.", minval = 0, maxval = 100, group = g04, inline = "c2c")
+
+c3On  = input.bool(true, "Combo 3", group = g04, inline = "c3")
+c3F   = input.int(300, "rápida", minval = 2, maxval = 4000, group = g04, inline = "c3")
+c3S   = input.int(600, "lenta",  minval = 2, maxval = 4000, group = g04, inline = "c3")
+c3LnC = input.color(#AB47BC, "Línea", group = g04, inline = "c3c")
+c3CldC= input.color(#AB47BC, "Nube",  group = g04, inline = "c3c")
+c3Tr  = input.int(88, "Transp.", minval = 0, maxval = 100, group = g04, inline = "c3c")
+
+cwOn  = input.bool(true, "Combo semanal", group = g04, inline = "cw")
+cwF   = input.int(63,  "rápida", minval = 2, maxval = 4000, group = g04, inline = "cw")
+cwS   = input.int(123, "lenta",  minval = 2, maxval = 4000, group = g04, inline = "cw")
+cwLnC = input.color(#FFB74D, "Línea", group = g04, inline = "cwc")
+cwCldC= input.color(#FFB74D, "Nube",  group = g04, inline = "cwc")
+cwTr  = input.int(85, "Transp.", minval = 0, maxval = 100, group = g04, inline = "cwc")
+
+f_scLen(_len, _k) =>
+    float _a  = 2.0 / (_len + 1.0)
+    float _ae = 1.0 - math.pow(1.0 - _a, _k)
+    int(math.min(100000, math.max(2, math.round(2.0 / math.max(1e-12, _ae) - 1.0))))
+
+emaDSec = timeframe.in_seconds(emaDTF)
+emaWSec = timeframe.in_seconds(emaWTF)
+float kD = float(tfSec) / math.max(1.0, float(emaDSec))
+float kW = float(tfSec) / math.max(1.0, float(emaWSec))
+
+emaAuto  = emaMode == "Automático (exacto donde se puede)"
+emaForce = emaMode == "Exacto (TF ancla)"
+emaDEx   = emaForce or (emaAuto and tfSec >= emaDSec)
+emaWEx   = emaForce or (emaAuto and tfSec >= emaWSec)
+
+L1Fr = f_scLen(c1F, kD)
+L1Sr = f_scLen(c1S, kD)
+L2Fr = f_scLen(c2F, kD)
+L2Sr = f_scLen(c2S, kD)
+L3Fr = f_scLen(c3F, kD)
+L3Sr = f_scLen(c3S, kD)
+LwFr = f_scLen(cwF, kW)
+LwSr = f_scLen(cwS, kW)
+
+fit1 = L1Fr < 5000 and L1Sr < 5000
+fit2 = L2Fr < 5000 and L2Sr < 5000
+fit3 = L3Fr < 5000 and L3Sr < 5000
+fitW = LwFr < 5000 and LwSr < 5000
+
+sc1 = not emaDEx and fit1
+sc2 = not emaDEx and fit2
+sc3 = not emaDEx and fit3
+scW = not emaWEx and fitW
+
+e1Fsc = ta.ema(emaSrc, sc1 ? L1Fr : 2)
+e1Ssc = ta.ema(emaSrc, sc1 ? L1Sr : 2)
+e2Fsc = ta.ema(emaSrc, sc2 ? L2Fr : 2)
+e2Ssc = ta.ema(emaSrc, sc2 ? L2Sr : 2)
+e3Fsc = ta.ema(emaSrc, sc3 ? L3Fr : 2)
+e3Ssc = ta.ema(emaSrc, sc3 ? L3Sr : 2)
+ewFsc = ta.ema(emaSrc, scW ? LwFr : 2)
+ewSsc = ta.ema(emaSrc, scW ? LwSr : 2)
+
+// Cuando un conjunto no usa la vía exacta se pide el propio TF del gráfico en
+// vez del ancla: así en timeframes bajos no se bajan velas diarias al pedo.
+emaDReqTF = emaDEx ? emaDTF : timeframe.period
+emaWReqTF = emaWEx ? emaWTF : timeframe.period
+
+[x1F, x1S, x2F, x2S, x3F, x3S] = request.security(syminfo.tickerid, emaDReqTF, [ta.ema(emaSrc, c1F), ta.ema(emaSrc, c1S), ta.ema(emaSrc, c2F), ta.ema(emaSrc, c2S), ta.ema(emaSrc, c3F), ta.ema(emaSrc, c3S)], lookahead = barmerge.lookahead_off)
+[xwF, xwS] = request.security(syminfo.tickerid, emaWReqTF, [ta.ema(emaSrc, cwF), ta.ema(emaSrc, cwS)], lookahead = barmerge.lookahead_off)
+
+e1F = emaDEx ? x1F : e1Fsc
+e1S = emaDEx ? x1S : e1Ssc
+e2F = emaDEx ? x2F : e2Fsc
+e2S = emaDEx ? x2S : e2Ssc
+e3F = emaDEx ? x3F : e3Fsc
+e3S = emaDEx ? x3S : e3Ssc
+ewF = emaWEx ? xwF : ewFsc
+ewS = emaWEx ? xwS : ewSsc
+
+onC1 = useDay and c1On and (emaDEx or fit1)
+onC2 = useDay and c2On and (emaDEx or fit2)
+onC3 = useDay and c3On and (emaDEx or fit3)
+onCW = useWk  and cwOn and (emaWEx or fitW)
+
+// Sesgo de la nube del combo 1. >= para que un empate exacto no parpadee.
+c1Col = e1F >= e1S ? c1Up : c1Dn
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §5 · CINTA TRADER XO — plots propios                     [7 plot counts]
+// ═══════════════════════════════════════════════════════════════════════════
+g05  = "⑤ Cinta Trader XO · estilo"
+xoWd = input.int(2, "Grosor de las líneas", minval = 1, maxval = 5, group = g05)
+
+xoV1 = xoBoth ? xoF : xoB
+xoV2 = xoBoth ? xoS : na
+
+pXF = plot(useXO ? xoV1 : na, "XO · EMA rápida / consolidada", color = xoCol, linewidth = xoWd)          // 2
+pXS = plot(useXO ? xoV2 : na, "XO · EMA lenta",                color = xoCol, linewidth = xoWd)          // 2
+fill(pXF, pXS, color = useXO and xoBoth and xoRibbon ? color.new(xoCol, xoRibTr) : na, title = "XO · Cinta")  // 1
+plot(useXO and xoBoth and xoMid ? (xoF + xoS) / 2 : na, "XO · Línea media", color = xoCol, linewidth = 1)     // 2
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §6 · BANCO COMPARTIDO DE TRES PARES                     [15 plot counts]
+//
+//  Ribbon 13/21/34 · combos diarios · combo semanal. Reparto de slots en la
+//  cabecera. Se dibuja la LENTA de cada par; la rápida se plotea con color
+//  `na`: el plot existe (su valor sigue en la ventana de datos) pero la línea
+//  no se ve. fill() trabaja con los VALORES de los plots, no con sus colores,
+//  así que las nubes se dibujan igual.
+//
+//  El Ribbon muestra sólo su línea del medio (la 21 = lenta del par 1); la 13
+//  y la 34 quedan ocultas salvo que prendas el interruptor.
+// ═══════════════════════════════════════════════════════════════════════════
+g06       = "⑥ Cintas compartidas · estilo"
+bankWd    = input.int(2, "Grosor de las líneas", minval = 1, maxval = 5, group = g06, tooltip = "Compartido por los tres sistemas: linewidth exige un valor de tipo input, no puede depender del sistema activo.")
+rbShowAll = input.bool(false, "Ribbon: mostrar también la 13 y la 34", group = g06)
+
+// — Valores
+p1Fv = useRib ? rb1 : useDay ? (onC1 ? e1F : na) : useWk ? (onCW ? ewF : na) : na
+p1Sv = useRib ? rb2 : useDay ? (onC1 ? e1S : na) : useWk ? (onCW ? ewS : na) : na
+p2Fv = useRib ? rb2 : useDay ? (onC2 ? e2F : na) : na
+p2Sv = useRib ? rb3 : useDay ? (onC2 ? e2S : na) : na
+p3Fv = useDay and onC3 ? e3F : na
+p3Sv = useDay and onC3 ? e3S : na
+
+// — Colores de línea
+p1Fc = useRib ? (rbShowAll ? rbLnC : na) : useDay ? (onC1 and emaFast ? c1LnC : na) : useWk ? (onCW and emaFast ? cwLnC : na) : na
+p1Sc = useRib ? rbLnC                    : useDay ? (onC1 ? c1LnC : na)             : useWk ? (onCW ? cwLnC : na)             : na
+p2Fc = useRib ? color(na)                : useDay ? (onC2 and emaFast ? c2LnC : na) : na
+p2Sc = useRib ? (rbShowAll ? rbLnC : na) : useDay ? (onC2 ? c2LnC : na)             : na
+p3Fc = useDay and onC3 and emaFast ? c3LnC : na
+p3Sc = useDay and onC3 ? c3LnC : na
+
+// — Colores de nube
+f1c = useRib ? color.new(rb1 >= rb2 ? rbUpC : rbDnC, rbTr1) : useDay ? (onC1 ? color.new(c1Col, c1Tr) : na) : useWk ? (onCW ? color.new(cwCldC, cwTr) : na) : na
+f2c = useRib ? color.new(rb2 >= rb3 ? rbUpC : rbDnC, rbTr2) : useDay ? (onC2 ? color.new(c2CldC, c2Tr) : na) : na
+f3c = useDay and onC3 ? color.new(c3CldC, c3Tr) : na
+
+pB1F = plot(p1Fv, "Par 1 rápida · Rib 13 / EMA 21 / EMA 63",  color = p1Fc, linewidth = bankWd)  // 2
+pB1S = plot(p1Sv, "Par 1 lenta · Rib 21 / EMA 34 / EMA 123",   color = p1Sc, linewidth = bankWd)  // 2
+pB2F = plot(p2Fv, "Par 2 rápida · Rib 21 / EMA 55 ó 100",      color = p2Fc, linewidth = bankWd)  // 2
+pB2S = plot(p2Sv, "Par 2 lenta · Rib 34 / EMA 115 ó 200",      color = p2Sc, linewidth = bankWd)  // 2
+pB3F = plot(p3Fv, "Par 3 rápida · EMA 300",                    color = p3Fc, linewidth = bankWd)  // 2
+pB3S = plot(p3Sv, "Par 3 lenta · EMA 600",                     color = p3Sc, linewidth = bankWd)  // 2
+
+fill(pB1F, pB1S, color = f1c, title = "Nube par 1 · 21/34 alcista-bajista")  // 1
+fill(pB2F, pB2S, color = f2c, title = "Nube par 2 · combo 2")              // 1
+fill(pB3F, pB3S, color = f3c, title = "Nube par 3 · 300/600")                // 1
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §7 · VWAP ACUMULATIVO — arquitectura híbrida
+//
+//  · Curvas de sesión / semana: NATIVAS del gráfico. Acumulan vela a vela en
+//    el TF del gráfico → la curva es continua, sin escalones.
+//  · Todo lo que termina en ETIQUETA (pw, m, pm, pq, y) sale de
+//    request.security en un TF de cálculo fijo cuyo historial alcanza SÍ O SÍ,
+//    con lookahead_off. El valor es idéntico en cualquier TF. La semana previa
+//    se calcula en 60m: en 1m, con 5000 velas de historial (3,5 días), la
+//    semana previa ni siquiera entra en el gráfico.
+//  · En símbolos sin volumen real el VWAP degenera: todo pesa 0.
+// ═══════════════════════════════════════════════════════════════════════════
+g07     = "⑦ VWAP · General"
+vwapSrc = input.source(hl2, "Fuente VWAP", group = g07, tooltip = "hl2 replica el script SBTC de referencia. El VWAP nativo de TradingView usa hlc3. El rolling multi-día del §9b tiene su propia fuente.")
+ctfM    = input.timeframe("60",  "TF de cálculo — w previa · m", group = g07, inline = "ctf1", tooltip = "Timeframe con el que se computan pwVWAP y los anclajes de mes. Se usa tal cual en cualquier vista, así que el nivel vale lo mismo en 1m que en 4h.")
+ctfQ6   = input.timeframe("D",   "q · 6M",            group = g07, inline = "ctf1")
+ctfY    = input.timeframe("D",   "y",                 group = g07, inline = "ctf1")
+rthSess = input.session("0930-1600", "Sesión regular", group = g07, inline = "rth", tooltip = "Sólo para las curvas con anclaje «Sesión reg.»: VWAP que acumula únicamente dentro de la rueda de una acción.")
+rthTzIn = input.string("America/New_York", "Zona", options = ["Exchange","America/New_York","America/Chicago","America/Argentina/Buenos_Aires","Europe/London","Europe/Berlin","Asia/Tokyo","UTC"], group = g07, inline = "rth")
+rthTz   = rthTzIn == "Exchange" ? syminfo.timezone : rthTzIn
+
+// Degeneración (deg*): si el TF del gráfico iguala o supera el período, el
+// VWAP de ese período colapsa al precio de la propia vela y la σ da 0.
+degD = tfSec < 86400
+degW = tfSec < 604800
+degM = tfSec < 2592000
+degQ = tfSec < 7776000
+deg6 = tfSec < 15552000
+degY = tfSec < 31536000
+
+//  Estabilidad numérica: en vez de Σ(v·p²) con E[p²] − E[p]², se acumula sobre
+//  (p − c) con c = primer precio del período. Idéntico (dif ~1e-13 %) pero sin
+//  la pérdida de dígitos cuando σ/precio es ínfimo.
+f_vwap(_src, _reset) =>
+    var float _c   = na
+    var float _s1  = 0.0
+    var float _sv  = 0.0
+    var float _s2  = 0.0
+    var bool  _rdy = false
+    if _reset or na(_c)
+        _c := _src
+    if _reset
+        _rdy := true
+    float d   = _src - _c
+    float vol = nz(volume, 0.0)
+    _s1 := _reset ? d * vol     : _s1 + d * vol
+    _sv := _reset ? vol         : _sv + vol
+    _s2 := _reset ? vol * d * d : _s2 + vol * d * d
+    float _m  = _sv > 0 ? _s1 / _sv : 0.0
+    float _vr = _sv > 0 ? _s2 / _sv - _m * _m : 0.0
+    [_c + _m, math.sqrt(math.max(_vr, 0.0)), _rdy]
+
+f_vwapSess(_src, _reset, _active) =>
+    var float _c   = na
+    var float _s1  = 0.0
+    var float _sv  = 0.0
+    var float _s2  = 0.0
+    var bool  _rdy = false
+    if _reset or na(_c)
+        _c := _src
+    if _reset
+        _rdy := true
+    float d   = _src - _c
+    float vol = _active ? nz(volume, 0.0) : 0.0
+    _s1 := _reset ? d * vol     : _s1 + d * vol
+    _sv := _reset ? vol         : _sv + vol
+    _s2 := _reset ? vol * d * d : _s2 + vol * d * d
+    float _m  = _sv > 0 ? _s1 / _sv : 0.0
+    float _vr = _sv > 0 ? _s2 / _sv - _m * _m : 0.0
+    [_c + _m, math.sqrt(math.max(_vr, 0.0)), _rdy]
+
+// CW10002: todos los timeframe.change y las referencias históricas se evalúan
+// SIEMPRE, fuera de ternarios y condicionales, y el `if` sólo copia valores.
+f_anchVwap(_src, _p) =>
+    int  _qi = year * 4 + math.floor((month - 1) / 3)
+    int  _hi = year * 2 + (month > 6 ? 1 : 0)
+    bool _cD = timeframe.change("D")
+    bool _cW = timeframe.change("W")
+    bool _cM = timeframe.change("M")
+    bool _cQ = not na(_qi[1]) and _qi != _qi[1]
+    bool _c6 = not na(_hi[1]) and _hi != _hi[1]
+    bool _cY = not na(year[1]) and year != year[1]
+    bool _chg = _p == "W" ? _cW : _p == "M" ? _cM : _p == "Q" ? _cQ : _p == "6" ? _c6 : _p == "Y" ? _cY : _cD
+    [vw, sd, rdy] = f_vwap(_src, _chg)
+    float _vwPrev = vw[1]
+    float _sdPrev = sd[1]
+    var float _pv   = na
+    var float _ps   = na
+    var bool  _px   = false
+    // na() no tiene sobrecarga para bool (CE10123): en vez de leer rdy[1] se
+    // replica su semántica con estado propio.
+    var bool  _seen = false
+    if _chg
+        _px := not _seen
+        _pv := _vwPrev
+        _ps := _sdPrev
+        _seen := true
+    [vw, sd, rdy, _pv, _ps, _px]
+
+f_anchVwapRTH(_src, _sess, _tz) =>
+    bool _in  = not na(time(timeframe.period, _sess, _tz))
+    bool _chg = _in and not _in[1]
+    [vw, sd, rdy] = f_vwapSess(_src, _chg, _in)
+    float _vwPrev = vw[1]
+    float _sdPrev = sd[1]
+    var float _pv   = na
+    var float _ps   = na
+    var bool  _px   = false
+    var bool  _seen = false
+    if _chg
+        _px := not _seen
+        _pv := _vwPrev
+        _ps := _sdPrev
+        _seen := true
+    [vw, sd, rdy, _pv, _ps, _px]
+
+// Curvas nativas. Los "previos" de estas tres no se usan: pw sale del TF fijo.
+[vwD, sdD, _rdD, _pdV, _pdS, _pdP] = f_anchVwap(vwapSrc, "D")
+[vwS, sdS, _rdS, _psV, _psS, _psP] = f_anchVwapRTH(vwapSrc, rthSess, rthTz)
+[vwW, sdW, _rdW, _pwV, _pwS, _pwP] = f_anchVwap(vwapSrc, "W")
+
+// Etiquetas: TF fijo.
+[_w60, _s60, _r60, pwVw, pwSd, pwPart] = request.security(syminfo.tickerid, ctfM, f_anchVwap(vwapSrc, "W"), lookahead = barmerge.lookahead_off)
+
+[vwM, sdM, rdyMr, pmVw, pmSd, pmPart] = request.security(syminfo.tickerid, ctfM,  f_anchVwap(vwapSrc, "M"), lookahead = barmerge.lookahead_off)
+[vwQ, sdQ, rdyQr, pqVw, pqSd, pqPart] = request.security(syminfo.tickerid, ctfQ6, f_anchVwap(vwapSrc, "Q"), lookahead = barmerge.lookahead_off)
+[vw6, sd6, rdy6r, p6Vw, p6Sd, p6Part] = request.security(syminfo.tickerid, ctfQ6, f_anchVwap(vwapSrc, "6"), lookahead = barmerge.lookahead_off)
+[vwY, sdY, rdyYr, pyVw, pySd, pyPart] = request.security(syminfo.tickerid, ctfY,  f_anchVwap(vwapSrc, "Y"), lookahead = barmerge.lookahead_off)
+
+[vwH, sdH, rdyHraw] = f_vwap(vwapSrc, false)
+
+astM = rdyMr ? "" : "*"
+astY = rdyYr ? "" : "*"
+apxW = pwPart ? "*" : ""
+apxM = pmPart ? "*" : ""
+apxQ = pqPart ? "*" : ""
+
+f_pick(_name, _d, _r, _w, _m, _q, _s, _y, _h) =>
+    switch _name
+        "Sesión"      => _d
+        "Sesión reg." => _r
+        "Semana"      => _w
+        "Mes"         => _m
+        "Trimestre"   => _q
+        "6 Meses"     => _s
+        "Año"         => _y
+        "Historial"   => _h
+        => _d
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §8 · CURVAS VWAP CON NUBES — sólo visión BAJA       [13 + 13 plot counts]
+//
+//  Dos curvas, sólo por debajo del corte BAJA → MEDIA. En el resto de las
+//  visiones no se dibuja ninguna curva VWAP: los VWAP de mes, trimestre y
+//  año quedan como etiquetas.
+//
+//  La nube σ2 se dibuja entre el borde σ1 y el borde σ2, así que necesita que
+//  ±1σ esté activado.
+// ═══════════════════════════════════════════════════════════════════════════
+g08a   = "⑧ VWAP · Curva 1 · visión BAJA"
+show1  = input.bool(true, "Activar", group = g08a)
+tf1    = input.string("Sesión", "Anclaje", options = ["Sesión","Sesión reg.","Semana","Mes","Trimestre","6 Meses","Año","Historial"], group = g08a)
+col1   = input.color(#00BCD4, "Color VWAP", group = g08a)
+k1a    = input.float(1.0, "Mult. banda 1", minval = 0.1, maxval = 10.0, step = 0.1, group = g08a, inline = "k1")
+k1b    = input.float(2.0, "banda 2",       minval = 0.1, maxval = 10.0, step = 0.1, group = g08a, inline = "k1")
+b1a    = input.bool(true,  "Banda 1", group = g08a, inline = "b1")
+b1b    = input.bool(true,  "Banda 2", group = g08a, inline = "b1")
+bandc1 = input.color(color.new(#00BCD4, 35), "Color banda 1", group = g08a)
+bandd1 = input.color(color.new(#00BCD4, 55), "Color banda 2", group = g08a)
+fl1a   = input.int(90, "Transp. nube σ1", minval = 0, maxval = 100, group = g08a, inline = "f1")
+fl1b   = input.int(95, "nube σ2",          minval = 0, maxval = 100, group = g08a, inline = "f1")
+
+g08b   = "⑧ VWAP · Curva 2 · visión BAJA"
+show2  = input.bool(true, "Activar", group = g08b)
+tf2    = input.string("Semana", "Anclaje", options = ["Sesión","Sesión reg.","Semana","Mes","Trimestre","6 Meses","Año","Historial"], group = g08b)
+col2   = input.color(#FF9800, "Color VWAP", group = g08b)
+k2a    = input.float(1.0, "Mult. banda 1", minval = 0.1, maxval = 10.0, step = 0.1, group = g08b, inline = "k2")
+k2b    = input.float(2.0, "banda 2",       minval = 0.1, maxval = 10.0, step = 0.1, group = g08b, inline = "k2")
+b2a    = input.bool(true,  "Banda 1", group = g08b, inline = "b2")
+b2b    = input.bool(true,  "Banda 2", group = g08b, inline = "b2")
+bandc2 = input.color(color.new(#FF9800, 35), "Color banda 1", group = g08b)
+bandd2 = input.color(color.new(#FF9800, 55), "Color banda 2", group = g08b)
+fl2a   = input.int(90, "Transp. nube σ1", minval = 0, maxval = 100, group = g08b, inline = "f2")
+fl2b   = input.int(95, "nube σ2",          minval = 0, maxval = 100, group = g08b, inline = "f2")
+
+g08e   = "⑧ VWAP · Curvas · común"
+wCur   = input.int(2, "Grosor de las curvas", minval = 1, maxval = 7, group = g08e)
+
+cv1 = f_pick(tf1, vwD, vwS, vwW, vwM, vwQ, vw6, vwY, vwH)
+cd1 = f_pick(tf1, sdD, sdS, sdW, sdM, sdQ, sd6, sdY, sdH)
+ok1 = f_pick(tf1, degD, isLTF, degW, degM, degQ, deg6, degY, true)
+cv2 = f_pick(tf2, vwD, vwS, vwW, vwM, vwQ, vw6, vwY, vwH)
+cd2 = f_pick(tf2, sdD, sdS, sdW, sdM, sdQ, sd6, sdY, sdH)
+ok2 = f_pick(tf2, degD, isLTF, degW, degM, degQ, deg6, degY, true)
+
+on1 = bandA and show1 and ok1
+on2 = bandA and show2 and ok2
+
+plot(on1 ? cv1 : na, "VWAP 1", color = col1, linewidth = wCur)                                             // 2
+u1a = plot(on1 and b1a ? cv1 + cd1 * k1a : na, "VWAP 1 · σ1+", color = bandc1)                             // 2
+l1a = plot(on1 and b1a ? cv1 - cd1 * k1a : na, "VWAP 1 · σ1−", color = bandc1)                             // 2
+u1b = plot(on1 and b1b ? cv1 + cd1 * k1b : na, "VWAP 1 · σ2+", color = bandd1)                             // 2
+l1b = plot(on1 and b1b ? cv1 - cd1 * k1b : na, "VWAP 1 · σ2−", color = bandd1)                             // 2
+fill(u1a, l1a, color = on1 and b1a ? color.new(bandc1, fl1a) : na, title = "VWAP 1 · nube σ1")             // 1
+fill(u1a, u1b, color = on1 and b1a and b1b ? color.new(bandd1, fl1b) : na, title = "VWAP 1 · nube σ2 sup") // 1
+fill(l1a, l1b, color = on1 and b1a and b1b ? color.new(bandd1, fl1b) : na, title = "VWAP 1 · nube σ2 inf") // 1
+
+plot(on2 ? cv2 : na, "VWAP 2", color = col2, linewidth = wCur)                                             // 2
+u2a = plot(on2 and b2a ? cv2 + cd2 * k2a : na, "VWAP 2 · σ1+", color = bandc2)                             // 2
+l2a = plot(on2 and b2a ? cv2 - cd2 * k2a : na, "VWAP 2 · σ1−", color = bandc2)                             // 2
+u2b = plot(on2 and b2b ? cv2 + cd2 * k2b : na, "VWAP 2 · σ2+", color = bandd2)                             // 2
+l2b = plot(on2 and b2b ? cv2 - cd2 * k2b : na, "VWAP 2 · σ2−", color = bandd2)                             // 2
+fill(u2a, l2a, color = on2 and b2a ? color.new(bandc2, fl2a) : na, title = "VWAP 2 · nube σ1")             // 1
+fill(u2a, u2b, color = on2 and b2a and b2b ? color.new(bandd2, fl2b) : na, title = "VWAP 2 · nube σ2 sup") // 1
+fill(l2a, l2b, color = on2 and b2a and b2b ? color.new(bandd2, fl2b) : na, title = "VWAP 2 · nube σ2 inf") // 1
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §9a · ROLLING VWAP 24h · ventana móvil en tiempo          [2 plot counts]
+//
+//  La CURVA rVWAP de la visión BAJA (encendida por default). Se acumula con las velas
+//  del gráfico para que la línea sea continua. Las ETIQUETAS rVAH / rVAL no
+//  salen de acá: se calculan en §10 sobre velas de 1m, así valen lo mismo en
+//  1m que en 30m. Antes colgaban del "Activar" de esta curva, que venía
+//  apagado por default: por eso no aparecían nunca.
+//
+//  Cola por tiempo con sumas incrementales, O(1) por barra. En la vela en
+//  curso Pine hace rollback de los escalares pero NO del contenido de los
+//  arrays, así que toda mutación va dentro de barstate.isconfirmed y la vela
+//  viva se suma aparte.
+// ═══════════════════════════════════════════════════════════════════════════
+g09a     = "⑨a Rolling VWAP 24h (visión BAJA)"
+rollLine = input.bool(true, "Dibujar la curva rVWAP", group = g09a, tooltip = "Las etiquetas rVAH / rVAL se controlan en ⑫ y no dependen de esta curva. La ventana y el multiplicador de acá valen para las dos cosas.")
+rollHrs  = input.float(24, "Ventana (horas)", minval = 0.5, maxval = 168, step = 0.5, group = g09a, tooltip = "24 = último día calendario. Para acciones en gráficos sólo-RTH, 6.5 ≈ una rueda completa.")
+rollCol  = input.color(#FFEB3B, "Color", group = g09a, inline = "ro")
+rollWd   = input.int(2, "Grosor", minval = 1, maxval = 7, group = g09a, inline = "ro")
+rollK    = input.float(1.0, "Mult. de rVAH / rVAL (σ)", minval = 0.1, maxval = 10.0, step = 0.1, group = g09a)
+
+var array<float> rqPV = array.new_float()
+var array<float> rqV  = array.new_float()
+var array<int>   rqT  = array.new_int()
+var float rSumP  = 0.0
+var float rSumV  = 0.0
+
+rollMs   = int(rollHrs * 3600000)
+rollCalc = rollLine and bandA and tfSec * 1000 < rollMs
+
+float _rv = nz(volume, 0.0)
+if rollCalc and barstate.isconfirmed
+    array.push(rqPV, vwapSrc * _rv)
+    array.push(rqV,  _rv)
+    array.push(rqT,  time)
+    rSumP  += vwapSrc * _rv
+    rSumV  += _rv
+    while array.size(rqT) > 0 and array.get(rqT, 0) <= time - rollMs
+        rSumP  -= array.shift(rqPV)
+        rSumV  -= array.shift(rqV)
+        array.shift(rqT)
+
+float liveP  = barstate.isconfirmed ? 0.0 : vwapSrc * _rv
+float liveV  = barstate.isconfirmed ? 0.0 : _rv
+float rTotV  = rSumV + liveV
+float rollV  = rollCalc and rTotV > 0 ? (rSumP + liveP) / rTotV : na
+
+plot(rollCalc ? rollV : na, "Rolling VWAP 24h", color = rollCol, linewidth = rollWd)  // 2
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §9b · ROLLING VWAP MULTI-DÍA — 7D / 30D / 90D / 365D      [2 plot counts]
+//
+//  VENTANA POR TIEMPO CALENDARIO, no por cantidad de velas. Ver la auditoría
+//  en la cabecera del archivo: contar 365 VELAS diarias en una acción es
+//  contar ~17,3 meses, y ahí estaba la diferencia con el script de referencia.
+//
+//  Puntero incremental: _n es la cantidad de velas dentro de la ventana
+//  (offsets 0.._n−1), así que el acumulado de referencia es el del offset _n.
+//  Crece de a una por vela y se recorta mientras la más vieja quede fuera del
+//  corte, o sea O(1) amortizado. Los escalares `var` SÍ se rollbackean en la
+//  vela viva, por eso acá no hace falta el truco de los arrays del §9a.
+//
+//  Cuando el historial no llega, time[_n−1] es na, la comparación con na es
+//  falsa, el bucle corta y el acumulado de referencia queda na → nz(...,0) →
+//  acumulado COMPLETO: VWAP anclado al inicio del histórico, con asterisco.
+//
+//  Se computa sobre velas DIARIAS vía request.security: el valor es idéntico
+//  en cualquier TF y el 365D existe incluso en 1m.
+// ═══════════════════════════════════════════════════════════════════════════
+g09b    = "⑨b Rolling VWAP · multi-día (todas las visiones)"
+mdSrc   = input.source(hlc3, "Fuente", group = g09b, tooltip = "hlc3 es la fuente del script de referencia. Si querés que los cuatro rolling coincidan al centavo con él, dejala en hlc3 (el resto del indicador usa la fuente del §7, hl2).")
+md7On   = input.bool(true,  "7D",   group = g09b, inline = "md")
+md30On  = input.bool(true,  "30D",  group = g09b, inline = "md")
+md90On  = input.bool(true,  "90D",  group = g09b, inline = "md")
+md365On = input.bool(true,  "365D", group = g09b, inline = "md")
+mdCol   = input.color(#B39DDB, "Color de las etiquetas", group = g09b)
+md365Ln = input.bool(true, "Dibujar el 365D como línea", group = g09b, inline = "ml")
+md365C  = input.color(#FFA726, "Color", group = g09b, inline = "ml")
+md365W  = input.int(2, "Grosor", minval = 1, maxval = 7, group = g09b, inline = "ml")
+
+// Borde inclusivo: entran las velas con time ≥ time_actual − días·86400000,
+// que es exactamente lo que devuelve el binary_search_leftmost del script de
+// referencia. El tope de 400 blinda el offset contra el max_bars_back: una
+// ventana de 365 días nunca puede tener más de 366 velas diarias.
+f_mdWin(_cpv, _cv, _days) =>
+    float   _cut = time - _days * 86400000.0
+    var int _n   = 0
+    _n := int(math.min(_n + 1, 400))
+    while _n > 1 and time[_n - 1] < _cut
+        _n := _n - 1
+    float _pv = _cpv - nz(_cpv[_n], 0.0)
+    float _vv = _cv  - nz(_cv[_n],  0.0)
+    [_vv > 0 ? _pv / _vv : na, not na(_cv[_n])]
+
+// CE10239: request.security NO admite tuplas anidadas. Una sola función que
+// devuelva la tupla ya plana, con ta.cum() calculado una única vez.
+f_mdAll(_src) =>
+    float _cpv = ta.cum(_src * nz(volume, 0.0))
+    float _cv  = ta.cum(nz(volume, 0.0))
+    [_v7,   _f7]   = f_mdWin(_cpv, _cv, 7)
+    [_v30,  _f30]  = f_mdWin(_cpv, _cv, 30)
+    [_v90,  _f90]  = f_mdWin(_cpv, _cv, 90)
+    [_v365, _f365] = f_mdWin(_cpv, _cv, 365)
+    [_v7, _f7, _v30, _f30, _v90, _f90, _v365, _f365]
+
+[md7, f7, md30, f30, md90, f90, md365, f365] = request.security(syminfo.tickerid, "D", f_mdAll(mdSrc), lookahead = barmerge.lookahead_off)
+
+ast7   = f7   ? "" : "*"
+ast30  = f30  ? "" : "*"
+ast90  = f90  ? "" : "*"
+ast365 = f365 ? "" : "*"
+
+plot(md365Ln ? md365 : na, "rVWAP 365d", color = md365C, linewidth = md365W)  // 2
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §10 · DATOS DE 1m — PERFIL DIARIO ANCLADO + ROLLING 24h   [0 plot counts]
+//
+//  Sólo visión BAJA. request.security_lower_tf trae, para cada vela del
+//  gráfico, las velas de 1m que la componen. Con eso se arman dos colas:
+//
+//    · DÍA: todas las velas de 1m desde el inicio del día (se vacía en cada
+//      cambio de día). Da dVWAP, dPOC, dVAH y dVAL.
+//    · 24h: las velas de 1m de la ventana móvil del §9a. Da rVAH y rVAL.
+//
+//  Como la resolución es fija, las etiquetas valen lo mismo en 1m, 5m, 15m o
+//  30m. Se mutan sólo en velas confirmadas (los arrays no hacen rollback en la
+//  vela viva) y las velas de 1m de la vela en curso se suman aparte al final.
+//
+//  PERFIL. Rango del día partido en N filas iguales. El volumen de cada vela
+//  de 1m se reparte entre las filas que toca, proporcional a la porción de su
+//  rango que cae en cada una. POC = fila de más volumen (su punto medio). El
+//  área de valor arranca en el POC y suma de a una fila, siempre la vecina de
+//  más volumen (arriba o abajo), hasta juntar el % pedido. dVAH = borde
+//  superior de la fila más alta del área; dVAL = borde inferior de la más baja.
+//
+//  dVWAP también sale de acá (Σ precio·vol / Σ vol sobre las velas de 1m del
+//  día): es el mismo VWAP anclado al inicio del día que dibuja la curva de
+//  sesión, pero a resolución fija. En 1m coincide al centavo con la curva;
+//  en 30m la curva usa el hl2 de la vela de 30m y puede diferir por décimas.
+// ═══════════════════════════════════════════════════════════════════════════
+g10    = "⑩ Perfil diario anclado · rolling 24h (visión BAJA)"
+vpRes  = input.timeframe("1", "Resolución de los datos", group = g10, tooltip = "Velas con las que se arman el perfil del día y el rolling 24h. Tiene que ser menor o igual al TF del gráfico; si no lo es, se usa el del gráfico. 1m es lo que garantiza el mismo valor en toda la visión baja.")
+vpRows = input.int(24, "Filas del perfil", minval = 5, maxval = 1000, group = g10, inline = "vp", tooltip = "24 filas y 70 % son los defaults del Volume Profile de TradingView.")
+vpVA   = input.float(70.0, "Área de valor (%)", minval = 10.0, maxval = 99.0, step = 1.0, group = g10, inline = "vp")
+
+vpSec = timeframe.in_seconds(vpRes)
+ibOn  = bandA and vpSec <= tfSec
+ibTF  = ibOn ? vpRes : timeframe.period
+
+[ibT, ibH, ibL, ibV, ibS] = request.security_lower_tf(syminfo.tickerid, ibTF, [time, high, low, nz(volume, 0.0), vwapSrc])
+
+var array<float> dyH = array.new_float()
+var array<float> dyL = array.new_float()
+var array<float> dyV = array.new_float()
+var array<float> dyS = array.new_float()
+var bool dyFull = false
+
+var array<int>   r1T = array.new_int()
+var array<float> r1S = array.new_float()
+var array<float> r1V = array.new_float()
+var bool r1Cut = false      // ya se descartó algo por viejo → la historia cubre la ventana
+
+if ibOn and chgD
+    array.clear(dyH)
+    array.clear(dyL)
+    array.clear(dyV)
+    array.clear(dyS)
+    dyFull := true
+
+if ibOn and barstate.isconfirmed
+    for [i, t] in ibT
+        float _h = array.get(ibH, i)
+        float _l = array.get(ibL, i)
+        float _v = array.get(ibV, i)
+        float _s = array.get(ibS, i)
+        array.push(dyH, _h)
+        array.push(dyL, _l)
+        array.push(dyV, _v)
+        array.push(dyS, _s)
+        array.push(r1T, t)
+        array.push(r1S, _s)
+        array.push(r1V, _v)
+    if array.size(r1T) > 0
+        int _cut = array.last(r1T) - rollMs
+        while array.size(r1T) > 0 and array.first(r1T) <= _cut
+            array.shift(r1T)
+            array.shift(r1S)
+            array.shift(r1V)
+            r1Cut := true
+
+float dVwL  = na
+float dPocL = na
+float dVahL = na
+float dValL = na
+float rVwL  = na
+float rVahL = na
+float rValL = na
+bool  rFull = false
+
+if barstate.islast and ibOn
+    bool _live = not barstate.isconfirmed
+
+    // ── Día: cola confirmada + velas de 1m de la vela en curso
+    aH = array.copy(dyH)
+    aL = array.copy(dyL)
+    aV = array.copy(dyV)
+    aS = array.copy(dyS)
+    if _live
+        array.concat(aH, ibH)
+        array.concat(aL, ibL)
+        array.concat(aV, ibV)
+        array.concat(aS, ibS)
+    int _n = array.size(aH)
+    if _n > 0
+        float _sv  = 0.0
+        float _ssv = 0.0
+        for [i, v] in aV
+            _sv  += v
+            _ssv += array.get(aS, i) * v
+        dVwL := _sv > 0 ? _ssv / _sv : na
+
+        float _lo = array.min(aL)
+        float _hi = array.max(aH)
+        float _st = (_hi - _lo) / vpRows
+        if _st <= 0 or _sv <= 0
+            dPocL := _hi
+            dVahL := _hi
+            dValL := _lo
+        else
+            hist = array.new_float(vpRows, 0.0)
+            for [i, v] in aV
+                if v > 0
+                    float _h  = array.get(aH, i)
+                    float _l  = array.get(aL, i)
+                    int   _r0 = math.min(vpRows - 1, math.max(0, int(math.floor((_l - _lo) / _st))))
+                    int   _r1 = math.min(vpRows - 1, math.max(0, int(math.floor((_h - _lo) / _st))))
+                    if _h <= _l
+                        array.set(hist, _r0, array.get(hist, _r0) + v)
+                    else
+                        for r = _r0 to _r1
+                            float _bot = _lo + r * _st
+                            float _ov  = math.min(_h, _bot + _st) - math.max(_l, _bot)
+                            if _ov > 0
+                                array.set(hist, r, array.get(hist, r) + v * _ov / (_h - _l))
+            int   _poc = array.indexof(hist, array.max(hist))
+            float _tgt = array.sum(hist) * vpVA / 100.0
+            float _acc = array.get(hist, _poc)
+            int   _up  = _poc
+            int   _dn  = _poc
+            while _acc < _tgt and (_up < vpRows - 1 or _dn > 0)
+                float _vu = _up < vpRows - 1 ? array.get(hist, _up + 1) : -1.0
+                float _vd = _dn > 0          ? array.get(hist, _dn - 1) : -1.0
+                if _vu >= _vd
+                    _up  += 1
+                    _acc += _vu
+                else
+                    _dn  -= 1
+                    _acc += _vd
+            dPocL := _lo + (_poc + 0.5) * _st
+            dVahL := _lo + (_up + 1) * _st
+            dValL := _lo + _dn * _st
+
+    // ── Rolling 24h: cola confirmada + vela en curso, recortada al corte vivo
+    bT = array.copy(r1T)
+    bS = array.copy(r1S)
+    bV = array.copy(r1V)
+    if _live
+        array.concat(bT, ibT)
+        array.concat(bS, ibS)
+        array.concat(bV, ibV)
+    if array.size(bT) > 0
+        int   _cut = array.last(bT) - rollMs
+        float _w   = 0.0
+        float _wx  = 0.0
+        bool  _old = r1Cut
+        for [i, t] in bT
+            if t > _cut
+                float _v = array.get(bV, i)
+                _w  += _v
+                _wx += array.get(bS, i) * _v
+            else
+                _old := true
+        if _w > 0
+            float _m  = _wx / _w
+            float _w2 = 0.0
+            for [i, t] in bT
+                if t > _cut
+                    float _d = array.get(bS, i) - _m
+                    _w2 += array.get(bV, i) * _d * _d
+            float _sd = math.sqrt(math.max(_w2 / _w, 0.0))
+            rVwL  := _m
+            rVahL := _m + _sd * rollK
+            rValL := _m - _sd * rollK
+        rFull := _old
+
+astDp = dyFull ? "" : "*"
+astR  = rFull  ? "" : "*"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §11 · NIVELES OHLC — TF fijo vía request.security        [0 plot counts]
+//
+//  open con lookahead_on y high[1]/low[1] con lookahead_on son los dos
+//  idiomas que NO repintan: el open del período en curso ya es conocido
+//  desde su primera vela, y el high/low del período anterior ya está cerrado.
+//  Las velas del gráfico no alcanzan: en 1m, 5000 velas son 3,5 días y la
+//  semana previa (o el lunes, un jueves) queda afuera del historial.
+//
+//  MNDAY-H/L: high/low de la vela DIARIA del lunes de la semana en curso.
+//  Con lookahead_off el lunes se ve en desarrollo en tiempo real y queda fijo
+//  al cierre del día; si la semana no tuvo lunes (feriado) no se dibuja.
+// ═══════════════════════════════════════════════════════════════════════════
+g11    = "⑪ Niveles OHLC · colores"
+colDay = input.color(#42A5F5, "DO",              group = g11, inline = "o1")
+colWk  = input.color(#26A69A, "WO · PWH · PWL",  group = g11, inline = "o1")
+colMon = input.color(#AB47BC, "MNDAY",           group = g11, inline = "o1")
+colMo  = input.color(#66BB6A, "MO",              group = g11, inline = "o2")
+colQo  = input.color(#AB47BC, "PQH · PQL",       group = g11, inline = "o2")
+colYo  = input.color(#FF7043, "YO",              group = g11, inline = "o2")
+
+f_monday() =>
+    var float _h = na
+    var float _l = na
+    if timeframe.change("W")
+        _h := na
+        _l := na
+    if dayofweek == dayofweek.monday
+        _h := high
+        _l := low
+    [_h, _l]
+
+oD             = request.security(syminfo.tickerid, "D",   open, lookahead = barmerge.lookahead_on)
+[oW, pwH, pwL] = request.security(syminfo.tickerid, "W",   [open, high[1], low[1]], lookahead = barmerge.lookahead_on)
+oM             = request.security(syminfo.tickerid, "M",   open, lookahead = barmerge.lookahead_on)
+[pqH, pqL]     = request.security(syminfo.tickerid, "3M",  [high[1], low[1]], lookahead = barmerge.lookahead_on)
+oY             = request.security(syminfo.tickerid, "12M", open, lookahead = barmerge.lookahead_on)
+[moH, moL]     = request.security(syminfo.tickerid, "D",   f_monday(), lookahead = barmerge.lookahead_off)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §12 · QUÉ ETIQUETA VA EN CADA VISIÓN                     [0 plot counts]
+//
+//  Sin interruptores maestros de módulo: cada etiqueta tiene el suyo dentro de
+//  su visión, más uno por visión para apagarla entera. VAH/VAL de los VWAP
+//  anclados (w, m, q, y) son VWAP ± 1σ; los del día (dVAH/dVAL) son el área
+//  de valor del perfil (§10); los del rolling 24h (rVAH/rVAL) son ± k·σ.
+//
+//  Prefijo "p" = período previo · sufijo "*" = período o ventana incompleta.
+// ═══════════════════════════════════════════════════════════════════════════
+g12a  = "⑫ Etiquetas · visión BAJA (< 45m)"
+lbOn  = input.bool(true,  "Mostrar etiquetas en esta visión", group = g12a)
+lbDvw = input.bool(true,  "dVWAP",     group = g12a, inline = "b1")
+lbDvh = input.bool(true,  "dVAH",      group = g12a, inline = "b1")
+lbDvl = input.bool(true,  "dVAL",      group = g12a, inline = "b1")
+lbDpc = input.bool(false, "dPOC",      group = g12a, inline = "b1")
+lbDO  = input.bool(true,  "DO",        group = g12a, inline = "b2")
+lbWO  = input.bool(true,  "WO",        group = g12a, inline = "b2")
+lbMnH = input.bool(true,  "MNDAY-H",   group = g12a, inline = "b2")
+lbMnL = input.bool(true,  "MNDAY-L",   group = g12a, inline = "b2")
+lbPWH = input.bool(true,  "PWH",       group = g12a, inline = "b3")
+lbPWL = input.bool(true,  "PWL",       group = g12a, inline = "b3")
+lbPwv = input.bool(true,  "pwVWAP",    group = g12a, inline = "b3")
+lbRvh = input.bool(true,  "rVAH",      group = g12a, inline = "b4")
+lbRvl = input.bool(true,  "rVAL",      group = g12a, inline = "b4")
+lbRvw = input.bool(false, "rVWAP",     group = g12a, inline = "b4")
+lbMvw = input.bool(true,  "mVWAP",     group = g12a, inline = "b5")
+lbMvh = input.bool(true,  "mVAH",      group = g12a, inline = "b5")
+lbMvl = input.bool(true,  "mVAL",      group = g12a, inline = "b5")
+lbR7  = input.bool(true,  "7D",        group = g12a, inline = "b6")
+lbR30 = input.bool(true,  "30D",       group = g12a, inline = "b6")
+lbR90 = input.bool(true,  "90D",       group = g12a, inline = "b6")
+lbR365= input.bool(true,  "365D",      group = g12a, inline = "b6")
+
+g12b  = "⑫ Etiquetas · visión MEDIA (45m … 12h)"
+lmOn  = input.bool(true,  "Mostrar etiquetas en esta visión", group = g12b)
+lmPQH = input.bool(true,  "PQH",       group = g12b, inline = "m1")
+lmPQL = input.bool(true,  "PQL",       group = g12b, inline = "m1")
+lmMO  = input.bool(true,  "MO",        group = g12b, inline = "m1")
+lmYvw = input.bool(true,  "yVWAP",     group = g12b, inline = "m2")
+lmYvh = input.bool(true,  "yVAH",      group = g12b, inline = "m2")
+lmYvl = input.bool(true,  "yVAL",      group = g12b, inline = "m2")
+lmQvw = input.bool(true,  "pqVWAP",    group = g12b, inline = "m3")
+lmQvh = input.bool(true,  "pqVAH",     group = g12b, inline = "m3")
+lmQvl = input.bool(true,  "pqVAL",     group = g12b, inline = "m3")
+lmPmw = input.bool(true,  "pmVWAP",    group = g12b, inline = "m4")
+lmPmh = input.bool(true,  "pmVAH",     group = g12b, inline = "m4")
+lmPml = input.bool(true,  "pmVAL",     group = g12b, inline = "m4")
+lmMvw = input.bool(true,  "mVWAP",     group = g12b, inline = "m5")
+lmMvh = input.bool(true,  "mVAH",      group = g12b, inline = "m5")
+lmMvl = input.bool(true,  "mVAL",      group = g12b, inline = "m5")
+lmR7  = input.bool(true,  "7D",        group = g12b, inline = "m6")
+lmR30 = input.bool(true,  "30D",       group = g12b, inline = "m6")
+lmR90 = input.bool(true,  "90D",       group = g12b, inline = "m6")
+lmR365= input.bool(true,  "365D",      group = g12b, inline = "m6")
+
+g12c  = "⑫ Etiquetas · visión ALTA (≥ 1D)"
+laOn  = input.bool(true,  "Mostrar etiquetas en esta visión", group = g12c)
+laYvw = input.bool(true,  "yVWAP",     group = g12c, inline = "a1")
+laYO  = input.bool(true,  "YO",        group = g12c, inline = "a1")
+laR7  = input.bool(true,  "7D",        group = g12c, inline = "a2")
+laR30 = input.bool(true,  "30D",       group = g12c, inline = "a2")
+laR90 = input.bool(true,  "90D",       group = g12c, inline = "a2")
+laR365= input.bool(true,  "365D",      group = g12c, inline = "a2")
+
+g12d  = "⑫ Etiquetas · colores de los VWAP"
+colDv = input.color(#42A5F5, "d",  group = g12d, inline = "cc")
+colRv = input.color(#EC407A, "r",  group = g12d, inline = "cc")
+colWv = input.color(#2962FF, "w",  group = g12d, inline = "cc")
+colMv = input.color(#66BB6A, "m",  group = g12d, inline = "cc")
+colQv = input.color(#AB47BC, "q",  group = g12d, inline = "cc")
+colYv = input.color(#FF7043, "y",  group = g12d, inline = "cc")
+
+lblLo = bandA
+lblMd = bandB
+lblHi = bandC or bandD
+
+mHiv  = vwM + sdM
+mLov  = vwM - sdM
+pmHiv = pmVw + pmSd
+pmLov = pmVw - pmSd
+pqHiv = pqVw + pqSd
+pqLov = pqVw - pqSd
+yHiv  = vwY + sdY
+yLov  = vwY - sdY
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §13 · MOTOR DE DIBUJO — segmentos + etiquetas agrupadas  [0 plot counts]
+// ═══════════════════════════════════════════════════════════════════════════
+g13     = "⑬ Etiquetas · estilo"
+lvlSeg  = input.bool(false, "Dibujar segmento de línea", group = g13, tooltip = "Apagado, el nivel se marca sólo con el texto y su prefijo. Encendido, agrega además una línea corta a la altura del precio.")
+lvlLen  = input.int(5, "Largo del segmento (velas)", minval = 0, maxval = 50, group = g13, inline = "geo")
+lvlGap  = input.int(4, "Separación etiqueta", minval = 0, maxval = 50, group = g13, inline = "geo", tooltip = "Velas de aire entre el final del segmento y el texto.")
+lvlPfx  = input.string("--- ", "Prefijo del texto", options = ["--- ", "-- ", "· ", "› ", "(ninguno)"], group = g13)
+lvlPre  = lvlPfx == "(ninguno)" ? "" : lvlPfx
+lvlSty  = input.string("Punteado", "Estilo", options = ["Punteado","Rayado","Sólido"], group = g13)
+lvlTol  = input.float(0.1, "Tolerancia de agrupado (%)", minval = 0.0, maxval = 5.0, step = 0.05, group = g13, tooltip = "Niveles a menos de este % se fusionan en UNA sola etiqueta. Bajala a 0 para verlos separados.")
+lvlSize = input.string("small", "Tamaño de texto", options = ["tiny","small","normal"], group = g13)
+
+lineStyle = lvlSty == "Punteado" ? line.style_dotted : lvlSty == "Rayado" ? line.style_dashed : line.style_solid
+txtSize   = lvlSize == "tiny" ? size.tiny : lvlSize == "normal" ? size.normal : size.small
+
+f_push(_p, _t, _c, _price, _txt, _col, _show) =>
+    if _show and not na(_price)
+        array.push(_p, _price)
+        array.push(_t, _txt)
+        array.push(_c, _col)
+
+f_drawLvl(_y, _txt, _col, _seg, _len, _gap, _pre, _sty, _sz) =>
+    line _ln = na
+    if _seg
+        _ln := line.new(bar_index, _y, bar_index + _len, _y, color = _col, width = 1, style = _sty)
+    _lb = label.new(bar_index + _len + _gap, _y, _pre + _txt, xloc = xloc.bar_index, yloc = yloc.price, style = label.style_label_left, color = color.new(color.black, 100), textcolor = _col, size = _sz)
+    [_ln, _lb]
+
+var array<line>  LV = array.new<line>()
+var array<label> BV = array.new<label>()
+
+if barstate.islast
+    for x in LV
+        line.delete(x)
+    array.clear(LV)
+    for x in BV
+        label.delete(x)
+    array.clear(BV)
+
+if barstate.islast
+    prices = array.new_float()
+    texts  = array.new_string()
+    cols   = array.new_color()
+
+    if lblLo and lbOn
+        // ── Perfil diario (1m)
+        f_push(prices, texts, cols, dVwL,  "dVWAP" + astDp, colDv, lbDvw)
+        f_push(prices, texts, cols, dVahL, "dVAH" + astDp,  colDv, lbDvh)
+        f_push(prices, texts, cols, dValL, "dVAL" + astDp,  colDv, lbDvl)
+        f_push(prices, texts, cols, dPocL, "dPOC" + astDp,  colDv, lbDpc)
+        // ── OHLC
+        f_push(prices, texts, cols, oD,  "DO",        colDay, lbDO)
+        f_push(prices, texts, cols, oW,  "WO",        colWk,  lbWO)
+        f_push(prices, texts, cols, moH, "MNDAY - H", colMon, lbMnH)
+        f_push(prices, texts, cols, moL, "MNDAY - L", colMon, lbMnL)
+        f_push(prices, texts, cols, pwH, "PWH",       colWk,  lbPWH)
+        f_push(prices, texts, cols, pwL, "PWL",       colWk,  lbPWL)
+        // ── VWAP anclados
+        f_push(prices, texts, cols, pwVw, "pwVWAP" + apxW, colWv, lbPwv)
+        f_push(prices, texts, cols, vwM,  "mVWAP" + astM,  colMv, lbMvw)
+        f_push(prices, texts, cols, mHiv, "mVAH" + astM,   colMv, lbMvh)
+        f_push(prices, texts, cols, mLov, "mVAL" + astM,   colMv, lbMvl)
+        // ── Rolling 24h (1m)
+        f_push(prices, texts, cols, rVahL, "rVAH" + astR,  colRv, lbRvh)
+        f_push(prices, texts, cols, rValL, "rVAL" + astR,  colRv, lbRvl)
+        f_push(prices, texts, cols, rVwL,  "rVWAP" + astR, colRv, lbRvw)
+        // ── Rolling multi-día
+        f_push(prices, texts, cols, md7,   "7D rVWAP" + ast7,     mdCol, lbR7)
+        f_push(prices, texts, cols, md30,  "30D rVWAP" + ast30,   mdCol, lbR30)
+        f_push(prices, texts, cols, md90,  "90D rVWAP" + ast90,   mdCol, lbR90)
+        f_push(prices, texts, cols, md365, "365D rVWAP" + ast365, mdCol, lbR365)
+
+    if lblMd and lmOn
+        // ── OHLC
+        f_push(prices, texts, cols, pqH, "PQH", colQo, lmPQH)
+        f_push(prices, texts, cols, pqL, "PQL", colQo, lmPQL)
+        f_push(prices, texts, cols, oM,  "MO",  colMo, lmMO)
+        // ── VWAP anclados
+        f_push(prices, texts, cols, vwY,   "yVWAP" + astY,  colYv, lmYvw)
+        f_push(prices, texts, cols, yHiv,  "yVAH" + astY,   colYv, lmYvh)
+        f_push(prices, texts, cols, yLov,  "yVAL" + astY,   colYv, lmYvl)
+        f_push(prices, texts, cols, pqVw,  "pqVWAP" + apxQ, colQv, lmQvw)
+        f_push(prices, texts, cols, pqHiv, "pqVAH" + apxQ,  colQv, lmQvh)
+        f_push(prices, texts, cols, pqLov, "pqVAL" + apxQ,  colQv, lmQvl)
+        f_push(prices, texts, cols, pmVw,  "pmVWAP" + apxM, colMv, lmPmw)
+        f_push(prices, texts, cols, pmHiv, "pmVAH" + apxM,  colMv, lmPmh)
+        f_push(prices, texts, cols, pmLov, "pmVAL" + apxM,  colMv, lmPml)
+        f_push(prices, texts, cols, vwM,   "mVWAP" + astM,  colMv, lmMvw)
+        f_push(prices, texts, cols, mHiv,  "mVAH" + astM,   colMv, lmMvh)
+        f_push(prices, texts, cols, mLov,  "mVAL" + astM,   colMv, lmMvl)
+        // ── Rolling multi-día
+        f_push(prices, texts, cols, md7,   "7D rVWAP" + ast7,     mdCol, lmR7)
+        f_push(prices, texts, cols, md30,  "30D rVWAP" + ast30,   mdCol, lmR30)
+        f_push(prices, texts, cols, md90,  "90D rVWAP" + ast90,   mdCol, lmR90)
+        f_push(prices, texts, cols, md365, "365D rVWAP" + ast365, mdCol, lmR365)
+
+    if lblHi and laOn
+        f_push(prices, texts, cols, vwY, "yVWAP" + astY, colYv, laYvw and degY)
+        f_push(prices, texts, cols, oY,  "YO",           colYo, laYO)
+        f_push(prices, texts, cols, md7,   "7D rVWAP" + ast7,     mdCol, laR7)
+        f_push(prices, texts, cols, md30,  "30D rVWAP" + ast30,   mdCol, laR30)
+        f_push(prices, texts, cols, md90,  "90D rVWAP" + ast90,   mdCol, laR90)
+        f_push(prices, texts, cols, md365, "365D rVWAP" + ast365, mdCol, laR365)
+
+    // ── Agrupado por tolerancia y dibujo
+    int n = array.size(prices)
+    if n > 0
+        idxs = array.sort_indices(prices, order.ascending)
+        float tol = close * (lvlTol / 100.0)
+        float gP = na
+        string gT = ""
+        color  gC = color.gray
+        int    gN = 0
+        for i = 0 to n - 1
+            int    id = array.get(idxs, i)
+            float  p  = array.get(prices, id)
+            string t  = array.get(texts, id)
+            color  c  = array.get(cols, id)
+            if gN == 0
+                gP := p
+                gT := t
+                gC := c
+                gN := 1
+            else if math.abs(p - gP) <= tol
+                gT := gT + "  |  " + t
+                gN += 1
+            else
+                [ln, lb] = f_drawLvl(gP, gT, gC, lvlSeg, lvlLen, lvlGap, lvlPre, lineStyle, txtSize)
+                if not na(ln)
+                    array.push(LV, ln)
+                array.push(BV, lb)
+                gP := p
+                gT := t
+                gC := c
+                gN := 1
+        if gN > 0
+            [lnF, lbF] = f_drawLvl(gP, gT, gC, lvlSeg, lvlLen, lvlGap, lvlPre, lineStyle, txtSize)
+            if not na(lnF)
+                array.push(LV, lnF)
+            array.push(BV, lbF)

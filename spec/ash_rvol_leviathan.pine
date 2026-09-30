@@ -1,0 +1,225 @@
+// Absolute Strength Histogram v2 | jh   +   barras de Relative Volume (Leviathan)
+//
+//  El ASH queda igual: sus dos líneas Bulls/Bears y su cuadro MTF, intactos.
+//  La barra del ASH fue reemplazada por el Relative Volume del Volume Suite de
+//  LeviathanCapital, con su coloreo por umbrales.
+//
+//  ── QUÉ SE DEJÓ DE LEVIATHAN ──────────────────────────────────────────────
+//  Sólo la configuración predeterminada del Volume Suite, que es la que usás:
+//      Display                    = Relative Volume  →  volume / SMA(volume, 20)
+//      Threshold Calculation Type = RELATIVE         →  compara rvol contra 1.5 / 2.5 / 3.5
+//      Relative Volume style      = Columns
+//      Imbalances y Gradient      = apagados
+//
+//  Se fue todo lo que esos defaults nunca tocan: los otros tres displays
+//  (Volume, Volume Delta, Buy/Sell Volume), los modos de umbral SMA y Z-SCORE,
+//  los dos desbalances, el gradiente, y con ellos request.security_lower_tf(),
+//  f_mult1/2/3, f_zscore, disp_type, switch_src y los inputs tf, zlen y smalen.
+//  Si algún día querés uno de esos modos, se vuelve a agregar.
+//
+//  ── POR QUÉ LAS BARRAS SE VEÍAN ENANAS ────────────────────────────────────
+//  Comparten eje con el ASH y no hay forma en Pine de darle a un plot su
+//  propia escala. El rvol oscila alrededor de 1 y las líneas del ASH están en
+//  unidades de variación de precio, que según el símbolo pueden ser diez o
+//  cien veces más grandes. Las columnas quedaban aplastadas contra el cero.
+//
+//  Ahora las barras se escalan solas: se mide el máximo del ASH y el máximo
+//  del rvol en una ventana, y se busca el factor que hace que las barras
+//  lleguen al porcentaje del rango del ASH que elijas. Es SÓLO dibujo — el
+//  coloreo por umbrales sigue comparando el rvol crudo contra 1.5 / 2.5 / 3.5,
+//  y el valor real queda disponible en la ventana de datos como "RVOL real".
+//
+//  ── Notas del port a v6 ───────────────────────────────────────────────────
+//  · CW10002: las ta.* no pueden vivir adentro de un `if`. Por eso ma()
+//    calcula todas sus ramas y f_relative() se llama una sola vez, afuera.
+//  · CE10126: en v6 un `switch` de tipo constante exige rama por defecto. Al
+//    sacar disp_type() y switch_src() ya no queda ningún switch.
+//  · CE10156: la continuación de línea necesita indentación que no sea
+//    múltiplo de 4, por eso f_tfName usa if/else y no un ternario multilínea.
+//  · No hay anidamiento de request.*(): ashCalc() no contiene ninguno.
+
+//@version=6
+indicator("ASH v2 + Relative Volume (Leviathan)", overlay = false)
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ASH · entradas
+// ═══════════════════════════════════════════════════════════════════════════
+Length = input.int(9, title="Period of Evaluation", minval=1)
+Smooth = input.int(3, title="Period of Smoothing", minval=1)
+src = input.source(close, title="Source")
+Mode = input.string(title="Indicator Method", defval="RSI", options=["RSI", "STOCHASTIC","ADX"])
+ma_type = input.string(title="MA", defval="WMA", options=["ALMA", "EMA", "WMA", "SMA", "SMMA", "HMA"])
+alma_offset = input.float(defval=0.85, title="* Arnaud Legoux (ALMA) Only - Offset Value", minval=0, maxval=1, step=0.01)
+alma_sigma  = input.float(defval=6, title="* Arnaud Legoux (ALMA) Only - Sigma Value", minval=0)
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  BARRAS · Relative Volume (Leviathan) + escala
+// ═══════════════════════════════════════════════════════════════════════════
+grpB     = "Barras de volumen"
+rellen   = input.int(20, 'Relative Length', minval=1, group=grpB, tooltip="Ventana de la media de volumen. rvol = volumen / SMA(volumen, esta ventana).")
+upcol    = input.color(#d1d4dc, 'Colores base                ▲', inline='udcol', group=grpB)
+downcol  = input.color(#9598a1f6, '▼', inline='udcol', group=grpB)
+
+show_mult1    = input.bool(true, '',  inline='mult1', group=grpB)
+mult          = input.float(1.5, '>', inline='mult1', group=grpB, step=0.1)
+upcol_mult1   = input.color(#c8e6c9, '     ▲', inline='mult1', group=grpB)
+downcol_mult1 = input.color(#faa1a4, '▼', inline='mult1', group=grpB)
+
+show_mult2    = input.bool(true, '',  inline='mult2', group=grpB)
+mult2         = input.float(2.5, '>', inline='mult2', group=grpB, step=0.1)
+upcol_mult2   = input.color(#a5d6a7, '     ▲', inline='mult2', group=grpB)
+downcol_mult2 = input.color(#f77c80, '▼', inline='mult2', group=grpB)
+
+show_mult3    = input.bool(true, '',  inline='mult3', group=grpB)
+mult3         = input.float(3.5, '>', inline='mult3', group=grpB, step=0.1)
+upcol_mult3   = input.color(#66bb6a, '     ▲', inline='mult3', group=grpB)
+downcol_mult3 = input.color(#f7525f, '▼', inline='mult3', group=grpB)
+
+bar_fit  = input.bool(true, "Escalar las barras al rango del ASH", group=grpB, tooltip="Sólo afecta al dibujo. Los umbrales siguen comparando el rvol crudo.")
+bar_pct  = input.int(70, "Altura objetivo (% del rango del ASH)", minval=5, maxval=300, group=grpB)
+bar_look = input.int(300, "Ventana de referencia (velas)", minval=20, group=grpB)
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ASH · cuadro MTF
+// ═══════════════════════════════════════════════════════════════════════════
+grpT     = "Cuadro MTF"
+tbl_on   = input.bool(true, title="Mostrar cuadro de timeframe superior", group=grpT)
+tbl_auto = input.bool(true, title="Elegir el timeframe automáticamente", group=grpT, tooltip="Escalera: <5m→5m · <15m→15m · <1h→1h · <4h→4h · <1D→diario · <1W→semanal · resto→mensual. Cada escalón es siempre MAYOR que el TF del gráfico.")
+tbl_man  = input.timeframe("15", title="Timeframe fijo (si el automático está apagado)", group=grpT)
+tbl_pos  = input.string(title="Posición", defval="Superior derecha", options=["Superior derecha","Superior izquierda","Inferior derecha","Inferior izquierda"], group=grpT)
+tbl_size = input.string(title="Tamaño", defval="Chico", options=["Muy chico","Chico","Normal"], group=grpT)
+tbl_pct  = input.bool(true, title="Agregar separación normalizada (%)", group=grpT)
+tbl_fmt  = input.string(title="Decimales", defval="0.00", options=["0","0.0","0.00","0.0000"], group=grpT)
+tbl_bg   = input.color(#1E222D, title="Fondo", group=grpT)
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ASH · cálculo
+// ═══════════════════════════════════════════════════════════════════════════
+// Todas las ramas se calculan siempre (CW10002). Las longitudes derivadas van
+// acotadas a >= 1 porque ashCalc() llama ma("SMA", Price, 1) y con len=1 el
+// HMA pedía ta.wma(src, 0), que es inválido.
+ma(type, src, len) =>
+    int   _lenH = math.max(1, len / 2)
+    int   _lenS = math.max(1, int(math.round(math.sqrt(len))))
+    float _off  = math.min(math.max(alma_offset, 0.0), 1.0)
+    float _sig  = math.max(alma_sigma, 0.001)
+    float _sma  = ta.sma(src, len)
+    float _ema  = ta.ema(src, len)
+    float _wma  = ta.wma(src, len)
+    float _smma = na(_wma[1]) ? _sma : (_wma[1] * (len - 1) + src) / len
+    float _hma  = ta.wma(2 * ta.wma(src, _lenH) - ta.wma(src, len), _lenS)
+    float _alma = ta.alma(src, len, _off, _sig)
+    float result = type=="SMA" ? _sma : type=="EMA" ? _ema : type=="WMA" ? _wma : type=="SMMA" ? _smma : type=="HMA" ? _hma : type=="ALMA" ? _alma : 0.0
+    result
+
+ashCalc() =>
+    Price = src
+    Price1 = ma("SMA",Price,1)
+    Price2 = ma("SMA",Price[1],1)
+    //RSI
+    Bulls0 = 0.5*(math.abs(Price1-Price2)+(Price1-Price2))
+    Bears0 = 0.5*(math.abs(Price1-Price2)-(Price1-Price2))
+    //STOCHASTIC
+    Bulls1 = Price1 - ta.lowest(Price1,Length)
+    Bears1 = ta.highest(Price1,Length) - Price1
+    //ADX
+    Bulls2 = 0.5*(math.abs(high-high[1])+(high-high[1]))
+    Bears2 = 0.5*(math.abs(low[1]-low)+(low[1]-low))
+    //
+    Bulls = Mode == "RSI" ? Bulls0 : Mode == "STOCHASTIC" ? Bulls1 : Bulls2
+    Bears = Mode == "RSI" ? Bears0 : Mode == "STOCHASTIC" ? Bears1 : Bears2
+    AvgBulls=ma(ma_type,Bulls,Length)
+    AvgBears=ma(ma_type,Bears,Length)
+    [ma(ma_type,AvgBulls,Smooth), ma(ma_type,AvgBears,Smooth)]
+
+[SmthBulls, SmthBears] = ashCalc()
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ▼ LEVIATHAN · Relative Volume
+//   Mozilla Public License 2.0 — https://mozilla.org/MPL/2.0/
+//   © LeviathanCapital
+// ═══════════════════════════════════════════════════════════════════════════
+f_relative(src) =>
+    src / ta.sma(src, rellen)
+
+rvol = f_relative(volume)
+
+CRV_COL = close>open ? upcol : downcol
+if show_mult1 and rvol >= mult
+    CRV_COL := close>open ? upcol_mult1 : downcol_mult1
+if show_mult2 and rvol >= mult2
+    CRV_COL := close>open ? upcol_mult2 : downcol_mult2
+if show_mult3 and rvol >= mult3
+    CRV_COL := close>open ? upcol_mult3 : downcol_mult3
+// ═══════════════════════════════════════════════════════════════════════════
+// ▲ LEVIATHAN
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Escala de las barras. Sólo dibujo: los umbrales de arriba ya se
+//    evaluaron contra el rvol crudo. Las ta.highest van al ámbito global para
+//    no repetir el CW10002.
+ashMax = ta.highest(math.max(nz(SmthBulls), nz(SmthBears)), bar_look)
+volMax = ta.highest(nz(rvol), bar_look)
+barK   = bar_fit and volMax > 1e-9 and ashMax > 0 ? ashMax * bar_pct / 100.0 / volMax : 1.0
+
+// Las barras van primero para que queden DETRÁS de las líneas del ASH.
+plot(rvol * barK, style=plot.style_columns, color=CRV_COL, title='RVOL', editable=false)
+plot(rvol, title='RVOL real', display=display.data_window, editable=false)
+
+// Líneas del ASH, sin tocar.
+bull_trend_color = (SmthBulls<SmthBulls[1])?color.lime:color.green
+bear_trend_color = (SmthBears<SmthBears[1])?color.orange:color.red
+plot(SmthBulls, title="ASH Bulls", color=bull_trend_color, linewidth=4)
+plot(SmthBears, title="ASH Bears", color=bear_trend_color, linewidth=4)
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ASH · CUADRO DE ESTADO DEL TIMEFRAME SUPERIOR
+// ═══════════════════════════════════════════════════════════════════════════
+tf_sec = timeframe.in_seconds()
+
+htf_auto = tf_sec <    300 ? "5"   :
+           tf_sec <    900 ? "15"  :
+           tf_sec <   3600 ? "60"  :
+           tf_sec <  14400 ? "240" :
+           tf_sec <  86400 ? "D"   :
+           tf_sec < 604800 ? "W"   : "M"
+
+htf_tf = tbl_auto ? htf_auto : tbl_man
+
+f_tfName(_tf) =>
+    int _s = timeframe.in_seconds(_tf)
+    string _n = "MENSUAL"
+    if _s < 3600
+        _n := str.tostring(int(math.round(_s / 60.0))) + " MINUTOS"
+    else if _s == 3600
+        _n := "1 HORA"
+    else if _s < 86400
+        _n := str.tostring(int(math.round(_s / 3600.0))) + " HORAS"
+    else if _s == 86400
+        _n := "DIARIO"
+    else if _s < 604800
+        _n := str.tostring(int(math.round(_s / 86400.0))) + " DÍAS"
+    else if _s < 2592000
+        _n := "SEMANAL"
+    _n
+
+htf_nm = f_tfName(htf_tf)
+
+[hBulls, hBears] = request.security(syminfo.tickerid, htf_tf, ashCalc(), lookahead=barmerge.lookahead_off)
+
+hDiff = hBulls - hBears
+hUp   = hDiff >= 0
+hSum  = hBulls + hBears
+hPct  = hSum > 0 ? math.abs(hDiff) / hSum * 100 : 0.0
+hCol  = hUp ? ((hBulls < hBulls[1]) ? color.lime : color.green) : ((hBears < hBears[1]) ? color.orange : color.red)
+
+t_pos = tbl_pos == "Superior izquierda" ? position.top_left : tbl_pos == "Inferior derecha" ? position.bottom_right : tbl_pos == "Inferior izquierda" ? position.bottom_left : position.top_right
+t_sz  = tbl_size == "Muy chico" ? size.tiny : tbl_size == "Normal" ? size.normal : size.small
+
+var table tbl = table.new(t_pos, 2, 2, border_width=1, border_color=color.new(color.gray, 70))
+
+if tbl_on and barstate.islast
+    table.cell(tbl, 0, 0, htf_nm, text_color=color.white, bgcolor=color.new(tbl_bg, 15), text_size=t_sz, text_halign=text.align_left)
+    table.cell(tbl, 1, 0, hUp ? "▲" : "▼", text_color=color.white, bgcolor=color.new(hCol, 20), text_size=t_sz)
+    table.cell(tbl, 0, 1, "Sep.", text_color=color.new(color.gray, 20), bgcolor=color.new(tbl_bg, 15), text_size=t_sz, text_halign=text.align_left)
+    table.cell(tbl, 1, 1, str.tostring(math.abs(hDiff), tbl_fmt) + (tbl_pct ? "  (" + str.tostring(hPct, "0.0") + "%)" : ""), text_color=hCol, bgcolor=color.new(tbl_bg, 15), text_size=t_sz, text_halign=text.align_right)
