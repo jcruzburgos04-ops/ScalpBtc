@@ -1,0 +1,402 @@
+[
+ {
+  "caso": "c01",
+  "comentario": "",
+  "guardado": "2026-09-30T22:36:50.776Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2023-01-08 16:21",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c02",
+  "comentario": "",
+  "guardado": "2026-09-30T22:37:03.687Z",
+  "lado": "short",
+  "sl": null,
+  "t_utc": "2023-01-30 13:00",
+  "tipo": "rebote",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c03",
+  "comentario": "Barre el minimo de antes de las 02:30 ademas de la mecha que deja al tocar la desviacion -2 del vwap. ",
+  "guardado": "2026-09-30T22:41:20.945Z",
+  "lado": "long",
+  "sl": 23278.9,
+  "t_utc": "2023-02-04 06:18",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c04",
+  "comentario": "No lo tomaria porque se encuentra en la parte alta del vwap",
+  "guardado": "2026-09-30T22:42:22.396Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2023-03-25 03:41",
+  "tipo": "continuacion",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c05",
+  "comentario": "Lo tomaria porque la mecha de las 09:55 tomo el alto de las 09:15 para despues bajar, ademas de que esto ocurrio en el vwap. Los indicadores en 5m se muestran bajistas. ",
+  "guardado": "2026-09-30T22:43:36.728Z",
+  "lado": "short",
+  "sl": 30246.3,
+  "t_utc": "2023-04-16 13:43",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c06",
+  "comentario": "No porque esta en la parte alta del vwap",
+  "guardado": "2026-09-30T22:44:42.746Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2023-05-07 15:09",
+  "tipo": "continuacion",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c07",
+  "comentario": "rechazo del vwap, buscando ir hasta dVAL despues de aproximarse al dVAH. Los indicadors en m5 se encuentran proximos e indecisos",
+  "guardado": "2026-09-30T22:45:50.613Z",
+  "lado": "short",
+  "sl": 27373.5,
+  "t_utc": "2023-05-18 03:23",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c08",
+  "comentario": "Luego de mechazo en 06:03 perdio fuerza el precio y en 5m rechazo las emas. Los demas indicadores estan bajistas o proximos a estarlo. Por lo menos hasta el dVAL o el low del monday",
+  "guardado": "2026-09-30T22:47:13.564Z",
+  "lado": "short",
+  "sl": 26785.9,
+  "t_utc": "2023-06-05 10:13",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c09",
+  "comentario": "A pesar de haber estado en la parte alta del vwap y tomar el hugh de 21:19, el precio en 5m rebota en las emas y los demas indicadores estan proximos a estar long o ya lo estan",
+  "guardado": "2026-09-30T22:48:32.613Z",
+  "lado": "long",
+  "sl": 25910,
+  "t_utc": "2023-06-13 01:57",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c10",
+  "comentario": "en el mechazo de las 00:07 toma el vwap y baja, en 5m el precio esta muy proximo a las emas (dichas emas estan juntas). Los indicadores estan proximos a estar bajistas. Buscaria el dVAL",
+  "guardado": "2026-09-30T22:49:45.168Z",
+  "lado": "short",
+  "sl": 26948.7,
+  "t_utc": "2023-06-20 03:21",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c11",
+  "comentario": "Precio tomando el pwVWAP y rechazondo el high anterior. En 5m el precio muy cerca de las emas juntas. No me gusta mucho el ash en 5m",
+  "guardado": "2026-09-30T22:53:15.281Z",
+  "lado": "short",
+  "sl": 30448.7,
+  "t_utc": "2023-07-05 14:55",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c12",
+  "comentario": "Precio rebotando cerca del vwap, ademas de indicador ash por cruzarse en 1m y precio en 5m rebotando en las emas",
+  "guardado": "2026-09-30T22:54:29.839Z",
+  "lado": "long",
+  "sl": 29950,
+  "t_utc": "2023-07-20 01:28",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c13",
+  "comentario": "Dudosa porque no logro tomar el low de 2:50 ademas de estar debajo de las emas en 5m, con ash bajista. ASH en 1m con muchas oscilaciones",
+  "guardado": "2026-09-30T22:55:24.124Z",
+  "lado": "long",
+  "sl": 29771.7,
+  "t_utc": "2023-07-21 06:08",
+  "tipo": "rebote",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c14",
+  "comentario": "Mal PA precio muy oscilante en 1m, pareciera que sin volumen. Pero los demas indicadores se muestran bajista",
+  "guardado": "2026-09-30T22:56:12.085Z",
+  "lado": "short",
+  "sl": 27555.1,
+  "t_utc": "2023-08-30 02:02",
+  "tipo": "rebote",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c15",
+  "comentario": "Precio en 5m rebotando en las emas, ash en 5m alcista. Ademas del precio en 1m y ash pasando a ser alcista. Sirve para un movimiento corto.\n",
+  "guardado": "2026-09-30T22:57:24.547Z",
+  "lado": "long",
+  "sl": 26309,
+  "t_utc": "2023-09-14 08:22",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c16",
+  "comentario": "Precio tomo el dVAH, dejando una mecha con cuerpo luego. Ash en 1m por volverse bajista. Aunque los datos de 5m estan muy alejados de las emas y el ash muy amplio ",
+  "guardado": "2026-09-30T22:58:15.878Z",
+  "lado": "short",
+  "sl": 27463.4,
+  "t_utc": "2023-10-04 08:07",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c17",
+  "comentario": "Precio no logra tomar el high de 7:10, pero tiene las emas de 5m muy cercana y el ash cercano a cruzarse . Tampoco me gsta la vela que dejo en 5m la de 6:55",
+  "guardado": "2026-09-30T22:59:59.125Z",
+  "lado": "short",
+  "sl": 26772.3,
+  "t_utc": "2023-10-12 11:06",
+  "tipo": "continuacion",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c18",
+  "comentario": "Buen rebote en la -2desviacion, ademas de tener llas emas muy cercanas en 5m. los demas indicadores en 1m por volverse alcistas ",
+  "guardado": "2026-09-30T23:00:51.993Z",
+  "lado": "long",
+  "sl": 35231.3,
+  "t_utc": "2023-11-08 08:32",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c19",
+  "comentario": "Precio rebota en el dVAL, con ash proximo en 1m. Pero precio en 5m y ash muy feos y alejados. ",
+  "guardado": "2026-09-30T23:02:35.183Z",
+  "lado": "long",
+  "sl": 43527.7,
+  "t_utc": "2023-12-23 02:46",
+  "tipo": "rebote",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c20",
+  "comentario": "Fueza en el inicio de la sesion, con  toma del 30d y dVAH. en 5m no me gustan los indiacadores ",
+  "guardado": "2026-09-30T23:03:36.429Z",
+  "lado": "short",
+  "sl": 42984.8,
+  "t_utc": "2024-01-04 00:20",
+  "tipo": "continuacion",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c21",
+  "comentario": "En 9:24 tomo el low de 8:33, ademas de que el precio en 5m esta muy cerca de als emas y el ash cercano. Buscaria hasta el vwap de la sesion",
+  "guardado": "2026-09-30T23:04:38.911Z",
+  "lado": "long",
+  "sl": 42363.1,
+  "t_utc": "2024-01-18 13:20",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c22",
+  "comentario": "Buen rebote luego de cocar el -2desviacion. No se ve bien en 5m. pero como rebote puede funcionar hasta el vwap o labels cercanos a esa zona. ",
+  "guardado": "2026-09-30T23:05:30.363Z",
+  "lado": "long",
+  "sl": 41557.6,
+  "t_utc": "2024-01-21 16:33",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c23",
+  "comentario": "Toma de lows, vela con cuerpo y en 5m lel precio cercano a las emas y el ash cercano ",
+  "guardado": "2026-09-30T23:07:14.778Z",
+  "lado": "long",
+  "sl": 42929.1,
+  "t_utc": "2024-02-02 10:07",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c24",
+  "comentario": "Precio muy estirado hacia arriba, con ash en 1m por cruzarse, pero en 5m se encuentran ambos muy alejados. Tal vez el rebote sea corto ",
+  "guardado": "2026-09-30T23:08:06.546Z",
+  "lado": "short",
+  "sl": 62073.6,
+  "t_utc": "2024-03-03 03:49",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c25",
+  "comentario": "En la parte baja del vwap, con el precio en 5m oscilando en las emas y el ash de 5m muy proximo a cruzarse al igual que el de 1m ",
+  "guardado": "2026-09-30T23:08:45.445Z",
+  "lado": "long",
+  "sl": 62891.2,
+  "t_utc": "2024-04-17 11:31",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c26",
+  "comentario": "Vela de 03:02 tomo lows y reboto en el DO. El precio en 5m oscilante en las emas y el ash por cruzarse",
+  "guardado": "2026-09-30T23:09:36.501Z",
+  "lado": "long",
+  "sl": 64925,
+  "t_utc": "2024-04-21 06:16",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c27",
+  "comentario": "Rebote en rVAH, a pesar de venir de la parte alta del vwap, fue sin volumen la caida y el precio reboto en 5m ",
+  "guardado": "2026-09-30T23:10:14.748Z",
+  "lado": "long",
+  "sl": 59211.5,
+  "t_utc": "2024-05-03 01:55",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c28",
+  "comentario": "Toma de lows en 00:26, precio oscilante de 5m en las emas y los ash por cruzarse ",
+  "guardado": "2026-09-30T23:11:10.493Z",
+  "lado": "long",
+  "sl": 61398,
+  "t_utc": "2024-05-09 03:30",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c29",
+  "comentario": "Toma de higs, precio y ash oscilante en 5. Pero el precio en 1m esta en un rango sin mucho movimiento",
+  "guardado": "2026-09-30T23:11:51.398Z",
+  "lado": "short",
+  "sl": 71359.3,
+  "t_utc": "2024-06-07 07:26",
+  "tipo": "continuacion",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c30",
+  "comentario": "Rebote para continuar cayendo, con precio cercano a emas en 5m y ash por cambiar en ambos times",
+  "guardado": "2026-09-30T23:12:27.592Z",
+  "lado": "long",
+  "sl": 66221.8,
+  "t_utc": "2024-06-16 08:57",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c31",
+  "comentario": "Precio muy amplio y ash en 5m tambien. puede ser una caida por la subida que tuvo en 1m ",
+  "guardado": "2026-09-30T23:13:04.922Z",
+  "lado": "short",
+  "sl": null,
+  "t_utc": "2024-06-21 15:05",
+  "tipo": "rebote",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c32",
+  "comentario": "Rebote en dVAL, con volumen. ASH en 1m cercano a cruzarse pero precio y ash en 5m alejado ",
+  "guardado": "2026-09-30T23:13:40.854Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2024-07-06 05:03",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c33",
+  "comentario": "Precio en 5m oscilando en las emas y ash por ponerse bajista. Aunque en 1m se esta por poner alcista",
+  "guardado": "2026-09-30T23:15:57.095Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2024-09-26 03:33",
+  "tipo": "rebote",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c34",
+  "comentario": "Precio en un rango ademas del ash con muchos cruces en un corto periodo. Precio y ash en 5 por rebotar",
+  "guardado": "2026-09-30T23:16:31.496Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2024-09-27 13:20",
+  "tipo": "continuacion",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c35",
+  "comentario": "Toma de highs, mecha cayendo con algo de volumen. En 5m el precio alejado de emas y ash tambien. Puede ser una toma de liquidez en emas de 1m. Pero rota en el rVAH",
+  "guardado": "2026-09-30T23:17:22.928Z",
+  "lado": "short",
+  "sl": 62387.1,
+  "t_utc": "2024-10-09 15:58",
+  "tipo": "rebote",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c36",
+  "comentario": "Precio bajando luego de tomar dVAL, puede ser algo arriesgado shortear la parte baja",
+  "guardado": "2026-09-30T23:18:52.773Z",
+  "lado": "short",
+  "sl": 66966,
+  "t_utc": "2024-10-24 09:21",
+  "tipo": "rebote",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c37",
+  "comentario": "Precio en 5 y 1 muy oscilante e indicadores tambien, puede salir para cualquier lado",
+  "guardado": "2026-09-30T23:20:34.133Z",
+  "lado": "long",
+  "sl": null,
+  "t_utc": "2024-11-08 13:05",
+  "tipo": "continuacion",
+  "tomaria": "no"
+ },
+ {
+  "caso": "c38",
+  "comentario": "Toma de highs, ash 1m por cruzar. Aunque en 5m el ash esta alejado y las emas pareceria que tambien",
+  "guardado": "2026-09-30T23:21:15.395Z",
+  "lado": "short",
+  "sl": 98645.9,
+  "t_utc": "2024-11-24 02:44",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ },
+ {
+  "caso": "c39",
+  "comentario": "Precio rechazo el dVAH en 9:45, pero en 1m esta oscilante el precio auqnue estan por ponerse bajistas los ash",
+  "guardado": "2026-09-30T23:22:24.081Z",
+  "lado": "short",
+  "sl": null,
+  "t_utc": "2024-12-25 13:43",
+  "tipo": "continuacion",
+  "tomaria": "dudosa"
+ },
+ {
+  "caso": "c40",
+  "comentario": "toma de highs de 00:22, vela con cuerppo y volumen, con ash proximos a cruzarse",
+  "guardado": "2026-09-30T23:23:00.860Z",
+  "lado": "short",
+  "sl": 96353.4,
+  "t_utc": "2024-12-27 03:27",
+  "tipo": "continuacion",
+  "tomaria": "si"
+ }
+]

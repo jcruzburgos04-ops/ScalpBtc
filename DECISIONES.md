@@ -77,3 +77,5 @@ con y sin · variantes de calendario A–D.
 - [2026-09-30] SUPUESTO · Señal inicial para la revisión (senales.py): ASH 1m rojo con brecha normalizada |gn| ≤ 0,5 y
   cerrándose; precio sobre las dos XO con EMA11 < EMA25, |EMA11−EMA25|/ATR ≤ 1,0 y cerrándose; primera vela en que se
   cumplen ambas; solo en la ventana. Umbrales amplios a propósito: los definitivos salen de las respuestas de Juan.
+- [2026-09-30] PENDIENTE · Agregar a la señal dos filtros que salen de la ronda 1: ubicación ≤ +1σ del VWAP de sesión
+  a favor del trade, y ≤ 3 cruces del ASH de 1m en los últimos 30 min. Validar con una ronda 2 de casos nuevos.

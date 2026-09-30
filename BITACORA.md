@@ -93,3 +93,13 @@
 - Página de revisión publicada (https://claude.ai/artifact/B1PLzfg9X72ZzoXCAs6ZCt); las respuestas quedan en su
   base (colección `respuestas`). Lightweight-charts necesitó formateadores propios de hora/precio: con el idioma del
   entorno ("en-US@posix") el formateo nativo fallaba y los gráficos quedaban vacíos.
+
+### Ronda 1 de revisión (40 casos respondidos)
+- 25 sí / 8 dudosa / 7 no. Las brechas del ASH y de las XO casi no separan los sí de los no; lo que separa es
+  (a) la **ubicación respecto del VWAP de sesión** (no compra por encima de +1σ ni vende por debajo de −1σ) y
+  (b) el **rango oscilante** (≥ 4 cruces del ASH de 1m en 30 min). Las dos juntas: 23/25 sí pasan, 7/7 no filtrados.
+  Elegidas sobre los mismos 40 → hace falta una ronda nueva para validarlas. Detalle: `reports/f2/ronda1_analisis.md`.
+- Sus comentarios mencionan mucho la "toma de lows/highs" (barrida de liquidez) y los rebotes en −2σ, dVAL, DO, rVAH:
+  la barrida aparece en 36 % de los sí contra 12–14 % del resto; se deja para el estudio de niveles/volumen (F5–F6).
+- Tipo continuación/rebote con d ≤ 1 ATR de 5m: coincide 34/40.
+- SL: riesgo mediana 2,65 ATR; extremo de las últimas 2–5 velas + 0,3–0,7 ATR.
