@@ -1,0 +1,309 @@
+<title>Revisión de señales XO·ASH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: barra de progreso con las 40 fichas arriba; debajo, gráficos del caso a la izquierda y la respuesta a la derecha (apilado en el celular). */
+:root {
+  --bg: #f3f4f1; --panel: #ffffff; --fg: #1c2127; --muted: #65707a; --line: #d9ddd8;
+  --grid: #eceee9; --up: #13947f; --down: #d6504a; --accent: #c98a0b; --vwap: #1f8fb3;
+  --e11: #13947f; --e25: #d6504a; --bulls: #2e9e5b; --bears: #d6504a; --lvl: #7b6fc2;
+  --ok: #1f8f5a; --no: #c2453f; --maybe: #b8860b;
+  --f-ui: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --f-head: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-num: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161b; --panel: #181d23; --fg: #e3e7ea; --muted: #8b96a0; --line: #2a323b;
+  --grid: #1f262d; --up: #26a69a; --down: #ef5350; --accent: #e3a92b; --vwap: #38b6db;
+  --e11: #26a69a; --e25: #ef5350; --bulls: #4caf50; --bears: #ef5350; --lvl: #a99ce8;
+  --ok: #3fb97a; --no: #ef6a63; --maybe: #e3a92b; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #12161b; --panel: #181d23; --fg: #e3e7ea; --muted: #8b96a0; --line: #2a323b;
+  --grid: #1f262d; --up: #26a69a; --down: #ef5350; --accent: #e3a92b; --vwap: #38b6db;
+  --e11: #26a69a; --e25: #ef5350; --bulls: #4caf50; --bears: #ef5350; --lvl: #a99ce8;
+  --ok: #3fb97a; --no: #ef6a63; --maybe: #e3a92b; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 15px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 48px; display: grid; gap: 14px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; }
+h1 { font-family: var(--f-head); font-weight: 600; font-size: 1.7rem; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 70ch; line-height: 1.45; margin: 0; }
+.prog { font-family: var(--f-num); font-size: .9rem; color: var(--muted); }
+.fichas { display: flex; flex-wrap: wrap; gap: 6px; }
+.ficha { font-family: var(--f-num); font-size: .78rem; min-width: 2.4rem; padding: 5px 0; text-align: center; border-radius: 4px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; }
+.ficha[data-r="si"] { border-color: var(--ok); color: var(--ok); }
+.ficha[data-r="no"] { border-color: var(--no); color: var(--no); }
+.ficha[data-r="dudosa"] { border-color: var(--maybe); color: var(--maybe); }
+.ficha[aria-current="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.ficha:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.caso { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .caso { grid-template-columns: minmax(0, 1fr); } }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-family: var(--f-num); font-size: .88rem; color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 500; }
+.lado { font-family: var(--f-head); font-size: 1rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 10px; border-radius: 3px; color: var(--bg); }
+.lado.long { background: var(--up); } .lado.short { background: var(--down); }
+.graficos { display: grid; gap: 4px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px; min-width: 0; }
+.rot { font-family: var(--f-head); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.rot span { display: inline-flex; align-items: center; gap: 5px; text-transform: none; letter-spacing: 0; font-family: var(--f-num); font-size: .72rem; }
+.rot i { width: 12px; height: 2px; display: inline-block; }
+.c1m { height: 360px; } .cash { height: 150px; } .c5m { height: 230px; }
+form { display: grid; gap: 16px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
+legend, .lbl { font-family: var(--f-head); font-weight: 600; font-size: .95rem; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; padding: 0; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg label { flex: 1 1 0; min-width: 72px; text-align: center; padding: 9px 6px; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; background: var(--bg); font-weight: 500; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+.seg label.si:has(input:checked) { background: var(--ok); border-color: var(--ok); }
+.seg label.no:has(input:checked) { background: var(--no); border-color: var(--no); }
+.seg label.dudosa:has(input:checked) { background: var(--maybe); border-color: var(--maybe); }
+.campo { display: grid; gap: 5px; }
+.campo input, textarea { font: inherit; font-size: .95rem; padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--fg); width: 100%; box-sizing: border-box; }
+.campo input { font-family: var(--f-num); }
+textarea { min-height: 84px; resize: vertical; }
+.ayuda { color: var(--muted); font-size: .84rem; line-height: 1.4; margin: 0; }
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+button { font: inherit; font-weight: 600; padding: 10px 14px; border-radius: 5px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+button.prim { background: var(--accent); border-color: var(--accent); color: #17130a; flex: 1 1 auto; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.estado { font-size: .85rem; color: var(--muted); min-height: 1.2em; margin: 0; }
+.aviso { border: 1px solid var(--maybe); border-radius: 6px; padding: 10px 12px; color: var(--fg); background: var(--panel); margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Revisión de señales XO·ASH</h1>
+    <span class="prog" id="prog">0 / 40 respondidas</span>
+    <p class="sub">40 señales de 2023–2024 generadas con umbrales amplios. Cada gráfico termina en la vela de la señal (lo que verías en vivo, sin lo que pasó después). Respondé si la tomarías y, si querés, dónde pondrías el SL: con eso se ajusta qué significa "próximo a ponerse verde" y "por cruzarse". Horas en ART.</p>
+  </header>
+  <p class="aviso" id="sinDb" hidden>Esta vista no puede guardar respuestas. Abrí la página desde claude.ai con tu cuenta.</p>
+  <nav class="fichas" id="fichas" aria-label="Casos"></nav>
+
+  <section class="caso">
+    <div class="graficos">
+      <div class="meta" id="meta"></div>
+      <div class="panel">
+        <p class="rot">1m · <span><i style="background:var(--e11)"></i>EMA 11</span><span><i style="background:var(--e25)"></i>EMA 25</span><span><i style="background:var(--vwap)"></i>VWAP sesión ±1σ ±2σ</span><span><i style="background:var(--lvl)"></i>etiquetas</span></p>
+        <div class="c1m" id="g1m"></div>
+      </div>
+      <div class="panel">
+        <p class="rot">ASH 1m (16·4 EMA) + RVOL · <span><i style="background:var(--bulls)"></i>Bulls</span><span><i style="background:var(--bears)"></i>Bears</span></p>
+        <div class="cash" id="gash"></div>
+      </div>
+      <div class="panel">
+        <p class="rot">5m · última vela en formación · <span><i style="background:var(--e11)"></i>EMA 11</span><span><i style="background:var(--e25)"></i>EMA 25</span><span><i style="background:var(--bulls)"></i>ASH Bulls 5m</span><span><i style="background:var(--bears)"></i>ASH Bears 5m</span></p>
+        <div class="c5m" id="g5m"></div>
+      </div>
+    </div>
+
+    <form id="form" class="panel" autocomplete="off">
+      <fieldset>
+        <legend>¿La tomarías?</legend>
+        <div class="seg">
+          <label class="si"><input type="radio" name="tomaria" id="t-si" value="si">Sí</label>
+          <label class="no"><input type="radio" name="tomaria" id="t-no" value="no">No</label>
+          <label class="dudosa"><input type="radio" name="tomaria" id="t-dudosa" value="dudosa">Dudosa</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Tipo</legend>
+        <div class="seg">
+          <label><input type="radio" name="tipo" id="p-cont" value="continuacion">Continuación</label>
+          <label><input type="radio" name="tipo" id="p-reb" value="rebote">Rebote</label>
+        </div>
+        <p class="ayuda" id="tipoSug"></p>
+      </fieldset>
+      <div class="campo">
+        <label for="sl" class="lbl">Stop loss</label>
+        <input id="sl" name="sl" inputmode="decimal" placeholder="Hacé clic en el gráfico de 1m">
+        <p class="ayuda">Clic en el gráfico de 1m a la altura donde lo pondrías, o escribí el precio.</p>
+      </div>
+      <div class="campo">
+        <label for="com" class="lbl">Comentario</label>
+        <textarea id="com" name="com" placeholder="Qué te hace tomarla o no: ASH, XO, 5m, niveles…"></textarea>
+      </div>
+      <div class="acciones">
+        <button type="button" id="prev">← Anterior</button>
+        <button type="submit" class="prim" id="guardar">Guardar y seguir</button>
+      </div>
+      <p class="estado" id="estado" role="status"></p>
+    </form>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+const CASOS = __CASOS__;
+const ART = -3 * 3600;           // hora argentina (sin horario de verano)
+let idx = 0, resp = {}, db = null, graficos = [], slLinea = null, serieVelas = null;
+const $ = (id) => document.getElementById(id);
+// formato propio (sin Intl): los tiempos ya vienen corridos a hora ART
+const dos = (n) => String(n).padStart(2, "0");
+const hhmm = (t) => { const d = new Date(t * 1000); return dos(d.getUTCHours()) + ":" + dos(d.getUTCMinutes()); };
+const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function fichas() {
+  const nav = $("fichas"); nav.textContent = "";
+  CASOS.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "ficha"; b.textContent = String(i + 1).padStart(2, "0");
+    b.setAttribute("aria-label", `Caso ${i + 1}`);
+    if (resp[c.id]) b.dataset.r = resp[c.id].tomaria || "";
+    if (i === idx) b.setAttribute("aria-current", "true");
+    b.onclick = () => ir(i);
+    nav.appendChild(b);
+  });
+  const n = CASOS.filter(c => resp[c.id] && resp[c.id].tomaria).length;
+  $("prog").textContent = `${n} / ${CASOS.length} respondidas`;
+}
+
+function limpiar() { graficos.forEach(g => g.remove()); graficos = []; slLinea = null; }
+
+function base(el, h) {
+  const g = LightweightCharts.createChart(el, {
+    height: h, autoSize: true,
+    layout: { background: { color: tok("--panel") }, textColor: tok("--muted"), fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
+    grid: { vertLines: { color: tok("--grid") }, horzLines: { color: tok("--grid") } },
+    rightPriceScale: { borderColor: tok("--line") },
+    timeScale: { borderColor: tok("--line"), timeVisible: true, secondsVisible: false, rightOffset: 4, tickMarkFormatter: (t) => hhmm(t) },
+    crosshair: { mode: 0 },
+    localization: { locale: "es-AR", priceFormatter: (v) => v.toFixed(1), timeFormatter: hhmm },
+    handleScroll: true, handleScale: true,
+  });
+  graficos.push(g); return g;
+}
+const linea = (g, color, w = 1, estilo = 0) => g.addLineSeries({ color, lineWidth: w, lineStyle: estilo, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+const pts = (arr, k) => arr.filter(x => x[k] != null).map(x => ({ time: x.t + ART, value: x[k] }));
+
+function dibujar() {
+  limpiar();
+  const c = CASOS[idx];
+  const up = tok("--up"), dn = tok("--down");
+  // ── 1m
+  const g1 = base($("g1m"), 360);
+  const vw = tok("--vwap");
+  [["p2", 2], ["m2", 2], ["p1", 1], ["m1", 1]].forEach(([k, e]) => linea(g1, vw, 1, e).setData(pts(c.velas, k)));
+  linea(g1, vw, 2).setData(pts(c.velas, "vw"));
+  linea(g1, tok("--e11"), 2).setData(pts(c.velas, "e11"));
+  linea(g1, tok("--e25"), 2).setData(pts(c.velas, "e25"));
+  serieVelas = g1.addCandlestickSeries({ upColor: up, downColor: dn, borderUpColor: up, borderDownColor: dn, wickUpColor: up, wickDownColor: dn, priceLineVisible: false });
+  serieVelas.setData(c.velas.map(x => ({ time: x.t + ART, open: x.o, high: x.h, low: x.l, close: x.c })));
+  const ult = c.velas[c.velas.length - 1];
+  serieVelas.setMarkers([{ time: ult.t + ART, position: c.lado === "long" ? "belowBar" : "aboveBar", color: tok("--accent"),
+    shape: c.lado === "long" ? "arrowUp" : "arrowDown", text: "señal" }]);
+  const lo = Math.min(...c.velas.map(x => x.l)), hi = Math.max(...c.velas.map(x => x.h)), rg = hi - lo;
+  c.niveles.filter(n => n.p >= lo - 0.35 * rg && n.p <= hi + 0.35 * rg).forEach(n =>
+    serieVelas.createPriceLine({ price: n.p, color: tok("--lvl"), lineWidth: 1, lineStyle: 3, axisLabelVisible: true, title: n.n }));
+  g1.subscribeClick(p => {
+    if (!p.point) return;
+    const precio = serieVelas.coordinateToPrice(p.point.y);
+    if (precio == null) return;
+    $("sl").value = (Math.round(precio * 10) / 10).toFixed(1); marcarSL();
+  });
+  // ── ASH + RVOL 1m (RVOL en la escala izquierda)
+  const ga = base($("gash"), 150);
+  ga.applyOptions({ leftPriceScale: { visible: false } });
+  const rv = ga.addHistogramSeries({ priceScaleId: "left", priceLineVisible: false, lastValueVisible: false });
+  rv.setData(c.velas.filter(x => x.rv != null).map(x => ({ time: x.t + ART, value: x.rv,
+    color: (x.c > x.o ? up : dn) + (x.rv >= 1.5 ? "cc" : "40") })));
+  ga.priceScale("left").applyOptions({ scaleMargins: { top: 0.55, bottom: 0 } });
+  linea(ga, tok("--bulls"), 2).setData(pts(c.velas, "bu"));
+  linea(ga, tok("--bears"), 2).setData(pts(c.velas, "be"));
+  // sincronizar el zoom de 1m y ASH
+  let sinc = false;
+  const par = (a, b) => a.timeScale().subscribeVisibleLogicalRangeChange(r => { if (sinc || !r) return; sinc = true; b.timeScale().setVisibleLogicalRange(r); sinc = false; });
+  par(g1, ga); par(ga, g1);
+  // ── 5m (ASH de 5m en la escala izquierda, abajo)
+  const g5 = base($("g5m"), 230);
+  const s5 = g5.addCandlestickSeries({ upColor: up, downColor: dn, borderUpColor: up, borderDownColor: dn, wickUpColor: up, wickDownColor: dn, priceLineVisible: false });
+  s5.setData(c.velas5.map(x => ({ time: x.t + ART, open: x.o, high: x.h, low: x.l, close: x.c })));
+  s5.priceScale().applyOptions({ scaleMargins: { top: 0.05, bottom: 0.35 } });
+  linea(g5, tok("--e11"), 2).setData(pts(c.velas5, "e11"));
+  linea(g5, tok("--e25"), 2).setData(pts(c.velas5, "e25"));
+  const ab = g5.addLineSeries({ priceScaleId: "ash5", color: tok("--bulls"), lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  const ae = g5.addLineSeries({ priceScaleId: "ash5", color: tok("--bears"), lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  ab.setData(pts(c.velas5, "bu")); ae.setData(pts(c.velas5, "be"));
+  g5.priceScale("ash5").applyOptions({ scaleMargins: { top: 0.72, bottom: 0 }, visible: false });
+  [g1, ga, g5].forEach(g => g.timeScale().fitContent());
+  s5.setMarkers([{ time: c.velas5[c.velas5.length - 1].t + ART, position: "aboveBar", color: tok("--accent"), shape: "circle", text: "en formación" }]);
+}
+
+function marcarSL() {
+  if (!serieVelas) return;
+  if (slLinea) { serieVelas.removePriceLine(slLinea); slLinea = null; }
+  const v = parseFloat(String($("sl").value).replace(",", "."));
+  if (Number.isFinite(v)) slLinea = serieVelas.createPriceLine({ price: v, color: tok("--no"), lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: "SL" });
+}
+
+function cargarForm() {
+  const c = CASOS[idx], r = resp[c.id] || {};
+  $("meta").innerHTML = "";
+  const m = $("meta");
+  const lado = document.createElement("span"); lado.className = "lado " + c.lado; lado.textContent = c.lado; m.appendChild(lado);
+  const it = (k, v) => { const s = document.createElement("span"); s.append(k + " "); const b = document.createElement("b"); b.textContent = v; s.appendChild(b); m.appendChild(s); };
+  it("caso", `${idx + 1} de ${CASOS.length}`); it("ART", c.art); it("UTC", c.utc); it("día", c.dow);
+  $("tipoSug").textContent = `El código la clasificó como ${c.tipo === "continuacion" ? "continuación" : "rebote"} (distancia del precio a las EMAs de 5m).`;
+  document.querySelectorAll('input[name="tomaria"]').forEach(x => x.checked = x.value === r.tomaria);
+  document.querySelectorAll('input[name="tipo"]').forEach(x => x.checked = x.value === (r.tipo || c.tipo));
+  $("sl").value = r.sl ?? ""; $("com").value = r.comentario ?? "";
+  $("prev").disabled = idx === 0;
+  $("estado").textContent = r.tomaria ? "Guardada. Podés cambiarla y volver a guardar." : "";
+}
+
+function ir(i) {
+  idx = Math.max(0, Math.min(CASOS.length - 1, i));
+  try { localStorage.setItem("caso", String(idx)); } catch (e) {}
+  cargarForm(); dibujar(); marcarSL(); fichas();
+}
+
+$("sl").addEventListener("change", marcarSL);
+$("prev").onclick = () => ir(idx - 1);
+$("form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const c = CASOS[idx], f = new FormData($("form"));
+  const tomaria = f.get("tomaria");
+  if (!tomaria) { $("estado").textContent = "Elegí Sí, No o Dudosa antes de guardar."; return; }
+  const slTxt = String(f.get("sl") || "").replace(",", ".").trim();
+  const sl = slTxt === "" ? null : Number(slTxt);
+  if (slTxt !== "" && !Number.isFinite(sl)) { $("estado").textContent = "El SL tiene que ser un precio, por ejemplo 43125.5."; return; }
+  const doc = { caso: c.id, t_utc: c.utc, lado: c.lado, tomaria, tipo: f.get("tipo") || c.tipo, sl, comentario: String(f.get("com") || ""), guardado: new Date().toISOString() };
+  if (!db) { $("estado").textContent = "No se pudo guardar: esta vista no tiene acceso a las respuestas."; return; }
+  $("guardar").disabled = true; $("estado").textContent = "Guardando…";
+  try {
+    await db.collection("respuestas").doc(c.id).set(doc);
+    resp[c.id] = doc; $("estado").textContent = "Guardada.";
+    fichas();
+    const sig = CASOS.findIndex((x, i) => i > idx && !(resp[x.id] && resp[x.id].tomaria));
+    if (sig >= 0) ir(sig); else if (idx < CASOS.length - 1) ir(idx + 1);
+    else $("estado").textContent = "Guardada. Era el último caso.";
+  } catch (e) {
+    $("estado").textContent = e && e.code === "invalid_argument" ? "No tenés permiso para guardar en esta página." : "No se pudo guardar. Probá de nuevo en unos segundos.";
+  } finally { $("guardar").disabled = false; }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowRight") ir(idx + 1);
+  if (e.key === "ArrowLeft") ir(idx - 1);
+});
+// redibujar si cambia el tema
+const redibujar = () => { dibujar(); marcarSL(); };
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redibujar); } catch (e) {}
+new MutationObserver(redibujar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+try { const g = parseInt(localStorage.getItem("caso"), 10); if (Number.isFinite(g)) idx = Math.min(Math.max(g, 0), CASOS.length - 1); } catch (e) {}
+ir(idx);
+
+(async () => {
+  db = window.claude && window.claude.use ? await window.claude.use("db") : null;
+  if (!db) { $("sinDb").hidden = false; return; }
+  db.collection("respuestas").onSnapshot((snap) => {
+    resp = {}; snap.docs.forEach(d => { resp[d.id] = d.data(); });
+    fichas();
+    const r = resp[CASOS[idx].id];
+    if (r && !$("form").contains(document.activeElement)) cargarForm(), marcarSL();
+  }, () => { $("estado").textContent = "Se cortó la conexión con las respuestas. Recargá la página."; });
+})();
+</script>

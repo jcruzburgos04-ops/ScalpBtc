@@ -84,3 +84,12 @@
 - Cruce con nuestra réplica (TW1, 2026-02-20; su gráfico está en UTC+1): entradas long 67 127,32 y 67 135,84 a las
   ~01:26 UTC; nuestro **dVAL = 67 129,0** y VWAP −1σ = 67 121–67 134; salida ~67 311 ≈ dVAH 67 321 / +1σ 67 327.
   Rango 00:30–02:50 UTC entre dVAL y dVAH. Primer control de paridad contra un gráfico de TV: coincide.
+
+## F2 · Calibración de la señal (2026-09-30)
+- `src/senales.py`: señal inicial con umbrales amplios → 25 346 señales en la ventana de 2023–2024 (~35/día); solo
+  para muestrear. Mediana |gn| del ASH 0,043; mediana |xg| de las XO 0,34 ATR.
+- `src/f2_muestra.py`: 40 casos estratificados (3 tramos de |gn| × 3 de |xg|, long/short, continuación/rebote, días
+  distintos, 12 de fin de semana). Cada caso se dibuja SOLO hasta la vela de la señal (sin ver el resultado).
+- Página de revisión publicada (https://claude.ai/artifact/B1PLzfg9X72ZzoXCAs6ZCt); las respuestas quedan en su
+  base (colección `respuestas`). Lightweight-charts necesitó formateadores propios de hora/precio: con el idioma del
+  entorno ("en-US@posix") el formateo nativo fallaba y los gráficos quedaban vacíos.

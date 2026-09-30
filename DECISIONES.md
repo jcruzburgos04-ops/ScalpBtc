@@ -67,8 +67,13 @@ con y sin · variantes de calendario A–D.
     se reportan separados, sin mezclarlos con el grupo 1.
 
 ## Calibración de la señal (F2)
-- [2026-09-30] PENDIENTE · Juan no operó en 2023–2024 y no puede ver ese período en TV gratis, así que no hay marcas
-  propias. Propuesta: en vez de marcar desde cero, Juan revisa ~40 señales generadas por el código en 2023–2024,
+- [2026-09-30] CONFIRMADA (Juan: "avancemos con la propuesta simple") · Juan no operó en 2023–2024 y no puede ver
+  ese período en TV gratis, así que no hay marcas propias. Método: en vez de marcar desde cero, Juan revisa ~40 señales generadas por el código en 2023–2024,
   dibujadas con sus indicadores, y responde "la tomaría / no la tomaría" (y dónde pondría el SL). Con eso se
   ajustan los umbrales de "próximo a ponerse verde" / "por cruzarse". Alternativa sin Juan: fijar a priori 3–4
   variantes objetivas de la señal y elegir entre ellas solo con 2023–2024.
+- [2026-09-30] AVISO · F2 arrancó con F1 todavía sin validar contra TV (Juan pidió avanzar). Si la paridad de F1 muestra
+  diferencias, se corrigen los indicadores, se regeneran las señales y se revisan las respuestas afectadas.
+- [2026-09-30] SUPUESTO · Señal inicial para la revisión (senales.py): ASH 1m rojo con brecha normalizada |gn| ≤ 0,5 y
+  cerrándose; precio sobre las dos XO con EMA11 < EMA25, |EMA11−EMA25|/ATR ≤ 1,0 y cerrándose; primera vela en que se
+  cumplen ambas; solo en la ventana. Umbrales amplios a propósito: los definitivos salen de las respuestas de Juan.
