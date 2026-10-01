@@ -1,0 +1,72 @@
+[
+ {
+  "id": "C01",
+  "estado": "si",
+  "comentario": "varias señales B2"
+ },
+ {
+  "id": "C02",
+  "estado": "si",
+  "comentario": "no aparece donde es que B2 lo detecta"
+ },
+ {
+  "id": "C03",
+  "estado": "si",
+  "comentario": ""
+ },
+ {
+  "id": "C04",
+  "estado": "si",
+  "comentario": "aparecen 2 señales B2, en la primera despues hay una mecha que barre el low. Que podria haber sido su sl"
+ },
+ {
+  "id": "C05",
+  "estado": "si",
+  "comentario": "el b2 parece detectar un short, al cual le barren el high (sl). El trader detecta un long que B2 no"
+ },
+ {
+  "id": "C06",
+  "estado": "si",
+  "comentario": "B2 no detecta"
+ },
+ {
+  "id": "C07",
+  "estado": "si",
+  "comentario": "B2 no detecta la reentrada, la detecta cerca de la entrada, vuelve a pasar lo mismo que despues del primer B2 hay una vela que barre el low (sl)"
+ },
+ {
+  "id": "C08",
+  "estado": "si",
+  "comentario": ""
+ },
+ {
+  "id": "C09",
+  "estado": "si",
+  "comentario": "B2 la detecta antes"
+ },
+ {
+  "id": "C10",
+  "estado": "si",
+  "comentario": "si, pero vuelve a ocurrir lo mismo. Despues del primer B2 hay una mecha que barre los lows."
+ },
+ {
+  "id": "C11",
+  "estado": "si",
+  "comentario": "al reves, es una señal que B2 no detecto y el trader tampoco. Aprece un long que B2 no detecta"
+ },
+ {
+  "id": "C12",
+  "estado": "si",
+  "comentario": ""
+ },
+ {
+  "id": "C13",
+  "estado": "nose",
+  "comentario": "no hay ninguna señal de b2 ahi"
+ },
+ {
+  "id": "C14",
+  "estado": "nose",
+  "comentario": "puede ser, pero b2 tampoco detecto los longs anteriores"
+ }
+]

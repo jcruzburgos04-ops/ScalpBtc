@@ -276,3 +276,12 @@
   con el disparo base. Mejor: "hondo_ag" = más allá de ±1,5σ + primera vela sin extremo nuevo de 5 velas, que cierra a
   favor y con delta a favor (agresión agotada): detecta 45 % de sus entradas, 22 % de precisión, precio −0,06 ATR (igual
   al suyo), 12 señales/día. Ronda 2 (mismos 14 momentos): https://claude.ai/artifact/3t9jmiVuWsfE5xUn5i1Mo4
+- Ronda 2 de B2 (Juan): 12 sí, 2 no sé. Observación central: tras la 1.ª señal B2 una mecha barre el low/high → SL.
+- Diagnóstico (`src/b2_barrida.py`, `b2_sl.py`, `b2_primera.py`; jul–sep 2026, velas de 1m, sin BE): 1147 señales en
+  400 jugadas (61 % con más de una señal). Al 80 % le barren el extremo de 10 velas antes de llegar al VWAP; la 1.ª
+  señal 77 %, las siguientes 82 %; ignorar la 1.ª y entrar tras la barrida de su extremo: 78 % (no lo arregla).
+  Entre las que llegan al VWAP, el precio pasa el extremo una mediana de 2,9 ATR antes (solo 8 % son mechas ≤ 1 ATR):
+  no es una mecha, es que el movimiento sigue. Ampliar el SL (0,25 → 1,5 ATR) no mejora el R medio (−0,05 a −0,09).
+  Al momento de la 1.ª señal, las jugadas sin barrida tienen algo más de volumen (3,8× vs 2,9×), absorción, ATR
+  expandido (1,9× vs 1,6×) y menos recorrido en 4 h, pero ningún cuartil baja la barrida de 67 %.
+  Ojo: "1.ª señal de jugadas con una sola señal" (+1,23 R) usa información futura (que no hubo más señales).
