@@ -14,6 +14,16 @@ RAIZ = Path(__file__).resolve().parent.parent
 B2 = RAIZ / "reports" / "b2"
 VAR = sys.argv[1] if len(sys.argv) > 1 else "V10"
 ANTES, DESPUES = 150, 60
+if "--mismos" in sys.argv:
+    COLECCION = "b2_revision2"
+    DESC = ("Ronda 2. Mismos 14 momentos que revisaste, con el disparo recalibrado: B2 ahora espera que el precio esté más "
+            "allá de ±1,5σ del VWAP de sesión (antes ±1σ), con volumen 15 min ≥ 1,5× y absorción, y entra en la primera "
+            "vela que deja de hacer extremos nuevos, cierra a favor y tiene delta a favor (la agresión en contra se agotó). "
+            "La etiqueta de cada caso es la de la ronda 1. Mirá si ahora entra donde entraría el trader.")
+else:
+    COLECCION = "b2_revision"
+    DESC = ("B2 entra como el trader: lejos del VWAP de sesión (más allá de ±1σ en contra), con el volumen de los últimos "
+            "15 min a ≥ 1,5× lo normal y absorción. Antes de medir resultados, mirá si B2 marca entradas parecidas a las suyas.")
 LINEAS = {"vwap": "vwap_d", "p1": "vwap_d_p1", "m1": "vwap_d_m1", "p2": "vwap_d_p2", "m2": "vwap_d_m2",
           "vw": "vwap_w", "rv": "rVWAP", "vah": "dVAH", "val": "dVAL", "e11": "ema11", "e25": "ema25"}
 
@@ -30,7 +40,7 @@ def main(semilla: int = 3) -> None:
     s = pl.read_parquet(B2 / f"senales_sep_{VAR}.parquet")
     tr = pl.read_parquet(RAIZ / "reports" / "trader_sep" / "entradas.parquet").filter(pl.col("t_entrada").is_not_null())
     ent = [(int(a), b, c, float(d)) for a, b, c, d in tr.select("t_entrada", "lado", "id", "entrada").iter_rows()]
-    sen = [(int(a), b) for a, b in s.iter_rows()]
+    sen = [(int(a), b) for a, b in s.select("t_senal", "lado").iter_rows()]
     dias = {}
     for te, *_ in ent:
         d = te // 86_400_000
@@ -43,6 +53,12 @@ def main(semilla: int = 3) -> None:
     grupos = [("Entrada del trader que B2 detecta", [(e[0], e[1]) for e in rnd.sample(detect, min(5, len(detect)))]),
               ("Entrada del trader que B2 NO detecta", [(e[0], e[1]) for e in rnd.sample(no_det, min(4, len(no_det)))]),
               ("Señal de B2 que el trader no tomó", rnd.sample(no_tom, min(5, len(no_tom))))]
+    prev = B2 / "pagina" / "casos_centros.json"
+    if prev.exists() and "--mismos" in sys.argv:   # mismos 14 momentos que la revisión anterior, con las señales nuevas
+        grupos = [(e, [tuple(x) for x in l]) for e, l in json.loads(prev.read_text())]
+    else:
+        (B2 / "pagina").mkdir(parents=True, exist_ok=True)
+        prev.write_text(json.dumps(grupos))
     casos = []
     for etiqueta, lista in grupos:
         for centro, lado in sorted(lista):
@@ -63,10 +79,10 @@ def main(semilla: int = 3) -> None:
                          "CVD 15 min": f"{sg * k['cvd15'] * 100:+.0f} % a favor",
                          "VWAP sesión": f"{(k['close'] - k['vwap_d']) / (k['vwap_d_p1'] - k['vwap_d']):+.1f}σ"},
             })
-    out = B2 / "pagina"
+    out = B2 / ("pagina2" if "--mismos" in sys.argv else "pagina")
     out.mkdir(parents=True, exist_ok=True)
     html = (RAIZ / "src" / "plantillas" / "b2_revision.html").read_text()
-    html = html.replace("__CASOS__", json.dumps(casos, separators=(",", ":"), ensure_ascii=False)).replace("__VAR__", VAR)
+    html = html.replace("__CASOS__", json.dumps(casos, separators=(",", ":"), ensure_ascii=False)).replace("__VAR__", VAR).replace("__COLECCION__", COLECCION).replace("__DESC__", DESC)
     (out / "b2_revision.html").write_text(html)
     print(out / "b2_revision.html", len(casos), "casos;", len(detect), "detectadas,", len(no_det), "no detectadas,", len(no_tom), "no tomadas")
 

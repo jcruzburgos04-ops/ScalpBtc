@@ -74,7 +74,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
 <div class="wrap">
   <header style="display:grid;gap:10px">
     <h1>Estrategia B2 · casos de septiembre</h1>
-    <p class="sub">B2 entra como el trader: lejos del VWAP de sesión (más allá de ±1σ en contra), con el volumen de los últimos 15 min a ≥ 1,5× lo normal y absorción (mucho volumen y poco rango en las últimas 5 velas). Variante __VAR__. Antes de medir resultados, mirá si B2 marca entradas parecidas a las suyas. Hay tres grupos: entradas suyas que B2 detecta, entradas suyas que no detecta y señales de B2 que él no tomó.</p>
+    <p class="sub">__DESC__</p>
     <div class="leyenda">
       <span><i style="background:var(--vwap)"></i>VWAP sesión</span>
       <span><i style="background:var(--band)"></i>±1σ ±2σ</span>
@@ -147,12 +147,12 @@ async function guardar(id, estado) {
   resp[id] = r; pintar(id); progreso(); const st = s.querySelector(".estado");
   if (!db) { st.textContent = "No se puede guardar en esta vista"; return; }
   st.textContent = "Guardando…";
-  try { await db.collection("b2_revision").doc(id).set(r); st.textContent = "Guardado"; } catch (e) { st.textContent = "No se guardó. Probá de nuevo."; }
+  try { await db.collection("__COLECCION__").doc(id).set(r); st.textContent = "Guardado"; } catch (e) { st.textContent = "No se guardó. Probá de nuevo."; }
 }
 const cont = document.getElementById("casos"); CASOS.forEach((c) => cont.appendChild(tarjeta(c)));
 const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) grafico(CASOS.find((c) => "g-" + c.id === e.target.id)); }), { rootMargin: "800px 0px" }) : null;
 document.querySelectorAll(".graf").forEach((g) => io ? io.observe(g) : grafico(CASOS.find((c) => "g-" + c.id === g.id)));
 progreso();
 (async () => { try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
-  if (!db) return; db.collection("b2_revision").onSnapshot((snap) => { snap.docs.forEach((d) => { resp[d.id] = d.data(); pintar(d.id); }); progreso(); }); })();
+  if (!db) return; db.collection("__COLECCION__").onSnapshot((snap) => { snap.docs.forEach((d) => { resp[d.id] = d.data(); pintar(d.id); }); progreso(); }); })();
 </script>

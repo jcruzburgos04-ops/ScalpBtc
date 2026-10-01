@@ -1,0 +1,67 @@
+[
+ {
+  "id": "C02",
+  "estado": "si",
+  "comentario": "Se toma mas abajo, habria que calibrar"
+ },
+ {
+  "id": "C03",
+  "estado": "si",
+  "comentario": "muchas las toma anticipadamente, provocando que tal vez te saque por sl. Se toma mas abajo, habria que calibrar"
+ },
+ {
+  "id": "C04",
+  "estado": "si",
+  "comentario": "las dos primeras no las toma pero toma un short que sirve, Se toma mas abajo, habria que calibrar"
+ },
+ {
+  "id": "C05",
+  "estado": "si",
+  "comentario": ""
+ },
+ {
+  "id": "C06",
+  "estado": "si",
+  "comentario": "Hay que calibrar, que es lo que paso. o capaz es algo suelto que el trader vio."
+ },
+ {
+  "id": "C07",
+  "estado": "si",
+  "comentario": "Se toma mas abajo, habria que calibrar"
+ },
+ {
+  "id": "C08",
+  "estado": "si",
+  "comentario": "es una amplicacion del long que se abrio mas abajo, por testeo de emas y algun indicador mas se tiene que haber mostrado. Es algo que hace mucho el trader"
+ },
+ {
+  "id": "C09",
+  "estado": "si",
+  "comentario": "Se toma mas abajo, habria que calibrar"
+ },
+ {
+  "id": "C10",
+  "estado": "si",
+  "comentario": "muy anticipadamente se toman algunas, o aparece una B2 siempre antes de la entrada optima"
+ },
+ {
+  "id": "C11",
+  "estado": "no",
+  "comentario": "parece ser que va a continuar el impulso alcista o se le paso."
+ },
+ {
+  "id": "C12",
+  "estado": "si",
+  "comentario": "si, pero fijate que aparecen muchos B2 y no se logro el optimo. Podria sacarme el sl de ser asi"
+ },
+ {
+  "id": "C13",
+  "estado": "si",
+  "comentario": "si, pero fijate que aparecen muchos B2 y no se logro el optimo. Podria sacarme el sl de ser asi"
+ },
+ {
+  "id": "C14",
+  "estado": "si",
+  "comentario": "si, pero fijate que aparecen muchos B2 y no se logro el optimo. Podria sacarme el sl de ser asi. Ademas de que el long del trader no aparece el B2"
+ }
+]

@@ -269,3 +269,10 @@
   divergencia del CVD 15 min, pico en velas de 10 s y OI: no distinguen.
 - Variante elegida por coincidencia: V10 = σ + volumen 15 min ≥ 1,5× + absorción ≥ 1 (detecta 41 % de sus entradas,
   16 % de precisión, ~14 señales/día). Página con 14 casos: https://claude.ai/artifact/3RCjPq8Fi8tnaAfSoeJMui
+- Revisión de Juan de B2 ronda 1 (14 casos): 12 sí, 1 no, 1 sin responder. Comentario repetido: B2 entra antes y más
+  arriba que el trader ("se toma más abajo") y dispara varias veces antes del punto óptimo (riesgo de SL). C08: el
+  trader amplía longs por testeo de EMAs. `marcas/revision_b2_ronda1.json`.
+- Recalibración del disparo (`src/b2_timing.py`, mismo setup V10): mediana del precio de B2 vs el suyo +0,17 ATR (peor)
+  con el disparo base. Mejor: "hondo_ag" = más allá de ±1,5σ + primera vela sin extremo nuevo de 5 velas, que cierra a
+  favor y con delta a favor (agresión agotada): detecta 45 % de sus entradas, 22 % de precisión, precio −0,06 ATR (igual
+  al suyo), 12 señales/día. Ronda 2 (mismos 14 momentos): https://claude.ai/artifact/3t9jmiVuWsfE5xUn5i1Mo4
