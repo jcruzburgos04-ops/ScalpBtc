@@ -213,3 +213,17 @@
   la dirección contraria es una hipótesis nueva vista en el test: no se adopta sin otra validación.
 - Riesgo mediano 63 USD (~630 ticks): el slippage de pocos ticks en el stop de breakeven no cambia nada. Con
   comisión taker 0,05 % por lado (~0,7 R por lado con ese riesgo) todo esto sería negativo; el proyecto es sin comisiones.
+
+## Estrategia B · breakeven adoptado y validación de "pocos cruces del VWAP" (2026-10-01)
+- Juan adopta breakeven a +0,5 R (`b_correr.py` lo trae por defecto; `--be 0` lo apaga).
+- Chequeo de confusión en entrenamiento (2023–2024): "pocos cruces" ≈ "temprano en la sesión" (0–4 h UTC +0,141 vs
+  ≈ +0,07 el resto). Dentro de cada tramo de 4 h, pocos vs muchos cruces: +0,156/+0,123, +0,016/+0,133,
+  +0,053/+0,078, +0,083/+0,070 → sin un signo consistente.
+- Validación pre-registrada en **2022** (`src/b_validacion_2022.py` → `reports/b/validacion_2022.txt`), un tramo
+  nunca usado por B:
+  - H0, B1 dVAL/dVAH R ≥ 2 con breakeven 0,5 R: **+0,116 R [+0,059, +0,174]**, 2455 trades, WR 12,1 %.
+    Positivo en los 4 trimestres (Q2 ≈ 0: +0,012). Sin breakeven (comparación no pre-registrada): +0,082, WR 24,7 %.
+  - H1, cruces ≤ 16 vs > 16: dif +0,028 [−0,085, +0,146] → **no se confirma**; dentro de los tramos de 0–8 h, dif ≈ 0.
+  - H2, 00:30–04:00 UTC vs resto: dif −0,020 [−0,152, +0,114] → **no se confirma** (en 2022 Asia no rinde más).
+- Conclusión: el filtro de cruces del VWAP se descarta. Lo que se sostiene en 4 años (2022 fresco, 2023–2024,
+  2025–2026 walk-forward) es B1 dVAL/dVAH, R ≥ 2, breakeven 0,5 R: entre +0,09 y +0,12 R por trade, sin comisiones.

@@ -123,3 +123,6 @@ con y sin · variantes de calendario A–D.
   H1: cruces_vwap_dia ≤ 16 (p40 de 2023–2024) rinde más que > 16, global y dentro de cada tramo de 4 h.
   H2: señales 00:30–04:00 UTC rinden más que el resto de la ventana.
   Se reporta la diferencia con IC 95 % por bootstrap. Ninguna regla se ajusta después de ver 2022.
+- [2026-10-01] CONFIRMADA (resultado de la validación) · Filtro de cruces del VWAP DESCARTADO (no se confirma en 2022 y
+  en el entrenamiento es un efecto de la hora). El filtro horario de Asia también se descarta. B1 queda: dVAL/dVAH, R ≥ 2,
+  1 pata, breakeven 0,5 R, sin filtros de contexto. 2022 ya está usado para B: no sirve más como tramo fresco.
