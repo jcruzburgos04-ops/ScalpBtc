@@ -176,3 +176,18 @@
   nuestro fill 67 149,9 → TP en la media 67 226,4, +1,7 R). ±2σ no las encuentra (ese día no se tocó la banda).
 - Corrida en la ventana de calibración feb–may 2026 (`reports/b/`); página de revisión con 12 trades (los 2 suyos +
   5 dVAL/dVAH + 5 ±2σ) antes de mostrar números agregados (regla 2).
+- Revisión de B1 por Juan: 12/12 correcto (el código opera el setup del trader).
+- **Test de B1** (calibración feb–may 2026 → test 2023–2025 + jun 2026, reserva cerrada), TP en la media, 1 pata:
+  | variante | R mín | calib. | test | IC 95 % test |
+  |---|---|---|---|---|
+  | dVAL/dVAH | 1 | +0,025 | +0,010 | [−0,025, +0,044] |
+  | dVAL/dVAH | 2 | +0,085 | +0,038 | [−0,016, +0,088] |
+  | ±1σ | 1 | +0,018 | −0,046 | [−0,077, −0,016] |
+  | ±1σ | 2 | +0,069 | −0,014 | [−0,062, +0,037] |
+  | ±2σ | 1 | −0,036 | +0,008 | [−0,033, +0,049] |
+  | ±2σ | 2 | −0,001 | +0,011 | [−0,040, +0,063] |
+  La mejor en calibración (dVAL/dVAH, R ≥ 2) cae a la mitad en el test y su IC incluye 0. Recorrido a favor antes
+  del SL: mediana 0,98 R; con cualquier TP más cerca la expectativa queda ≈ 0. Asia algo mejor (+0,042, IC incluye 0).
+  Conclusión: la parte mecánica del setup (nivel + rechazo + TP en la media) no tiene ventaja robusta en BTC 1m
+  2023–2025. Lo que el trader agrega y no está codificado: lectura de orderflow (Aggr 10 s: esfuerzo sin resultado,
+  absorción), selección del contexto ("meta" del día) y manejo del trade (scratch rápido, parciales).
