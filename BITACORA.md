@@ -108,3 +108,8 @@
 - Ronda 2 publicada (https://claude.ai/artifact/WpAyVTCgDANQB8Bpfhrpav): 30 casos de días nuevos, 20 que pasan los
   filtros y 10 que no (5 por ubicación, 5 por rango), orden mezclado; qué grupo es cada uno queda solo en
   `reports/f2/ronda2/casos.json`.
+
+### Ronda 2 (2026-10-01)
+- 16 sí / 9 dudosa / 5 no. Los filtros de la ronda 1 no generalizan (ver `reports/f2/ronda2_analisis.md`): era el
+  sobreajuste esperable de elegir reglas con 40 casos. Con 70 casos, ninguna variable objetiva separa sus sí del
+  resto con AUC > 0,63. Tipo continuación/rebote: 30/30.

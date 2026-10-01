@@ -79,7 +79,11 @@ con y sin · variantes de calendario A–D.
   cumplen ambas; solo en la ventana. Umbrales amplios a propósito: los definitivos salen de las respuestas de Juan.
 - [2026-09-30] CONFIRMADA · Filtros de la ronda 1 sumados a la señal (senales.py): ubicación ≤ +1σ del VWAP de sesión
   a favor del trade (Z_MAX = 1,0) y ≤ 3 cruces del ASH de 1m en las últimas 30 velas (CRUCES_MAX = 3).
-- [2026-09-30] PENDIENTE · Validación de los filtros con la ronda 2 (30 casos nuevos: 20 pasan, 10 no, a ciegas).
+- [2026-10-01] RESULTADO · La ronda 2 NO valida los filtros (descartarían 6 de 16 sí, dejarían pasar 3 de 5 no).
+- [2026-10-01] PENDIENTE · Propuesta: sacar ubicación y rango como filtros duros; congelar la señal base (ASH + XO,
+  A = 0,5, B = 1,0) y el tipo (d ≤ 1 ATR 5m); registrar ubicación en el VWAP, cruces del ASH, RVOL, barrida,
+  alineación de 5m y niveles cercanos como variables de contexto de cada trade, y medir con resultados (F4–F6,
+  walk-forward en 2025–2026) cuáles mejoran la expectativa.
 - [2026-10-01] CONFIRMADA · No hay tope de trades por sesión (Juan busca hasta ~7 por sesión cuando el mercado lo da).
   La cantidad de trades por sesión es un RESULTADO a reportar (§9), no una regla. Con los filtros hay ~22 señales por
   sesión (mediana 2023–2024); los trades efectivos salen de aplicar R ≥ 2, una posición a la vez y máx. 4 patas.
