@@ -113,3 +113,20 @@
 - 16 sí / 9 dudosa / 5 no. Los filtros de la ronda 1 no generalizan (ver `reports/f2/ronda2_analisis.md`): era el
   sobreajuste esperable de elegir reglas con 40 casos. Con 70 casos, ninguna variable objetiva separa sus sí del
   resto con AUC > 0,63. Tipo continuación/rebote: 30/30.
+
+## F3 · Motor de ejecución (2026-10-01)
+- F2 cerrada (Juan): señal base congelada (ASH + XO, A = 0,5, B = 1,0; tipo por d ≤ 1 ATR de 5m), sin filtros duros.
+- SL elegido por coincidencia con los 49 SL de Juan (`src/sl.py`, `reports/f3_sl_candidatos.csv`):
+  **extremo de las últimas 10 velas ± 0,25 ATR(14)** → error mediano 0,20 ATR, 61 % a ≤ 0,25 ATR, 76 % a ≤ 0,5 ATR.
+  ext_5, zigzag y "desde el giro del ASH" con 0,25 ATR quedan casi iguales.
+- `src/motor.py`: fill en el primer tick (barra de 1 s) tras el cierre; TP por el primer segundo del last; SL por mark
+  1m; mark sintético (last 1 s + base interpolada) para el minuto de entrada y para SL/TP en el mismo minuto; patas
+  (máx. 4 abiertas); invalidación opcional (30 min, 0,5 R, ≥ 2 señales); tope 24 h. TP provisorio 2R desde el fill.
+- Chequeo independiente segundo a segundo en 150 patas: coincide (la única diferencia era un error del chequeo).
+- 2023–2024: 16 006 patas / 8 621 posiciones sin invalidación; 17 873 / 13 054 con invalidación. Ambiguas: 23
+  (0,14 %); todas en minutos violentos (rango del mark 70–900 USD) donde el sintético no reproduce. Fill − close
+  medio 0,08 USD. Riesgo mediano 63,5 USD = 2,63 ATR (igual al de Juan, 2,65). 2–3 patas con nocional > 125×.
+- Señales en contra con posición abierta: 9 077 ignoradas (registradas). Patas acumuladas por posición: hasta 29
+  (con máx. 4 abiertas a la vez, se liberan lugares al cerrar).
+- Mark sintético: en minutos normales reproduce el high/low del mark con error mediano 3–4 USD (76 % dentro de 2e-4).
+- Auditoría publicada: https://claude.ai/artifact/… (ver mensaje); respuestas en la colección `auditoria`.

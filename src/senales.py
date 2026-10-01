@@ -49,7 +49,7 @@ def atr_5m(df: pl.DataFrame) -> np.ndarray:
 
 
 def calcular(desde: str = "2023-01", hasta: str = "2024-12", a: float = A_MAX, b: float = B_MAX,
-             filtrar: bool = True) -> pl.DataFrame:
+             filtrar: bool = True, solo_ventana: bool = True) -> pl.DataFrame:
     """Señales de la ventana. Con filtrar=False devuelve también las que no pasan los filtros (columna pasa_filtros)."""
     df = ind.cargar(desde, hasta)
     df = df.with_columns(atr5m=pl.Series(atr_5m(df)))
@@ -71,7 +71,9 @@ def calcular(desde: str = "2023-01", hasta: str = "2024-12", a: float = A_MAX, b
         sig_short=pl.col("c_short") & ~pl.col("c_short").shift(1, fill_value=False),
         en_ventana=ventana_operativa(pl.col("open_time")),
     )
-    s = df.filter((pl.col("sig_long") | pl.col("sig_short")) & pl.col("en_ventana"))
+    # extremos de las últimas 10 velas (incluida la de la señal) para el SL elegido en F3
+    df = df.with_columns(min_low10=pl.col("low").rolling_min(10), max_high10=pl.col("high").rolling_max(10))
+    s = df.filter((pl.col("sig_long") | pl.col("sig_short")) & (pl.col("en_ventana") | (not solo_ventana)))
     # 5m: distancia del precio a las EMAs de 5m (vela en formación) en ATR de 5m, y brecha del ASH de 5m
     d5 = pl.max_horizontal((pl.col("close") - pl.col("ema11_5m_vivo")).abs(),
                            (pl.col("close") - pl.col("ema25_5m_vivo")).abs()) / pl.col("atr5m")

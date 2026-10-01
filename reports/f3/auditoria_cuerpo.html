@@ -1,0 +1,211 @@
+<style>
+.datos { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-family: var(--f-num); font-size: .84rem; margin: 0; }
+.datos dt { color: var(--muted); }
+.datos dd { margin: 0; color: var(--fg); }
+.etq { font-family: var(--f-head); font-weight: 600; font-size: 1rem; letter-spacing: .04em; color: var(--accent); }
+.explica { font-size: .9rem; line-height: 1.45; margin: 0; color: var(--fg); max-width: 70ch; }
+.r-pos { color: var(--ok); } .r-neg { color: var(--no); }
+.c1s { height: 230px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Auditoría del motor F3</h1>
+    <span class="prog" id="prog">0 / 20 revisados</span>
+    <p class="sub">20 trades de 2023–2024 elegidos al azar dentro de cada tipo de salida. Cada uno muestra las velas de 1m con el mark price (línea), la entrada, el SL y el TP, y abajo los segundos alrededor de la salida. El TP es provisorio (2R desde el fill) solo para probar el motor. Revisá si la salida está bien resuelta. Horas en ART.</p>
+  </header>
+  <p class="aviso" id="sinDb" hidden>Esta vista no puede guardar respuestas. Abrí la página desde claude.ai con tu cuenta.</p>
+  <nav class="fichas" id="fichas" aria-label="Trades"></nav>
+
+  <section class="caso">
+    <div class="graficos">
+      <div class="meta" id="meta"></div>
+      <div class="panel">
+        <p class="rot">1m · <span><i style="background:var(--vwap)"></i>mark price (cierre)</span><span><i style="background:var(--lvl)"></i>mark high/low</span><span><i style="background:var(--accent)"></i>fill</span><span><i style="background:var(--no)"></i>SL</span><span><i style="background:var(--ok)"></i>TP</span></p>
+        <div class="c1m" id="g1m"></div>
+      </div>
+      <div class="panel">
+        <p class="rot">1 s alrededor de la salida · <span><i style="background:var(--lvl)"></i>mark sintético (high/low)</span></p>
+        <div class="c1s" id="g1s"></div>
+      </div>
+    </div>
+
+    <form id="form" class="panel" autocomplete="off">
+      <p class="etq" id="etq"></p>
+      <dl class="datos" id="datos"></dl>
+      <p class="explica" id="explica"></p>
+      <fieldset>
+        <legend>¿La salida está bien resuelta?</legend>
+        <div class="seg">
+          <label class="si"><input type="radio" name="ok" id="o-si" value="si">Sí</label>
+          <label class="no"><input type="radio" name="ok" id="o-no" value="no">No</label>
+          <label class="dudosa"><input type="radio" name="ok" id="o-ns" value="no_se">No sé</label>
+        </div>
+      </fieldset>
+      <div class="campo">
+        <label for="com" class="lbl">Comentario</label>
+        <textarea id="com" name="com" placeholder="Qué ves mal o qué no se entiende"></textarea>
+      </div>
+      <div class="acciones">
+        <button type="button" id="prev">← Anterior</button>
+        <button type="submit" class="prim" id="guardar">Guardar y seguir</button>
+      </div>
+      <p class="estado" id="estado" role="status"></p>
+    </form>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+const CASOS = __CASOS__;
+const ART = -3 * 3600;
+let idx = 0, resp = {}, db = null, graficos = [];
+const $ = (id) => document.getElementById(id);
+const dos = (n) => String(n).padStart(2, "0");
+const hhmm = (t) => { const d = new Date(t * 1000); return dos(d.getUTCHours()) + ":" + dos(d.getUTCMinutes()); };
+const hhmmss = (t) => hhmm(t) + ":" + dos(new Date(t * 1000).getUTCSeconds());
+const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const usd = (v) => v == null ? "—" : v.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+const EXPLICA = {
+  "TP": "El last tocó el TP antes de que el mark tocara el SL. La hora de salida es el primer segundo de aggTrades que alcanza el TP.",
+  "SL": "El mark price tocó el SL antes de que el last tocara el TP. La salida se registra al SL (sin slippage en esta corrida).",
+  "tope 24 h": "Ni SL ni TP en 24 h desde el fill: tope técnico, sale al cierre de la última vela.",
+  "cierre por invalidación": "A partir de los 30 min del fill de la pata 1, el precio seguía a menos de 0,5 R del fill y hubo al menos 2 señales nuevas: se cierran todas las patas al cierre de esa vela.",
+  "ambiguo: SL y TP en el mismo minuto": "En el mismo minuto el mark tocó el SL y el last tocó el TP. El mark sintético (last de 1 s + base) no reproduce bien ese minuto, así que no se puede saber qué pasó primero: cuenta como pérdida (criterio conservador) y como TP en el optimista.",
+  "ambiguo: SL en el minuto de la entrada": "El mark tocó el SL en el mismo minuto de la entrada y no se puede saber si fue antes o después del fill. Conservador: SL. Optimista: se ignora ese toque y el trade sigue.",
+  "mark reconstruido": "El SL se disparó en un minuto sin mark real (día faltante en Binance): se usó el mark reconstruido de F0.",
+  "pata de ampliación": "Pata agregada a una posición abierta por una señal a favor; tiene su propio fill, SL y TP.",
+};
+
+function limpiar() { graficos.forEach(g => g.remove()); graficos = []; }
+function base(el, h, seg) {
+  const g = LightweightCharts.createChart(el, {
+    height: h, autoSize: true,
+    layout: { background: { color: tok("--panel") }, textColor: tok("--muted"), fontFamily: "JetBrains Mono, monospace", fontSize: 11 },
+    grid: { vertLines: { color: tok("--grid") }, horzLines: { color: tok("--grid") } },
+    rightPriceScale: { borderColor: tok("--line") },
+    timeScale: { borderColor: tok("--line"), timeVisible: true, secondsVisible: !!seg, rightOffset: 3, tickMarkFormatter: (t) => seg ? hhmmss(t) : hhmm(t) },
+    crosshair: { mode: 0 },
+    localization: { locale: "es-AR", priceFormatter: (v) => v.toFixed(1), timeFormatter: seg ? hhmmss : hhmm },
+  });
+  graficos.push(g); return g;
+}
+const linea = (g, color, w = 1, estilo = 0) => g.addLineSeries({ color, lineWidth: w, lineStyle: estilo, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+const velasCS = (g) => { const up = tok("--up"), dn = tok("--down"); return g.addCandlestickSeries({ upColor: up, downColor: dn, borderUpColor: up, borderDownColor: dn, wickUpColor: up, wickDownColor: dn, priceLineVisible: false }); };
+function lineasPrecio(s, c) {
+  s.createPriceLine({ price: c.fill, color: tok("--accent"), lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: "fill" });
+  s.createPriceLine({ price: c.sl, color: tok("--no"), lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: "SL" });
+  s.createPriceLine({ price: c.tp, color: tok("--ok"), lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: "TP" });
+}
+// lightweight-charts exige que el marcador caiga en un tiempo de vela existente
+const enVela = (arr, t) => { let best = arr[0].t; for (const x of arr) { if (x.t <= t) best = x.t; else break; } return best; };
+
+function dibujar() {
+  limpiar();
+  const c = CASOS[idx];
+  const g1 = base($("g1m"), 360, false);
+  linea(g1, tok("--lvl"), 1, 1).setData(c.velas.filter(x => x.mh != null).map(x => ({ time: x.t + ART, value: x.mh })));
+  linea(g1, tok("--lvl"), 1, 1).setData(c.velas.filter(x => x.ml != null).map(x => ({ time: x.t + ART, value: x.ml })));
+  linea(g1, tok("--vwap"), 2).setData(c.velas.filter(x => x.mc != null).map(x => ({ time: x.t + ART, value: x.mc })));
+  const s1 = velasCS(g1);
+  s1.setData(c.velas.map(x => ({ time: x.t + ART, open: x.o, high: x.h, low: x.l, close: x.c })));
+  lineasPrecio(s1, c);
+  const lg = c.lado === "long";
+  s1.setMarkers([
+    { time: enVela(c.velas, c.senal_t) + ART, position: lg ? "belowBar" : "aboveBar", color: tok("--accent"), shape: lg ? "arrowUp" : "arrowDown", text: "señal" },
+    { time: enVela(c.velas, c.salida_t) + ART, position: lg ? "aboveBar" : "belowBar", color: c.r >= 0 ? tok("--ok") : tok("--no"), shape: "circle", text: c.motivo },
+  ].sort((a, b) => a.time - b.time));
+  g1.timeScale().fitContent();
+  // 1 s
+  const g2 = base($("g1s"), 230, true);
+  if (c.sint.length) {
+    linea(g2, tok("--lvl"), 1, 1).setData(c.sint.map(x => ({ time: x.t + ART, value: x.sh })));
+    linea(g2, tok("--lvl"), 1, 1).setData(c.sint.map(x => ({ time: x.t + ART, value: x.sl })));
+  }
+  const s2 = velasCS(g2);
+  if (c.seg.length) {
+    s2.setData(c.seg.map(x => ({ time: x.t + ART, open: x.o, high: x.h, low: x.l, close: x.c })));
+    lineasPrecio(s2, c);
+    s2.setMarkers([{ time: enVela(c.seg, c.salida_t) + ART, position: lg ? "aboveBar" : "belowBar", color: c.r >= 0 ? tok("--ok") : tok("--no"), shape: "circle", text: "salida" }]);
+  }
+  g2.timeScale().fitContent();
+}
+
+function info() {
+  const c = CASOS[idx], r = resp[c.id] || {};
+  const m = $("meta"); m.textContent = "";
+  const lado = document.createElement("span"); lado.className = "lado " + c.lado; lado.textContent = c.lado; m.appendChild(lado);
+  const it = (k, v) => { const s = document.createElement("span"); s.append(k + " "); const b = document.createElement("b"); b.textContent = v; s.appendChild(b); m.appendChild(s); };
+  it("trade", `${idx + 1} de ${CASOS.length}`); it("posición", `${c.pos_id} · pata ${c.pata}`); it("versión", c.version);
+  $("etq").textContent = c.etiqueta;
+  const d = $("datos"); d.textContent = "";
+  const fila = (k, v, cls) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; if (cls) dd.className = cls; d.append(dt, dd); };
+  fila("señal (vela)", c.senal.slice(11, 16));
+  fila("fill", `${usd(c.fill)} a las ${c.fill_hora.slice(11)} (cierre de la vela ${usd(c.close_senal)})`);
+  fila("SL", `${usd(c.sl)} · riesgo ${usd(c.riesgo_usd)} USD = ${c.riesgo_atr} ATR`);
+  fila("TP", `${usd(c.tp)} (2R)`);
+  fila("salida", `${usd(c.salida)} a las ${c.salida_hora.slice(11)} · ${c.minutos} min`);
+  fila("resultado", c.r === c.r_opt ? `${c.r > 0 ? "+" : ""}${c.r} R` : `${c.r} R conservador · +${c.r_opt} R optimista`, c.r >= 0 ? "r-pos" : "r-neg");
+  fila("nocional", `${c.nocional_x}× el capital para arriesgar 1 %`);
+  $("explica").textContent = EXPLICA[c.etiqueta] || "";
+  document.querySelectorAll('input[name="ok"]').forEach(x => x.checked = x.value === r.ok);
+  $("com").value = r.comentario ?? "";
+  $("prev").disabled = idx === 0;
+  $("estado").textContent = r.ok ? "Guardado. Podés cambiarlo y volver a guardar." : "";
+}
+
+function fichas() {
+  const nav = $("fichas"); nav.textContent = "";
+  CASOS.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "ficha"; b.textContent = String(i + 1).padStart(2, "0");
+    b.setAttribute("aria-label", `Trade ${i + 1}`);
+    if (resp[c.id]) b.dataset.r = resp[c.id].ok === "no_se" ? "dudosa" : resp[c.id].ok;
+    if (i === idx) b.setAttribute("aria-current", "true");
+    b.onclick = () => ir(i); nav.appendChild(b);
+  });
+  $("prog").textContent = `${CASOS.filter(c => resp[c.id] && resp[c.id].ok).length} / ${CASOS.length} revisados`;
+}
+
+function ir(i) {
+  idx = Math.max(0, Math.min(CASOS.length - 1, i));
+  try { localStorage.setItem("trade", String(idx)); } catch (e) {}
+  info(); dibujar(); fichas();
+}
+$("prev").onclick = () => ir(idx - 1);
+$("form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const c = CASOS[idx], f = new FormData($("form")), ok = f.get("ok");
+  if (!ok) { $("estado").textContent = "Elegí Sí, No o No sé antes de guardar."; return; }
+  if (!db) { $("estado").textContent = "No se pudo guardar: esta vista no tiene acceso a las respuestas."; return; }
+  const doc = { trade: c.id, etiqueta: c.etiqueta, ok, comentario: String(f.get("com") || ""), guardado: new Date().toISOString() };
+  $("guardar").disabled = true; $("estado").textContent = "Guardando…";
+  try {
+    await db.collection("auditoria").doc(c.id).set(doc);
+    resp[c.id] = doc; fichas();
+    const sig = CASOS.findIndex((x, i) => i > idx && !(resp[x.id] && resp[x.id].ok));
+    if (sig >= 0) ir(sig); else if (idx < CASOS.length - 1) ir(idx + 1); else $("estado").textContent = "Guardado. Era el último trade.";
+  } catch (e) {
+    $("estado").textContent = e && e.code === "invalid_argument" ? "No tenés permiso para guardar en esta página." : "No se pudo guardar. Probá de nuevo en unos segundos.";
+  } finally { $("guardar").disabled = false; }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowRight") ir(idx + 1);
+  if (e.key === "ArrowLeft") ir(idx - 1);
+});
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", dibujar); } catch (e) {}
+new MutationObserver(dibujar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+try { const g = parseInt(localStorage.getItem("trade"), 10); if (Number.isFinite(g)) idx = Math.min(Math.max(g, 0), CASOS.length - 1); } catch (e) {}
+ir(idx);
+(async () => {
+  db = window.claude && window.claude.use ? await window.claude.use("db") : null;
+  if (!db) { $("sinDb").hidden = false; return; }
+  db.collection("auditoria").onSnapshot((snap) => {
+    resp = {}; snap.docs.forEach(d => { resp[d.id] = d.data(); });
+    fichas();
+    if (!$("form").contains(document.activeElement)) info();
+  }, () => { $("estado").textContent = "Se cortó la conexión con las respuestas. Recargá la página."; });
+})();
+</script>
