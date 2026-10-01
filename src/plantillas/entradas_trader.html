@@ -38,7 +38,7 @@ select.fil { padding-right: 8px; }
 .cab .id { font: 600 1.25rem var(--display); }
 .chip { font: 600 .74rem var(--body); text-transform: uppercase; letter-spacing: .06em; border-radius: 4px; padding: 2px 7px; border: 1px solid currentColor; }
 .chip.long { color: var(--long); } .chip.short { color: var(--short); }
-.chip.alta { color: var(--long); } .chip.media { color: var(--warn); } .chip.baja { color: var(--muted); }
+.chip.alta, .chip.Juan, .chip.confirmada { color: var(--long); } .chip.media { color: var(--warn); } .chip.baja { color: var(--muted); }
 .cab .meta { color: var(--muted); font-size: .88rem; }
 .cab a { color: var(--accent); font-size: .88rem; }
 .cuerpo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
@@ -96,7 +96,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
     </div>
     <div class="filtros" id="filtros">
       <select class="fil" id="f-lado" aria-label="Lado"><option value="">Long y short</option><option value="long">Solo long</option><option value="short">Solo short</option></select>
-      <select class="fil" id="f-conf" aria-label="Confianza de la ubicación"><option value="">Toda ubicación</option><option value="alta">Ubicación alta</option><option value="media">Media</option><option value="baja">Baja</option></select>
+      <select class="fil" id="f-conf" aria-label="Confianza de la ubicación"><option value="">Toda ubicación</option><option value="Juan">Con tu hora</option><option value="confirmada">Confirmadas por vos</option><option value="alta">Orden con hora</option></select>
       <select class="fil" id="f-cap" aria-label="Captura"><option value="">Todas las capturas</option>${""}</select>
       <select class="fil" id="f-rev" aria-label="Revisión"><option value="">Revisadas y no</option><option value="no">Sin revisar</option><option value="mal">Marcadas mal</option></select>
     </div>
@@ -108,7 +108,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
   <section id="panel-resumen" role="tabpanel" aria-labelledby="tab-resumen" class="resumen" hidden>
     <h2>Qué tienen en común sus entradas</h2>
     <p class="sub" id="res-intro"></p>
-    <div class="tabla"><table id="res-tabla"><thead><tr><th>Al momento de entrar</th><th style="text-align:right">Sus entradas</th><th style="text-align:right">Ubicación alta/media</th><th style="text-align:right">Un minuto cualquiera</th><th style="text-align:right">Veces más</th></tr></thead><tbody></tbody></table></div>
+    <div class="tabla"><table id="res-tabla"><thead><tr><th>Al momento de entrar</th><th style="text-align:right">Sus entradas</th><th style="text-align:right">Revisadas por vos</th><th style="text-align:right">Un minuto cualquiera</th><th style="text-align:right">Veces más</th></tr></thead><tbody></tbody></table></div>
     <h2>Nivel más cercano a cada entrada</h2>
     <ul class="lista" id="res-niveles"></ul>
     <p class="sub">Con unos 35 niveles dibujados, casi siempre hay uno cerca: estar a ≤ 0,5 ATR de algún nivel pasa en el 45 % de los minutos de septiembre. Por eso la cercanía a un nivel, sola, no distingue sus entradas.</p>
@@ -169,7 +169,7 @@ function tarjeta(c, i) {
       <span class="chip ${c.lado}">${c.lado}</span>
       <span class="num">${usd(c.entrada)}</span>
       <span class="meta">${c.plataforma} · hora del trader ${hora} (UTC+2) · ${fecha(c.t || 0, -3 * 3600).slice(6)} ART</span>
-      <span class="chip ${c.confianza}" title="Confianza de la ubicación al minuto">ubicación ${c.confianza}</span>
+      <span class="chip ${c.confianza}" title="De dónde sale la ubicación">${c.confianza === "Juan" ? "con tu hora" : (c.confianza === "confirmada" ? "confirmada" : "ubicación " + c.confianza)}</span>
       <a href="capturas/${c.captura}.jpg" target="_blank" rel="noopener">captura n.º ${c.n_captura} de 18</a>
     </div>
     <div class="meta sub" style="font-size:.86rem">${ubic}${c.nota ? " · " + c.nota : ""}</div>
@@ -275,7 +275,7 @@ function filtrar() {
 
 function resumen() {
   document.getElementById("res-intro").textContent =
-    `${RES.n} entradas ubicadas (${RES.n_conf} con ubicación alta o media). Cada rasgo se compara con lo que pasa en un minuto cualquiera de septiembre, mirado desde el mismo lado (long o short). "Veces más" > 1 = el rasgo aparece más en sus entradas que por azar. Las entradas no son independientes: varias son de la misma jugada.`;
+    `${RES.n} entradas ubicadas (${RES.n_conf} con tu hora o confirmadas por vos). Cada rasgo se compara con lo que pasa en un minuto cualquiera de septiembre, mirado desde el mismo lado (long o short). "Veces más" > 1 = el rasgo aparece más en sus entradas que por azar. Las entradas no son independientes: varias son de la misma jugada.`;
   const tb = document.querySelector("#res-tabla tbody");
   RES.rasgos.forEach((r) => {
     const x = r.base > 0 ? r.todas / r.base : null;

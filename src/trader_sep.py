@@ -88,6 +88,10 @@ def ubicar(tr: pl.DataFrame, df: pl.DataFrame) -> pl.DataFrame:
             continue
         i0, i1 = np.searchsorted(t, a), np.searchsorted(t, b, side="right")
         ok = (l[i0:i1] - PREMIO_LO <= p) & (p <= h[i0:i1] + PREMIO_HI)
+        if not ok.any() and r.get("fuente") == "hora de Juan":   # su precio no toca: me quedo con la vela que marcó Juan
+            m = ap // 60_000 * 60_000
+            filas.append({"id": r["id"], "t_entrada": m, "episodios": 0, "dif_min": 0, "toca": False, "candidatos": [m]})
+            continue
         if not ok.any():
             filas.append({"id": r["id"], "t_entrada": None, "episodios": 0, "dif_min": None, "toca": False, "candidatos": []})
             continue
@@ -157,7 +161,9 @@ def confianza(tr: pl.DataFrame) -> pl.DataFrame:
     """alta: orden con hora, o un único paso del precio cerca de donde lo dibujó; media: ≤ 5 pasos y ≤ 30 min de la
     hora leída; baja: el resto (la ubicación al minuto es dudosa, la zona de precio no)."""
     e, d = pl.col("episodios"), pl.col("dif_min").abs()
-    return tr.with_columns(confianza=pl.when(pl.col("exacta") == "si").then(pl.lit("alta"))
+    return tr.with_columns(confianza=pl.when(pl.col("fuente") == "hora de Juan").then(pl.lit("Juan"))
+                           .when(pl.col("fuente") == "ubicación confirmada").then(pl.lit("confirmada"))
+                           .when(pl.col("exacta") == "si").then(pl.lit("alta"))
                            .when((e <= 2) & (d <= 15)).then(pl.lit("alta"))
                            .when((e <= 5) & (d <= 30)).then(pl.lit("media")).otherwise(pl.lit("baja")))
 
@@ -216,11 +222,11 @@ def similitudes(tr: pl.DataFrame, df: pl.DataFrame) -> str:
     filas = []
     for nom, (col, f) in RASGOS.items():
         pe = float(e.select(f(pl.col(col)).cast(pl.Float64).mean()).item())
-        pa = float(e.filter(pl.col("confianza") != "baja").select(f(pl.col(col)).cast(pl.Float64).mean()).item())
+        pa = float(e.filter(pl.col("confianza").is_in(["Juan", "confirmada"])).select(f(pl.col(col)).cast(pl.Float64).mean()).item())
         pb = sum(peso[l] * float(lb.filter(pl.col("lado") == l).select(f(pl.col(col)).cast(pl.Float64).mean()).item()) for l in peso)
         filas.append((nom, pe, pa, pb))
-    n, na = e.height, e.filter(pl.col("confianza") != "baja").height
-    l = [f"| Rasgo al entrar | Sus entradas (n={n}) | Solo ubicación alta/media (n={na}) | Cualquier minuto de sep. | Veces más frecuente |",
+    n, na = e.height, e.filter(pl.col("confianza").is_in(["Juan", "confirmada"])).height
+    l = [f"| Rasgo al entrar | Sus entradas (n={n}) | Revisadas por Juan (n={na}) | Cualquier minuto de sep. | Veces más frecuente |",
          "|---|---|---|---|---|"]
     for nom, pe, pa, pb in filas:
         l.append(f"| {nom} | {pe:.0%} | {pa:.0%} | {pb:.0%} | {pe / pb:.1f}× |" if pb > 0 else f"| {nom} | {pe:.0%} | {pa:.0%} | – | – |")
@@ -235,6 +241,7 @@ def similitudes(tr: pl.DataFrame, df: pl.DataFrame) -> str:
 
 def main() -> None:
     tr = pl.read_csv(RAIZ / "marcas" / "trader_sep2026" / "trades.csv", schema_overrides={"entrada": pl.Float64})
+    tr = tr.filter(pl.col("excluir") != "si")          # trades que Juan no encontró en la captura
     df = base("2026-07", "2026-09")
     tr = confianza(ubicar(tr, df))
     tr = leer_indicadores(tr, df)

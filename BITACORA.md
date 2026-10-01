@@ -246,3 +246,12 @@
   - RVOL, CVD, cercanía a un nivel (≤ 0,5 ATR: 48 % vs 45 %) y horario: sin diferencia.
   - Entradas agrupadas (varias por jugada): no son independientes; los porcentajes son descriptivos.
 - Página de revisión de las ubicaciones: https://claude.ai/artifact/CcvQAupyC3KseTdnTdtrYg (colección `ubicacion`).
+- Revisión de Juan de las 105 ubicaciones (2026-10-01): 24 bien, 75 mal (casi todas con la hora correcta de la vela),
+  6 "no sé". 12 excluidas (no encontró el trade en el gráfico, duplicada o lado incorrecto). Por pedido de Juan no se
+  exige la vela exacta: se toma la vela más próxima a su hora (±15 min) donde pasa su precio; si no pasa, su vela.
+  Resultado: 60/65 tocan su precio a 0,3 min de media de su hora. `marcas/trader_sep2026/revision_juan.csv`;
+  `trades_v1.csv` = ubicación original.
+- Con las ubicaciones corregidas (93 entradas) el patrón se refuerza: más allá de 1σ del VWAP de sesión en contra 51 %
+  (vs 21 %), barrida del extremo de 60 min 34 % (vs 15 %, 2,3×), venía en contra 15 min 49 % (vs 37 %), y los
+  osciladores en contra al entrar: ASH 5m a favor 23 % (vs 51 %), XO 1m 30 % (vs 50 %), ASH 1m 38 % (vs 50 %).
+  Contra el rolling VWAP 68 %. RVOL, CVD, cercanía a niveles y horario: sin diferencia.

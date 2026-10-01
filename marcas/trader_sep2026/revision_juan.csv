@@ -1,0 +1,106 @@
+id,estado,hora_juan,excluir,comentario
+T01,mal,18:16,no,vela 18:16
+T02,bien,,no,
+T03,bien,,no,
+T04,mal,06:09,no,vela 06:09
+T05,mal,07:42,no,vela 07:42
+T06,mal,05:18,no,vela 05:18
+T07,mal,22:58,no,vela 22:58
+T08,mal,22:53,no,vela 22:53
+T09,bien,,no,
+T10,nose,,no,
+T11,nose,,no,
+T12,nose,,no,
+T13,nose,,no,estos ultimos estan todos en cruces muy distintos y tiene otras capturas de trades abiertos pero no graficados.
+T14,nose,,no,
+T15,nose,,no,
+T16,mal,,si,no es ese tiempo ni precios. estos ultimos estan todos muy confusos porque grafico menos de las graficas que aparecen
+T17,mal,17:23,no,vela 17:23
+T18,bien,16:36,no,"vela 16:36, mas abajo"
+T19,mal,,si,esta la captura pero no el trade en el tv
+T20,mal,,si,esta la captura pero no el trade en el tv
+T21,mal,,si,esta la captura pero no el trade en el tv
+T22,mal,,si,esta la captura pero no el trade en el tv
+T23,mal,01:37,no,vela 01:37
+T24,mal,03:05,no,"vela 03:05, malos precios no coinciden con las velas del trader."
+T25,mal,04:48,no,"vela 04:48, la grafica de ese trade es ahi."
+T26,mal,09:54,no,vela 09:54
+T27,mal,02:48,no,vela 02:48
+T28,bien,,no,
+T29,bien,,no,
+T30,bien,,no,
+T31,mal,06:03,no,vela 06:03
+T32,mal,15:44,no,vela 15:44
+T33,bien,,no,
+T34,mal,15:49,no,vela 15:49
+T35,bien,,no,es ahi pero un poco mas arriba
+T36,mal,00:34,no,vela 00:34
+T37,mal,04:50,no,vela 04:50
+T38,mal,06:56,no,vela 06:56
+T39,mal,19:54,no,vela 19:54
+T40,mal,,si,"no hay mas ahi, son los 4 de antes"
+T41,mal,20:03,no,vela 20:03
+T42,mal,19:54,no,vela 19:54
+T43,mal,20:29,no,vela 20:29
+T44,mal,20:02,no,vela 20:02
+T45,mal,20:58,no,vela 20:58
+T46,bien,,no,
+T47,mal,,si,no hay ahi
+T48,mal,20:44,no,vela 20:44
+T49,mal,21:15,no,vela 21:15
+T50,bien,,no,
+T51,mal,22:35,no,vela 22:35
+T52,mal,03:06,no,vela 03:06
+T53,mal,03:17,no,vela 3:17
+T54,mal,04:25,no,vela 04:25
+T55,mal,04:34,no,ese trade se habia abierto a las 04:34 pero duro bastante tiempo
+T56,mal,16:05,no,vela 16:05
+T57,bien,,no,
+T58,mal,15:55,no,vela 15:55
+T59,mal,15:56,no,vela 15:56
+T60,mal,16:53,no,vela 16:53
+T61,bien,,no,
+T62,mal,00:27,no,vela 00:27
+T63,mal,00:26,no,es en la vela 00:26
+T64,bien,,no,
+T65,bien,,no,
+T66,bien,,no,
+T67,bien,,no,
+T68,mal,00:08,no,vela 00:08
+T69,mal,,si,"no hubo nada ahi, era un long"
+T70,mal,,si,el long ese se dio en velas que no estan en el grafico
+T71,mal,,si,se dio en velas que no estan en el grafico
+T72,mal,15:51,no,vela 15:51
+T73,mal,15:35,no,vela de 15:35
+T74,bien,,no,
+T75,mal,14:32,no,vela 14:32
+T76,bien,14:34,no,vela 14:34
+T77,mal,14:34,no,vela 14:34
+T78,mal,19:47,no,vela 19:47
+T79,mal,15:55,no,vela de 15:55
+T80,mal,16:41,no,vela 16:41
+T81,mal,06:22,no,vela 06:22
+T82,mal,,si,No hay ningun trade ahi.
+T83,bien,,no,
+T84,bien,,no,
+T85,mal,16:04,no,vela de 16:04 o por ahi
+T86,mal,23:35,no,es en la vela de 23:35
+T87,mal,14:37,no,vela de 14:37
+T88,mal,14:38,no,vela de 14:38
+T89,mal,15:37,no,vela de 15:37
+T90,mal,15:37,no,vela de 15:37
+T91,mal,19:30,no,"es en la vela de las 19:30, hay varios trades ahi, pero por la hora considero que es ese"
+T92,mal,04:09,no,"en ese horario no hay ningun trade, es a las 04:09"
+T93,mal,07:29,no,es en la vela de las 07:29
+T94,mal,20:49,no,vela 20:49
+T95,bien,,no,
+T96,bien,,no,
+T97,bien,,no,
+T98,mal,10:11,no,es en ese precio pero en la vela de las 10:11
+T99,mal,15:02,no,es en la vela de las 15:02
+T100,mal,15:01,no,es en la vela de las 15:01
+T101,mal,01:49,no,Es en la vela de las 01:49
+T102,mal,16:35,no,"Es en la vela de las 16:35, igual hay varios trades en esa foto, capaz que me estoy confundiendo"
+T103,mal,17:21,no,Vela de 17:21
+T104,mal,15:43,no,vela de 15:43
+T105,mal,15:43,si,"vela de 15:43, es el mismo trade que el t104"
