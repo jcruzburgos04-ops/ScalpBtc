@@ -32,11 +32,13 @@ def segundos(meses: list[str]) -> pl.DataFrame:
         delta10s=((2 * pl.col("vb") - pl.col("v")) / pl.col("v")).last()).sort("open_time"))
 
 
-def agregar(df: pl.DataFrame, desde: str, hasta: str) -> pl.DataFrame:
+def agregar(df: pl.DataFrame, desde: str, hasta: str, con_segundos: bool = True) -> pl.DataFrame:
     """Suma los rasgos de volumen a un DataFrame por minuto que ya viene de f6_variables.por_minuto."""
     meses = pl.date_range(pl.date(int(desde[:4]), int(desde[5:]), 1), pl.date(int(hasta[:4]), int(hasta[5:]), 1),
                           "1mo", eager=True).dt.strftime("%Y-%m").to_list()
-    df = df.sort("open_time").join(segundos(meses), on="open_time", how="left")
+    df = df.sort("open_time")
+    if con_segundos:
+        df = df.join(segundos(meses), on="open_time", how="left")
     v15 = pl.col("volume").rolling_sum(15)
     v5 = pl.col("volume").rolling_sum(5)
     df = df.with_columns(

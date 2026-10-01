@@ -293,3 +293,11 @@
   60 combinaciones: win rate entre 22 % y 88 % (SL ancho + TP chico = 80–88 %, como el trader), pero R medio entre
   −0,09 y +0,02 en todas: el escalonado cambia el win rate, no la ventaja. La mejor (+0,022) es ruido de 60 pruebas
   en muestra. Ampliar por señal casi no ocurre (1,1–1,4 patas de media).
+- Test fuera de muestra B2 escalonada 2023–2025 (config. fijada antes: SL extremo − 2 ATR, 3 patas cada 1 ATR,
+  TP +1 ATR; velas de 1m, sin BE ni comisiones): 12 657 posiciones, gana 84 %, R medio +0,018 [IC 95 % +0,010,
+  +0,026]; 2023 +0,012, 2024 +0,022, 2025 +0,019. Ganancia media +0,19 R, pérdida media −0,88 R. Positivo y estable,
+  pero muy chico: con riesgo ≈ 3 ATR (≈ 0,3 % del precio) la comisión taker ida y vuelta cuesta ≈ 0,3 R por pata.
+- Pérdidas del trader (Juan: calaveras sobre las herramientas long/short de TV): detección por plantilla + revisión
+  visual → 16 calaveras, 15 únicas (K10 ≈ K08), en `marcas/trader_sep2026/calaveras.csv` (hora y precio aproximados,
+  lado sin confirmar). Con ~93 entradas ganadoras de las tarjetas, su win rate ronda 85 %, coherente con el 86 % de
+  "+1 ATR antes de −1 ATR" medido en sus entradas. Corrige lo dicho antes: no es solo sesgo de selección.
