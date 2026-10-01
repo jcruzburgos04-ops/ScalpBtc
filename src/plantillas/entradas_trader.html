@@ -84,7 +84,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
       <span><i style="background:var(--lvl)"></i>dVAH / dVAL</span>
       <span><i style="background:var(--e11)"></i>EMA 11</span>
       <span><i style="background:var(--e25)"></i>EMA 25</span>
-      <span>Eje: hora de las capturas (UTC+2)</span>
+      <span>Eje: hora del trader (UTC+2 = ART + 5 h)</span>
     </div>
   </header>
 
@@ -96,6 +96,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
     <div class="filtros" id="filtros">
       <select class="fil" id="f-lado" aria-label="Lado"><option value="">Long y short</option><option value="long">Solo long</option><option value="short">Solo short</option></select>
       <select class="fil" id="f-conf" aria-label="Confianza de la ubicación"><option value="">Toda ubicación</option><option value="alta">Ubicación alta</option><option value="media">Media</option><option value="baja">Baja</option></select>
+      <select class="fil" id="f-cap" aria-label="Captura"><option value="">Todas las capturas</option>${""}</select>
       <select class="fil" id="f-rev" aria-label="Revisión"><option value="">Revisadas y no</option><option value="no">Sin revisar</option><option value="mal">Marcadas mal</option></select>
     </div>
     <div class="prog" id="prog"><b>0</b> / 0 revisadas</div>
@@ -158,7 +159,7 @@ function lectura(c) {
 
 function tarjeta(c, i) {
   const s = document.createElement("article");
-  s.className = "caso"; s.id = "c-" + c.id; s.dataset.lado = c.lado; s.dataset.conf = c.confianza;
+  s.className = "caso"; s.id = "c-" + c.id; s.dataset.lado = c.lado; s.dataset.conf = c.confianza; s.dataset.cap = c.n_captura;
   const hora = c.t ? fecha(c.t, TZ) : "sin ubicar";
   const ubic = c.exacta === "si" ? "orden con hora exacta" : (c.t ? `${c.episodios} paso${c.episodios === 1 ? "" : "s"} del precio en la ventana · ${c.dif_min > 0 ? "+" : ""}${c.dif_min} min de donde lo leí` : "el precio no pasó por ahí en la ventana");
   s.innerHTML = `
@@ -166,9 +167,9 @@ function tarjeta(c, i) {
       <span class="id">${c.id}</span>
       <span class="chip ${c.lado}">${c.lado}</span>
       <span class="num">${usd(c.entrada)}</span>
-      <span class="meta">${c.plataforma} · captura ${hora} (UTC+2)</span>
+      <span class="meta">${c.plataforma} · hora del trader ${hora} (UTC+2) · ${fecha(c.t || 0, -3 * 3600).slice(6)} ART</span>
       <span class="chip ${c.confianza}" title="Confianza de la ubicación al minuto">ubicación ${c.confianza}</span>
-      <a href="capturas/${c.captura}.jpg" target="_blank" rel="noopener">ver ${c.captura}</a>
+      <a href="capturas/${c.captura}.jpg" target="_blank" rel="noopener">captura n.º ${c.n_captura} de 18</a>
     </div>
     <div class="meta sub" style="font-size:.86rem">${ubic}${c.nota ? " · " + c.nota : ""}</div>
     <div class="cuerpo">
@@ -256,10 +257,11 @@ function progreso() {
 }
 
 function filtrar() {
+  const cp = document.getElementById("f-cap").value;
   const l = document.getElementById("f-lado").value, cf = document.getElementById("f-conf").value, rv = document.getElementById("f-rev").value;
   document.querySelectorAll(".caso").forEach((s) => {
     const r = s.dataset.rev;
-    s.hidden = (l && s.dataset.lado !== l) || (cf && s.dataset.conf !== cf) || (rv === "no" && r) || (rv === "mal" && r !== "mal");
+    s.hidden = (cp && s.dataset.cap !== cp) || (l && s.dataset.lado !== l) || (cf && s.dataset.conf !== cf) || (rv === "no" && r) || (rv === "mal" && r !== "mal");
   });
 }
 
@@ -297,7 +299,9 @@ function iniciar() {
     if (e.isIntersecting) { const id = e.target.id.slice(2); grafico(CASOS.find((c) => c.id === id)); }
   }), { rootMargin: "800px 0px" }) : null;
   document.querySelectorAll(".graf").forEach((g) => io ? io.observe(g) : grafico(CASOS.find((c) => c.id === g.id.slice(2))));
-  ["f-lado", "f-conf", "f-rev"].forEach((id) => document.getElementById(id).addEventListener("change", filtrar));
+  const fc = document.getElementById("f-cap");
+  [...new Set(CASOS.map((c) => c.n_captura))].sort((a, b) => a - b).forEach((n) => { const o = document.createElement("option"); o.value = n; o.textContent = "Captura n.º " + n; fc.appendChild(o); });
+  ["f-cap", "f-lado", "f-conf", "f-rev"].forEach((id) => document.getElementById(id).addEventListener("change", filtrar));
   resumen(); tabs(); progreso();
   (async () => {
     try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }

@@ -33,9 +33,12 @@ def main() -> None:
     t = df["open_time"].to_list()
     idx = {v: i for i, v in enumerate(t)}
     casos = []
-    for r in tr.sort("t_entrada", nulls_last=True).iter_rows(named=True):
+    tr = tr.with_columns(_n=pl.col("id").str.slice(1).cast(pl.Int32)).sort("_n")
+    for r in tr.iter_rows(named=True):
         c = {k: r[k] for k in ("id", "captura", "plataforma", "lado", "entrada", "exacta", "nota", "confianza", "episodios", "dif_min",
                                "nivel1", "nivel2", "precio_vs_xo")}
+        lote, k = r["captura"].replace("lote", "").split("_")
+        c["n_captura"] = (int(lote) - 1) * 5 + int(k)   # orden en que Juan mandó las capturas (1–18)
         c["t"] = r["t_entrada"]
         if r["t_entrada"] is not None:
             i = idx[r["t_entrada"]]
