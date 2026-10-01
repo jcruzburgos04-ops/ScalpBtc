@@ -285,3 +285,11 @@
   Al momento de la 1.ª señal, las jugadas sin barrida tienen algo más de volumen (3,8× vs 2,9×), absorción, ATR
   expandido (1,9× vs 1,6×) y menos recorrido en 4 h, pero ningún cuartil baja la barrida de 67 %.
   Ojo: "1.ª señal de jugadas con una sola señal" (+1,23 R) usa información futura (que no hubo más señales).
+- ¿Por qué el trader "gana 75 %"? (`src/b2_vs_trader.py`, 4 h, velas de 1m): +1 ATR antes de −1 ATR: sus 93 entradas
+  86 %, señales B2 50 %; +0,5/−3 ATR: 97 % vs 81 %. Sus capturas son tarjetas de PnL de posiciones ganadoras: la
+  muestra está sesgada a ganadores (no hay ninguna tarjeta en pérdida), así que su win rate real no es observable.
+- B2 escalonada (`src/b2_escalonada.py`, jul–sep 2026, 1m, sin BE ni comisiones): SL común detrás del extremo
+  (0,25–3 ATR), 1–3 patas (por nueva señal B2 o por órdenes límite cada 0,5/1 ATR), TP VWAP / mitad / +1 ATR.
+  60 combinaciones: win rate entre 22 % y 88 % (SL ancho + TP chico = 80–88 %, como el trader), pero R medio entre
+  −0,09 y +0,02 en todas: el escalonado cambia el win rate, no la ventaja. La mejor (+0,022) es ruido de 60 pruebas
+  en muestra. Ampliar por señal casi no ocurre (1,1–1,4 patas de media).
