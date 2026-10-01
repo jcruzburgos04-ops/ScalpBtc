@@ -24,3 +24,11 @@ Lectura preliminar (a revisar en el análisis):
 | lote3_03.jpg | 8 → 9 sep | longs 78 265,17 · 77 946,64 · 78 827,83 · 78 914,30 |
 | lote3_04.jpg | 7 → 8 sep | shorts 79 236,05 · 79 154,94; TxFlow sell 81 511,9 |
 | lote3_05.jpg | 3 → 4 sep | longs 78 967,57 · 79 628,18 · 79 330,64 · Nado 76 750 (swing) · RISE 79 664,0 · 79 402,3; short 81 820,43; TxFlow sell 81 511,9 (swing, se repite en varias capturas) |
+| lote4_01.jpg | 2 → 3 sep | longs 77 056,45 · 77 195,44 · 77 198,60; Nado 76 750 (swing) |
+| lote4_02.jpg | 1 → 2 sep | longs Nado 76 953 · 76 771 · Var 77 073,96 · 76 783,10 · 76 807,41 · Nado 76 750; short 77 469,68; TxFlow sell 81 198,2 (swing) |
+| lote4_03.jpg | 31 ago → 1 sep | longs Nado 77 267 · Var 78 380,94 · 78 081,14 · Nado 77 421 · Var 77 896,54 |
+
+Juan terminó de mandar (2026-10-01). Líneas de su gráfico: VWAP rojo = semanal, blanco = sesión, amarillo = rolling VWAP.
+Zona horaria de las capturas: **UTC+2** (confirmada con las 11 órdenes con hora del 28-sep contra Binance).
+Transcripción completa: `trades.csv` (105 entradas). Fuera del análisis: lote1_01 (1-oct-2026, cae en la nueva reserva
+oct–dic) y las posiciones swing (TxFlow short 81 511,9 y 81 198,2; Nado long 76 258 y 76 446).

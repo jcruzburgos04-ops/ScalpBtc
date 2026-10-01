@@ -11,7 +11,7 @@ import pyarrow.compute as pc
 PROC = Path(__file__).resolve().parent.parent / "data" / "proc"
 ESCALA_P = 100
 # Tramo de reserva (CLAUDE.md §6c, aprobado por Juan 2026-09-30): no se mira, no se grafica ni se usa hasta F8.
-RESERVA = ("2026-07", "2026-09")
+RESERVA = ("2026-10", "2026-12")  # reserva jul–sep 2026 liberada (2026-10-01); F8 confirma con oct–dic 2026
 
 
 def sin_reserva(df: pl.DataFrame, col: str = "open_time") -> pl.DataFrame:

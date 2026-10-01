@@ -1,0 +1,312 @@
+<title>Entradas del trader · septiembre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna de lectura tipo terminal; cada entrada = gráfico + lectura, en la misma oscuridad que su TradingView */
+:root {
+  color-scheme: dark;
+  --bg: #0c0e12; --panel: #13161b; --line: #252a32; --fg: #d9dce1; --muted: #8b919b;
+  --accent: #5fc4d3;
+  --long: #3fb68b; --short: #e0605c; --warn: #d9a441;
+  --vwap: #f1f2f4; --vw: #e5484d; --rv: #e3c34a; --band: #5b626d; --lvl: #a08cf0; --e11: #4a9eff; --e25: #f0a35e;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 22px; }
+h1 { font: 600 2.1rem/1.1 var(--display); letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h2 { font: 600 1.35rem/1.2 var(--display); margin: 0; letter-spacing: .02em; }
+p { margin: 0; max-width: 72ch; }
+.sub { color: var(--muted); }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .86rem; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 18px; height: 2px; display: inline-block; }
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-block: 10px; }
+.tabs { display: flex; gap: 4px; }
+.tab, .fil, .btn { font: 500 .9rem var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.tab:focus-visible, .fil:focus-visible, .btn:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.filtros { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+select.fil { padding-right: 8px; }
+.prog { margin-left: auto; color: var(--muted); font-size: .88rem; }
+.prog b { color: var(--fg); font-family: var(--mono); font-weight: 500; }
+.caso { border-top: 1px solid var(--line); padding-block: 18px 6px; display: grid; gap: 12px; }
+.cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.cab .id { font: 600 1.25rem var(--display); }
+.chip { font: 600 .74rem var(--body); text-transform: uppercase; letter-spacing: .06em; border-radius: 4px; padding: 2px 7px; border: 1px solid currentColor; }
+.chip.long { color: var(--long); } .chip.short { color: var(--short); }
+.chip.alta { color: var(--long); } .chip.media { color: var(--warn); } .chip.baja { color: var(--muted); }
+.cab .meta { color: var(--muted); font-size: .88rem; }
+.cab a { color: var(--accent); font-size: .88rem; }
+.cuerpo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 820px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+.graf { height: 320px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+.graf .vacio { color: var(--muted); padding: 16px; font-size: .9rem; }
+.lect { display: grid; gap: 2px; font-size: .9rem; min-width: 0; }
+.fila { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding-block: 3px; border-bottom: 1px dashed var(--line); }
+.fila .k { color: var(--muted); }
+.fila .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .84rem; overflow-wrap: anywhere; }
+.fila .s { font: 600 .7rem var(--body); text-transform: uppercase; letter-spacing: .05em; }
+.s.fav { color: var(--long); } .s.con { color: var(--short); } .s.neu { color: var(--muted); }
+.nota { color: var(--warn); font-size: .86rem; }
+fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+legend { float: left; margin-right: 6px; color: var(--muted); font-size: .9rem; }
+.btn[aria-pressed="true"].bien { border-color: var(--long); color: var(--long); }
+.btn[aria-pressed="true"].mal { border-color: var(--short); color: var(--short); }
+.btn[aria-pressed="true"].nose { border-color: var(--warn); color: var(--warn); }
+textarea { width: 100%; min-height: 2.4rem; resize: vertical; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; font: .9rem var(--body); padding: 6px 8px; box-sizing: border-box; }
+.estado { color: var(--muted); font-size: .8rem; }
+.resumen { display: grid; gap: 16px; }
+.tabla { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .78rem var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+td .barrita { display: block; height: 4px; border-radius: 2px; background: var(--accent); margin-top: 4px; opacity: .8; }
+tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
+.lista { columns: 2 16rem; gap: 24px; padding-left: 1.1rem; margin: 0; color: var(--muted); }
+.lista b { color: var(--fg); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <h1>Entradas del trader · septiembre 2026</h1>
+    <p class="sub">Cada tarjeta de sus capturas, ubicada al minuto en Binance <span class="mono">BTCUSDT.P</span> 1m. Su exchange cotiza unos 10–45 USD arriba de Binance, así que la flecha marca el minuto donde Binance pasó por su precio, el más cercano a donde lo dibujó. Mirá cada una contra la captura y marcá si la ubicación es correcta. Los indicadores son los de la última vela cerrada antes de entrar.</p>
+    <div class="leyenda">
+      <span><i style="background:var(--vwap)"></i>VWAP sesión</span>
+      <span><i style="background:var(--band)"></i>±1σ ±2σ</span>
+      <span><i style="background:var(--vw)"></i>VWAP semanal</span>
+      <span><i style="background:var(--rv)"></i>rolling VWAP</span>
+      <span><i style="background:var(--lvl)"></i>dVAH / dVAL</span>
+      <span><i style="background:var(--e11)"></i>EMA 11</span>
+      <span><i style="background:var(--e25)"></i>EMA 25</span>
+      <span>Eje: hora de las capturas (UTC+2)</span>
+    </div>
+  </header>
+
+  <div class="barra">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-casos" aria-selected="true" aria-controls="panel-casos">Entradas</button>
+      <button class="tab" role="tab" id="tab-resumen" aria-selected="false" aria-controls="panel-resumen">Qué tienen en común</button>
+    </div>
+    <div class="filtros" id="filtros">
+      <select class="fil" id="f-lado" aria-label="Lado"><option value="">Long y short</option><option value="long">Solo long</option><option value="short">Solo short</option></select>
+      <select class="fil" id="f-conf" aria-label="Confianza de la ubicación"><option value="">Toda ubicación</option><option value="alta">Ubicación alta</option><option value="media">Media</option><option value="baja">Baja</option></select>
+      <select class="fil" id="f-rev" aria-label="Revisión"><option value="">Revisadas y no</option><option value="no">Sin revisar</option><option value="mal">Marcadas mal</option></select>
+    </div>
+    <div class="prog" id="prog"><b>0</b> / 0 revisadas</div>
+  </div>
+
+  <section id="panel-casos" role="tabpanel" aria-labelledby="tab-casos"></section>
+
+  <section id="panel-resumen" role="tabpanel" aria-labelledby="tab-resumen" class="resumen" hidden>
+    <h2>Qué tienen en común sus entradas</h2>
+    <p class="sub" id="res-intro"></p>
+    <div class="tabla"><table id="res-tabla"><thead><tr><th>Al momento de entrar</th><th style="text-align:right">Sus entradas</th><th style="text-align:right">Ubicación alta/media</th><th style="text-align:right">Un minuto cualquiera</th><th style="text-align:right">Veces más</th></tr></thead><tbody></tbody></table></div>
+    <h2>Nivel más cercano a cada entrada</h2>
+    <ul class="lista" id="res-niveles"></ul>
+    <p class="sub">Con unos 35 niveles dibujados, casi siempre hay uno cerca: estar a ≤ 0,5 ATR de algún nivel pasa en el 45 % de los minutos de septiembre. Por eso la cercanía a un nivel, sola, no distingue sus entradas.</p>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+const CASOS = __CASOS__;
+const RES = __RESUMEN__;
+const TZ = 2 * 3600;  // hora de las capturas
+const css = getComputedStyle(document.documentElement);
+const tok = (n) => css.getPropertyValue(n).trim();
+const p2 = (n) => String(n).padStart(2, "0");
+const hhmm = (t) => { const d = new Date(t * 1000); return p2(d.getUTCHours()) + ":" + p2(d.getUTCMinutes()); };
+const fecha = (ms, off) => { const d = new Date(ms + off * 1000); return p2(d.getUTCDate()) + "/" + p2(d.getUTCMonth() + 1) + " " + p2(d.getUTCHours()) + ":" + p2(d.getUTCMinutes()); };
+const usd = (v) => v == null ? "–" : v.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const f1 = (v, s = "") => v == null ? "–" : (v > 0 && s ? "+" : "") + v.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + s;
+const pct = (v) => Math.round(v * 100) + " %";
+let respuestas = {}, db = null;
+
+function lectura(c) {
+  const L = c.lado === "long";
+  const filas = [];
+  const add = (k, v, s, cls) => filas.push([k, v, s || "", cls || "neu"]);
+  const z = c.z_vwap_d;
+  const zz = z == null ? "–" : f1(z, "σ");
+  const barato = z != null && (L ? z < 0 : z > 0);
+  add("VWAP sesión", zz + (z != null && Math.abs(z) >= 1 ? (L ? (z <= -1 ? " · bajo −1σ" : " · sobre +1σ") : (z >= 1 ? " · sobre +1σ" : " · bajo −1σ")) : ""), barato ? "barato" : "caro", barato ? "fav" : "con");
+  add("VWAP semanal", (c.sobre_vwap_w ? "arriba" : "abajo") + " · " + f1(c.z_vwap_w, "σ"), c.sobre_vwap_w === L ? "con la semana" : "contra la semana", c.sobre_vwap_w === L ? "fav" : "con");
+  add("Rolling VWAP", c.sobre_rvwap ? "arriba" : "abajo", c.sobre_rvwap === L ? "con tendencia" : "contra tendencia", c.sobre_rvwap === L ? "fav" : "con");
+  add("Nivel más cerca", `${c.nivel1} a ${f1(Math.abs(c.dist1_atr))} ATR ${c.dist1_atr >= 0 ? "debajo" : "arriba"}`, Math.abs(c.dist1_atr) <= 0.5 ? "≤ 0,5 ATR" : "", Math.abs(c.dist1_atr) <= 0.5 ? "fav" : "neu");
+  add("Segundo nivel", `${c.nivel2} a ${f1(Math.abs(c.dist2_atr))} ATR`, "");
+  const sube = (L ? 1 : -1) * c.ret15_atr > 0;
+  add("Últimos 15 min", `${sube ? "subió" : "bajó"} ${f1(Math.abs(c.ret15_atr))} ATR`, c.ret15_atr <= -1 ? "venía en contra" : (c.ret15_atr >= 1 ? "venía a favor" : "lateral"), "neu");
+  add("Barrida 60 min", c.barrida60 ? (L ? "hizo el mínimo de 60 min" : "hizo el máximo de 60 min") : "no", c.barrida60 ? "barrida" : "", c.barrida60 ? "fav" : "neu");
+  add("ASH 1m", `${c.ash1_a_favor ? (L ? "verde" : "rojo") : (L ? "rojo" : "verde")} · brecha ${f1(c.ash1_gn)} · cruzó hace ${c.ash1_velas_desde_cruce > 30 ? "+30" : c.ash1_velas_desde_cruce} velas`, c.ash1_a_favor ? "a favor" : "en contra", c.ash1_a_favor ? "fav" : "con");
+  add("XO 1m", `${c.xo_a_favor ? "cruzadas a favor" : "sin cruzar"} · precio ${c.precio_vs_xo}`, c.xo_a_favor ? "a favor" : "en contra", c.xo_a_favor ? "fav" : "con");
+  add("ASH 5m (vivo)", `brecha ${f1(c.ash5_gn)}`, c.ash5_a_favor ? "a favor" : "en contra", c.ash5_a_favor ? "fav" : "con");
+  add("RVOL", `${f1(c.rvol)} · máx 5 velas ${f1(c.rvol_max5)}`, c.rvol_max5 >= 1.5 ? "volumen alto" : "", c.rvol_max5 >= 1.5 ? "fav" : "neu");
+  const cvdN = c.cvd5 == null || Math.abs(c.cvd5) < 0.01;
+  add("CVD 5 min", f1(c.cvd5 == null ? null : c.cvd5 * 100, " %") + " a favor", cvdN ? "parejo" : (c.cvd5 > 0 ? "agresión a favor" : "agresión en contra"), cvdN ? "neu" : (c.cvd5 > 0 ? "fav" : "con"));
+  add("Órdenes grandes 5 min", `${c.grandes5_favor ?? "–"} a favor · ${c.grandes5_contra ?? "–"} en contra`, "");
+  const pr = c.pos_rango_dia;
+  add("Rango del día", pr == null ? "–" : (pr < 0 ? "debajo del mínimo previo del día" : (pr > 1 ? "encima del máximo previo del día" : pct(pr) + " desde el mínimo")), pr != null && (pr < 0 || pr > 1) ? "extremo nuevo" : "");
+  add("Hora", `${fecha(c.t, -3 * 3600)} ART · ATR ${f1(c.atr14)} USD`, "");
+  return filas;
+}
+
+function tarjeta(c, i) {
+  const s = document.createElement("article");
+  s.className = "caso"; s.id = "c-" + c.id; s.dataset.lado = c.lado; s.dataset.conf = c.confianza;
+  const hora = c.t ? fecha(c.t, TZ) : "sin ubicar";
+  const ubic = c.exacta === "si" ? "orden con hora exacta" : (c.t ? `${c.episodios} paso${c.episodios === 1 ? "" : "s"} del precio en la ventana · ${c.dif_min > 0 ? "+" : ""}${c.dif_min} min de donde lo leí` : "el precio no pasó por ahí en la ventana");
+  s.innerHTML = `
+    <div class="cab">
+      <span class="id">${c.id}</span>
+      <span class="chip ${c.lado}">${c.lado}</span>
+      <span class="num">${usd(c.entrada)}</span>
+      <span class="meta">${c.plataforma} · captura ${hora} (UTC+2)</span>
+      <span class="chip ${c.confianza}" title="Confianza de la ubicación al minuto">ubicación ${c.confianza}</span>
+      <a href="capturas/${c.captura}.jpg" target="_blank" rel="noopener">ver ${c.captura}</a>
+    </div>
+    <div class="meta sub" style="font-size:.86rem">${ubic}${c.nota ? " · " + c.nota : ""}</div>
+    <div class="cuerpo">
+      <div class="graf" id="g-${c.id}">${c.t ? "" : '<div class="vacio">No encontré el precio en la ventana de la captura.</div>'}</div>
+      <div class="lect"></div>
+    </div>
+    <fieldset>
+      <legend>¿La flecha está donde él entró?</legend>
+      <button class="btn bien" data-v="bien" aria-pressed="false">Sí, es ahí</button>
+      <button class="btn mal" data-v="mal" aria-pressed="false">No, es en otro lado</button>
+      <button class="btn nose" data-v="nose" aria-pressed="false">No sé</button>
+      <span class="estado" aria-live="polite"></span>
+    </fieldset>
+    <textarea id="com-${c.id}" placeholder="Si está mal: dónde entró (hora de la captura) o qué vio para entrar"></textarea>`;
+  if (c.t) {
+    const lect = s.querySelector(".lect");
+    lectura(c).forEach(([k, v, e, cls]) => {
+      const f = document.createElement("div"); f.className = "fila";
+      f.innerHTML = `<span class="k"></span><span class="v"></span><span class="s ${cls}"></span>`;
+      f.children[0].textContent = k; f.children[1].textContent = v; f.children[2].textContent = e;
+      lect.appendChild(f);
+    });
+  }
+  s.querySelectorAll(".btn").forEach((b) => b.addEventListener("click", () => guardar(c.id, b.dataset.v)));
+  const ta = s.querySelector("textarea");
+  ta.addEventListener("change", () => guardar(c.id, null));
+  return s;
+}
+
+function grafico(c) {
+  const el = document.getElementById("g-" + c.id);
+  if (!el || el.dataset.ok || !c.t || !window.LightweightCharts) return;
+  el.dataset.ok = "1";
+  const g = LightweightCharts.createChart(el, {
+    autoSize: true,
+    layout: { background: { color: tok("--panel") }, textColor: tok("--muted"), fontFamily: tok("--mono"), fontSize: 11 },
+    grid: { vertLines: { color: tok("--line") }, horzLines: { color: tok("--line") } },
+    rightPriceScale: { borderColor: tok("--line") },
+    timeScale: { borderColor: tok("--line"), timeVisible: true, tickMarkFormatter: (t) => hhmm(t) },
+    localization: { locale: "es-AR", priceFormatter: (v) => v.toFixed(1), timeFormatter: hhmm },
+    crosshair: { mode: 0 },
+  });
+  const ts = c.velas.map((v) => v[0] + TZ);
+  const lin = (k, col, w, st) => {
+    const s = g.addLineSeries({ color: col, lineWidth: w, lineStyle: st, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    s.setData(c.lineas[k].map((v, i) => v == null ? { time: ts[i] } : { time: ts[i], value: v }));
+  };
+  lin("p2", tok("--band"), 1, 1); lin("m2", tok("--band"), 1, 1); lin("p1", tok("--band"), 1, 2); lin("m1", tok("--band"), 1, 2);
+  lin("vah", tok("--lvl"), 1, 1); lin("val", tok("--lvl"), 1, 1);
+  lin("vw", tok("--vw"), 2, 0); lin("rv", tok("--rv"), 2, 0); lin("vwap", tok("--vwap"), 2, 0);
+  lin("e25", tok("--e25"), 1, 0); lin("e11", tok("--e11"), 1, 0);
+  const vel = g.addCandlestickSeries({ upColor: tok("--long"), downColor: tok("--short"), borderVisible: false, wickUpColor: tok("--long"), wickDownColor: tok("--short"), priceLineVisible: false, lastValueVisible: false });
+  vel.setData(c.velas.map((v, i) => ({ time: ts[i], open: v[1], high: v[2], low: v[3], close: v[4] })));
+  const L = c.lado === "long";
+  vel.setMarkers([{ time: c.t / 1000 + TZ, position: L ? "belowBar" : "aboveBar", color: L ? tok("--long") : tok("--short"), shape: L ? "arrowUp" : "arrowDown", text: c.id }]);
+  vel.createPriceLine({ price: c.entrada, color: L ? tok("--long") : tok("--short"), lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: "su precio" });
+  g.timeScale().fitContent();
+}
+
+function pintarRespuesta(id) {
+  const s = document.getElementById("c-" + id); if (!s) return;
+  const r = respuestas[id] || {};
+  s.querySelectorAll(".btn").forEach((b) => b.setAttribute("aria-pressed", String(r.estado === b.dataset.v)));
+  const ta = s.querySelector("textarea"); if (document.activeElement !== ta && r.comentario != null) ta.value = r.comentario;
+  s.dataset.rev = r.estado || "";
+}
+
+async function guardar(id, estado) {
+  const s = document.getElementById("c-" + id);
+  const r = Object.assign({}, respuestas[id] || {});
+  if (estado) r.estado = estado;
+  r.comentario = s.querySelector("textarea").value;
+  r.actualizado = Date.now();
+  respuestas[id] = r; pintarRespuesta(id); progreso();
+  const st = s.querySelector(".estado");
+  if (!db) { st.textContent = "No se puede guardar en esta vista"; return; }
+  st.textContent = "Guardando…";
+  try { await db.collection("ubicacion").doc(id).set(r); st.textContent = "Guardado"; }
+  catch (e) { st.textContent = "No se guardó: " + (e && e.message ? e.message : "error") + ". Probá de nuevo."; }
+}
+
+function progreso() {
+  const n = CASOS.length, k = CASOS.filter((c) => respuestas[c.id] && respuestas[c.id].estado).length;
+  document.getElementById("prog").innerHTML = `<b>${k}</b> / ${n} revisadas`;
+}
+
+function filtrar() {
+  const l = document.getElementById("f-lado").value, cf = document.getElementById("f-conf").value, rv = document.getElementById("f-rev").value;
+  document.querySelectorAll(".caso").forEach((s) => {
+    const r = s.dataset.rev;
+    s.hidden = (l && s.dataset.lado !== l) || (cf && s.dataset.conf !== cf) || (rv === "no" && r) || (rv === "mal" && r !== "mal");
+  });
+}
+
+function resumen() {
+  document.getElementById("res-intro").textContent =
+    `${RES.n} entradas ubicadas (${RES.n_conf} con ubicación alta o media). Cada rasgo se compara con lo que pasa en un minuto cualquiera de septiembre, mirado desde el mismo lado (long o short). "Veces más" > 1 = el rasgo aparece más en sus entradas que por azar. Las entradas no son independientes: varias son de la misma jugada.`;
+  const tb = document.querySelector("#res-tabla tbody");
+  RES.rasgos.forEach((r) => {
+    const x = r.base > 0 ? r.todas / r.base : null;
+    const tr = document.createElement("tr");
+    if (x != null && (x >= 1.5 || x <= 0.7)) tr.className = "fuerte";
+    tr.innerHTML = `<td></td><td class="n">${pct(r.todas)}<span class="barrita" style="width:${Math.round(r.todas * 100)}%"></span></td><td class="n">${pct(r.conf)}</td><td class="n">${pct(r.base)}</td><td class="n">${x == null ? "–" : x.toFixed(1).replace(".", ",") + "×"}</td>`;
+    tr.children[0].textContent = r.rasgo;
+    tb.appendChild(tr);
+  });
+  const ul = document.getElementById("res-niveles");
+  RES.niveles.forEach((n) => { const li = document.createElement("li"); li.innerHTML = `<b></b> ${n.n} (${n.cerca} a ≤ 0,5 ATR)`; li.firstChild.textContent = n.nivel1; ul.appendChild(li); });
+}
+
+function tabs() {
+  const tc = document.getElementById("tab-casos"), tr = document.getElementById("tab-resumen");
+  const ver = (casos) => {
+    tc.setAttribute("aria-selected", String(casos)); tr.setAttribute("aria-selected", String(!casos));
+    document.getElementById("panel-casos").hidden = !casos; document.getElementById("panel-resumen").hidden = casos;
+    document.getElementById("filtros").hidden = !casos;
+  };
+  tc.addEventListener("click", () => ver(true)); tr.addEventListener("click", () => ver(false));
+  if (location.hash === "#resumen") ver(false);
+}
+
+function iniciar() {
+  const panel = document.getElementById("panel-casos");
+  CASOS.forEach((c, i) => panel.appendChild(tarjeta(c, i)));
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) { const id = e.target.id.slice(2); grafico(CASOS.find((c) => c.id === id)); }
+  }), { rootMargin: "800px 0px" }) : null;
+  document.querySelectorAll(".graf").forEach((g) => io ? io.observe(g) : grafico(CASOS.find((c) => c.id === g.id.slice(2))));
+  ["f-lado", "f-conf", "f-rev"].forEach((id) => document.getElementById(id).addEventListener("change", filtrar));
+  resumen(); tabs(); progreso();
+  (async () => {
+    try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
+    if (!db) return;
+    db.collection("ubicacion").onSnapshot((snap) => {
+      snap.docs.forEach((d) => { respuestas[d.id] = d.data(); pintarRespuesta(d.id); });
+      progreso(); filtrar();
+    });
+  })();
+}
+iniciar();
+</script>

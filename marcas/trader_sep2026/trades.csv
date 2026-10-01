@@ -1,0 +1,106 @@
+id,captura,plataforma,lado,entrada,desde,hasta,aprox,exacta,nota
+T01,lote1_02,Variational,long,83462.69,09-28 17:30,09-28 18:50,09-28 18:05,no,
+T02,lote1_02,Variational,long,83651.94,09-28 18:40,09-28 19:40,09-28 19:10,no,
+T03,lote1_02,Nado,long,83658,09-28 17:30,09-28 19:40,09-28 19:10,no,
+T04,lote1_02,Nado,long,83030,09-29 04:30,09-29 08:30,09-29 06:30,no,
+T05,lote1_02,TxFlow,long,83135.4,09-29 04:30,09-29 08:30,09-29 07:30,no,
+T06,lote1_02,Variational,long,82915.15,09-29 03:30,09-29 06:30,09-29 05:00,no,
+T07,lote1_03,Nado,long,83970,09-26 22:00,09-27 00:30,09-26 22:50,no,
+T08,lote1_03,TxFlow,long,83943.1,09-26 22:00,09-27 00:30,09-26 22:50,no,
+T09,lote1_03,Variational,long,84360.01,09-27 18:30,09-27 21:00,09-27 19:40,no,
+T10,lote1_03,lista 25x,long,83275.6,09-28 05:34,09-28 05:35,09-28 05:34,si,orden con hora 05:34:44
+T11,lote1_03,lista 25x,short,83512,09-28 07:00,09-28 07:01,09-28 07:00,si,sell 07:00:52 (short o cierre: ambigua)
+T12,lote1_03,lista 25x,long,83086.5,09-28 07:24,09-28 07:25,09-28 07:24,si,buy 07:24:34 (long o cierre del short: ambigua)
+T13,lote1_03,lista 25x,long,83096.5,09-28 07:27,09-28 07:28,09-28 07:27,si,buy 07:27:20 (ambigua)
+T14,lote1_03,lista 25x,long,82779.9,09-28 07:39,09-28 07:40,09-28 07:39,si,buy 07:39:33
+T15,lote1_03,Variational,long,83045.51,09-28 07:00,09-28 08:00,09-28 07:25,no,
+T16,lote1_03,Variational,long,82908.09,09-28 07:00,09-28 13:00,09-28 07:40,no,ubicación dudosa (07:40 o mínimo de 11:30)
+T17,lote1_03,Variational,long,82836.19,09-28 16:00,09-28 18:00,09-28 17:00,no,
+T18,lote1_04,Variational,long,85654.98,09-22 15:00,09-22 23:59,09-22 16:30,no,
+T19,lote1_04,RISE,long,84160.3,09-23 16:00,09-23 23:59,09-23 18:00,no,
+T20,lote1_04,Variational,long,84212.67,09-23 16:00,09-23 23:59,09-23 18:00,no,
+T21,lote1_04,Variational,long,83659.56,09-24 09:00,09-24 13:00,09-24 11:30,no,
+T22,lote1_04,Variational,long,83723.82,09-24 09:00,09-24 18:00,09-24 11:15,no,
+T23,lote1_05,Variational,long,81138.54,09-20 22:30,09-21 03:00,09-21 02:00,no,
+T24,lote1_05,Variational,long,81789.02,09-21 02:30,09-21 04:30,09-21 03:20,no,flecha
+T25,lote1_05,Variational,long,81015.48,09-21 03:30,09-21 06:30,09-21 04:00,no,flecha
+T26,lote1_05,Variational,long,81639.22,09-21 09:00,09-21 10:30,09-21 09:58,no,
+T27,lote1_05,Variational,short,81743.19,09-21 02:00,09-21 04:00,09-21 02:55,no,flecha
+T28,lote1_05,Variational,short,81580.05,09-21 03:00,09-21 05:00,09-21 03:50,no,flecha
+T29,lote1_05,TxFlow,short,81763.5,09-21 02:30,09-21 04:30,09-21 03:25,no,flecha
+T30,lote1_05,Variational,short,81412.22,09-21 04:00,09-21 05:30,09-21 04:40,no,flecha
+T31,lote1_05,Variational,short,81391.89,09-21 05:30,09-21 07:30,09-21 06:25,no,flecha
+T32,lote1_05,Variational,long,85039.97,09-21 14:00,09-21 16:30,09-21 15:15,no,flecha
+T33,lote1_05,Variational,long,85350.79,09-21 15:30,09-21 17:00,09-21 16:25,no,flecha
+T34,lote1_05,Variational,long,85369.03,09-21 15:00,09-21 17:00,09-21 15:45,no,flecha
+T35,lote2_01,Variational,long,76272.64,09-17 16:00,09-17 18:30,09-17 17:15,no,
+T36,lote2_01,Variational,long,76521.97,09-17 23:00,09-18 03:00,09-18 01:30,no,
+T37,lote2_01,Variational,long,76932.35,09-18 03:00,09-18 06:00,09-18 04:30,no,
+T38,lote2_01,Variational,long,77437.13,09-18 04:30,09-18 07:00,09-18 05:30,no,
+T39,lote2_02,Nado,long,75509,09-16 19:30,09-16 20:30,09-16 19:55,no,flecha
+T40,lote2_02,Nado,long,75748,09-16 19:30,09-16 21:30,09-16 20:00,no,flecha
+T41,lote2_02,Variational,long,75533.68,09-16 19:30,09-16 20:30,09-16 19:57,no,flecha
+T42,lote2_02,Variational,long,75453.72,09-16 19:30,09-16 20:30,09-16 19:50,no,flecha
+T43,lote2_02,Nado,long,75842,09-16 19:30,09-16 21:30,09-16 20:10,no,flecha
+T44,lote2_02,Nado,long,75518,09-16 19:30,09-16 20:30,09-16 19:58,no,flecha
+T45,lote2_02,Nado,long,75496,09-16 21:30,09-16 23:30,09-16 22:30,no,flecha
+T46,lote2_02,Nado,long,75218,09-16 20:00,09-16 21:30,09-16 20:45,no,flecha
+T47,lote2_02,Variational,short,76043.79,09-16 19:45,09-16 21:30,09-16 20:05,no,flecha
+T48,lote2_02,Variational,short,76182.52,09-16 20:00,09-16 22:00,09-16 21:00,no,flecha
+T49,lote2_02,Variational,short,75920.39,09-16 20:00,09-16 22:00,09-16 21:10,no,flecha
+T50,lote2_02,Variational,short,76195.07,09-16 19:45,09-16 22:00,09-16 20:10,no,flecha
+T51,lote2_02,Variational,short,75841.62,09-16 20:00,09-16 22:00,09-16 20:40,no,flecha
+T52,lote2_02,Variational,long,76162.07,09-17 02:30,09-17 04:30,09-17 03:30,no,flecha
+T53,lote2_02,Nado,long,76223,09-17 03:30,09-17 05:00,09-17 04:10,no,flecha
+T54,lote2_02,Variational,long,76111.13,09-17 04:30,09-17 06:00,09-17 05:10,no,flecha
+T55,lote2_02,Nado,long,76205,09-17 13:00,09-17 14:30,09-17 14:00,no,flecha
+T56,lote2_02,Variational,long,76429.16,09-17 15:00,09-17 17:00,09-17 15:55,no,flecha
+T57,lote2_02,Variational,long,76250.45,09-17 15:00,09-17 17:00,09-17 15:50,no,flecha
+T58,lote2_04,Variational,long,76279.86,09-15 13:00,09-15 16:00,09-15 15:00,no,
+T59,lote2_04,Nado,long,76281,09-15 13:00,09-15 16:00,09-15 15:00,no,
+T60,lote2_04,Variational,long,75793.30,09-15 15:30,09-15 18:30,09-15 17:15,no,
+T61,lote2_04,Nado,long,75847,09-15 15:30,09-15 18:30,09-15 17:15,no,
+T62,lote2_04,Nado,long,75476,09-15 20:00,09-16 02:30,09-16 01:30,no,entrada leída del % y el mark
+T63,lote2_04,Variational,long,75430.69,09-16 00:00,09-16 03:00,09-16 01:30,no,
+T64,lote2_04,Nado,long,75507,09-16 09:00,09-16 12:00,09-16 10:45,no,entrada leída del % y el mark
+T65,lote2_05,Variational,short,79217.09,09-14 21:30,09-15 00:30,09-14 22:45,no,
+T66,lote3_01,Variational,long,76878.41,09-13 15:00,09-13 18:00,09-13 16:15,no,
+T67,lote3_01,Variational,short,77204.60,09-13 20:00,09-14 00:30,09-13 23:00,no,
+T68,lote3_01,Variational,short,76969.69,09-13 23:30,09-14 01:30,09-14 00:15,no,
+T69,lote3_01,Variational,short,76673.14,09-14 00:30,09-14 02:30,09-14 01:30,no,
+T70,lote3_01,Variational,long,77856.90,09-14 04:00,09-14 16:30,09-14 10:00,no,ubicación dudosa
+T71,lote3_01,Variational,short,78046.37,09-14 09:00,09-14 16:30,09-14 12:00,no,ubicación dudosa
+T72,lote3_01,Variational,short,78206.60,09-14 13:00,09-14 16:30,09-14 16:00,no,
+T73,lote3_02,Nado,long,76950,09-10 15:00,09-10 20:00,09-10 16:00,no,
+T74,lote3_02,Variational,long,77027.55,09-10 15:00,09-10 20:00,09-10 19:00,no,
+T75,lote3_02,Variational,long,76497.51,09-11 14:00,09-11 15:00,09-11 14:25,no,
+T76,lote3_02,lista,long,76438.91,09-11 14:00,09-11 15:00,09-11 14:20,no,orden buy sin hora
+T77,lote3_02,Nado,long,76973,09-11 13:00,09-11 16:00,09-11 14:35,no,
+T78,lote3_02,Variational,short,77538.99,09-11 15:30,09-11 20:00,09-11 18:45,no,
+T79,lote3_03,Variational,long,77946.64,09-08 15:00,09-08 17:00,09-08 16:00,no,
+T80,lote3_03,Variational,long,78265.17,09-08 16:00,09-08 19:00,09-08 17:00,no,
+T81,lote3_03,Variational,long,78827.83,09-09 04:00,09-09 09:00,09-09 06:45,no,
+T82,lote3_03,Variational,long,78914.30,09-09 09:00,09-09 17:00,09-09 12:00,no,ubicación dudosa
+T83,lote3_04,Variational,short,79236.05,09-07 20:00,09-08 00:00,09-07 22:00,no,
+T84,lote3_04,Variational,short,79154.94,09-08 02:30,09-08 05:00,09-08 04:00,no,
+T85,lote3_05,Variational,long,78967.57,09-03 15:00,09-03 17:30,09-03 16:30,no,
+T86,lote3_05,Variational,short,81820.43,09-03 22:00,09-04 01:00,09-03 23:30,no,
+T87,lote3_05,RISE,long,79664.0,09-04 13:00,09-04 16:00,09-04 14:45,no,
+T88,lote3_05,Variational,long,79628.18,09-04 13:00,09-04 16:00,09-04 15:00,no,
+T89,lote3_05,Variational,long,79330.64,09-04 14:00,09-04 16:30,09-04 15:30,no,
+T90,lote3_05,RISE,long,79402.3,09-04 14:00,09-04 16:30,09-04 15:45,no,
+T91,lote4_01,Variational,long,77056.45,09-02 18:00,09-02 23:59,09-02 20:00,no,
+T92,lote4_01,Variational,long,77195.44,09-03 01:00,09-03 04:00,09-03 02:30,no,
+T93,lote4_01,Variational,long,77198.60,09-03 06:30,09-03 09:00,09-03 07:30,no,
+T94,lote4_02,Nado,long,76953,09-01 20:30,09-01 22:00,09-01 20:50,no,
+T95,lote4_02,Nado,long,76771,09-02 03:30,09-02 04:30,09-02 04:00,no,
+T96,lote4_02,Variational,long,77073.96,09-02 03:30,09-02 05:00,09-02 04:20,no,
+T97,lote4_02,Variational,long,76783.10,09-02 03:30,09-02 05:00,09-02 04:00,no,
+T98,lote4_02,Variational,short,77469.68,09-02 07:00,09-02 10:30,09-02 09:45,no,
+T99,lote4_02,Variational,long,76807.41,09-02 13:00,09-02 16:30,09-02 15:30,no,
+T100,lote4_02,Nado,long,76750,09-02 12:00,09-02 16:30,09-02 13:00,no,posición swing (se ve abierta en 3 capturas)
+T101,lote4_03,Nado,long,77267,08-31 01:15,08-31 02:30,08-31 01:45,no,
+T102,lote4_03,Variational,long,78081.14,08-31 14:00,08-31 17:00,08-31 16:00,no,
+T103,lote4_03,Variational,long,78380.94,08-31 15:00,08-31 18:00,08-31 17:00,no,
+T104,lote4_03,Nado,long,77421,09-01 13:00,09-01 16:30,09-01 15:50,no,
+T105,lote4_03,Variational,long,77896.54,09-01 10:00,09-01 16:30,09-01 16:15,no,

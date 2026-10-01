@@ -38,13 +38,13 @@ Método: mark ≈ last + b(t), b = mark − last interpolada entre la mediana de
 
 | Métrica | Valor |
 |---|---|
-| Error absoluto del close, mediana | 2.08 USD |
-| Error absoluto del close, p95 | 19.29 USD (0.0218 %) |
-| Minutos con high reconstruido > high real | 73.7 % |
-| Minutos con low reconstruido < low real | 67.9 % |
-| Exceso del high, mediana | 0.39 USD |
-| Exceso del low, mediana | 2.42 USD |
-| Rango H−L del mark real, mediana | 38.50 USD |
+| Error absoluto del close, mediana | 1.90 USD |
+| Error absoluto del close, p95 | 17.72 USD (0.0203 %) |
+| Minutos con high reconstruido > high real | 71.9 % |
+| Minutos con low reconstruido < low real | 68.9 % |
+| Exceso del high, mediana | 0.25 USD |
+| Exceso del low, mediana | 2.58 USD |
+| Rango H−L del mark real, mediana | 34.30 USD |
 
 Lectura: si high/low reconstruidos superan al real en la mayoría de los minutos, el SL por mark se dispara
 más seguido que en la realidad en esos días (sesgo conservador). Los trades que caigan en minutos

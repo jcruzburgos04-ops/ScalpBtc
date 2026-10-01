@@ -80,7 +80,8 @@ def bajar(ruta: str, destino: Path, reintentos: int = 5) -> Path:
                 raise ValueError(f"CHECKSUM no coincide: {ruta}")
             return destino
         except Exception as e:  # red o checksum: reintento con backoff
-            if i == reintentos - 1:
+            no_existe = isinstance(e, requests.HTTPError) and e.response is not None and e.response.status_code == 404
+            if no_existe or i == reintentos - 1:
                 raise
             print(f"  reintento {i + 1} {ruta}: {e}")
             time.sleep(2 ** (i + 1))
@@ -135,7 +136,12 @@ def zips_del_mes(dataset: str, sub: str, mes: str, simbolo: str = "BTCUSDT", mer
     etiqueta = f"{simbolo}-{sub.rstrip('/') or dataset}" if sub else f"{simbolo}-{dataset}"
     if not solo_daily and mes_cerrado(mes):
         ruta = base.format(f="monthly") + f"{etiqueta}-{mes}.zip"
-        return [bajar(ruta, RAW / Path(ruta).name)]
+        try:
+            return [bajar(ruta, RAW / Path(ruta).name)]
+        except requests.HTTPError as e:  # el mensual se publica unos días después del cierre → diarios
+            if e.response is None or e.response.status_code != 404:
+                raise
+            print(f"  sin mensual todavía ({mes}), uso los diarios")
     out = []
     for dia in dias_del_mes(mes):
         ruta = base.format(f="daily") + f"{etiqueta}-{dia}.zip"

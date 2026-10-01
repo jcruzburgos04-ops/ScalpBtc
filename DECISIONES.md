@@ -132,3 +132,8 @@ con y sin · variantes de calendario A–D.
   la reserva jul–sep 2026**. Esos meses pasan a calibrar o estudiar sus trades. La confirmación final de F8 pasa
   a ser **oct–dic 2026** a medida que transcurre (datos que nadie vio). Reemplaza la reserva del §6c.
 - [2026-10-01] PENDIENTE · Zona horaria del eje de sus capturas (para ubicar cada entrada en UTC).
+- [2026-10-01] CONFIRMADA (por datos) · Capturas del trader en UTC+2. Líneas de su gráfico (Juan): rojo = VWAP semanal,
+  blanco = VWAP de sesión, amarillo = rolling VWAP.
+- [2026-10-01] SUPUESTO · Se excluyen del estudio la captura del 1-oct (nueva reserva) y las posiciones swing.
+  Las entradas se leen con la última vela de 1m cerrada antes del minuto de entrada. PENDIENTE: Juan confirma las
+  ubicaciones en la página de revisión.

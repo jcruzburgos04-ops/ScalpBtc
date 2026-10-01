@@ -227,3 +227,22 @@
   - H2, 00:30–04:00 UTC vs resto: dif −0,020 [−0,152, +0,114] → **no se confirma** (en 2022 Asia no rinde más).
 - Conclusión: el filtro de cruces del VWAP se descarta. Lo que se sostiene en 4 años (2022 fresco, 2023–2024,
   2025–2026 walk-forward) es B1 dVAL/dVAH, R ≥ 2, breakeven 0,5 R: entre +0,09 y +0,12 R por trade, sin comisiones.
+
+## Trades del trader · septiembre 2026 (2026-10-01)
+- Juan mandó 18 capturas (31-ago → 1-oct). Se transcribieron 105 entradas de las tarjetas (Variational 50x, Nado,
+  TxFlow, RISE) y de las listas de órdenes con hora (`marcas/trader_sep2026/trades.csv`). Su exchange cotiza ≈ 10–45 USD
+  arriba de Binance. Zona horaria de las capturas: UTC+2, verificada con 11 órdenes con hora del 28-sep.
+- Fuera: lote1_01 (1-oct, nueva reserva) y 4 posiciones swing que aparecen en varias capturas.
+- Ubicación al minuto (`src/trader_sep.py`): minuto de Binance donde pasó su precio, el más cercano a donde lo dibujó.
+  Confianza: 29 alta, 38 media, 38 baja (la zona de precio es segura; el minuto exacto no siempre).
+- `f0_descarga.py`: si el zip mensual todavía no está publicado (404), usa los diarios; un 404 ya no se reintenta.
+- Reserva movida: `datos.RESERVA = 2026-10 → 2026-12` (jul–sep liberados).
+- Lectura descriptiva vs un minuto cualquiera de septiembre (mismo lado):
+  - del lado barato del VWAP de sesión 73 % (vs 50 %); más allá de 1σ en contra 51 % (vs 21 %, 2,5×);
+  - contra el rolling VWAP 69 % y contra el VWAP semanal 67 % (de tendencia: 31 % vs 50 %);
+  - barrida del extremo de 60 min en las últimas 5 velas 27 % (vs 15 %, 1,8×);
+  - ASH 1m a favor 50 % (= azar); XO 1m cruzadas a favor 33 % y ASH 5m a favor 32 % (vs 50 %): entra ANTES de que
+    giren los osciladores;
+  - RVOL, CVD, cercanía a un nivel (≤ 0,5 ATR: 48 % vs 45 %) y horario: sin diferencia.
+  - Entradas agrupadas (varias por jugada): no son independientes; los porcentajes son descriptivos.
+- Página de revisión de las ubicaciones: https://claude.ai/artifact/CcvQAupyC3KseTdnTdtrYg (colección `ubicacion`).

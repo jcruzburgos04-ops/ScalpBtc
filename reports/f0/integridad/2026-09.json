@@ -1,14 +1,14 @@
 {
  "klines_1m": {
-  "esperados": 41760,
-  "presentes": 41760,
+  "esperados": 43200,
+  "presentes": 43200,
   "duplicados": 0,
   "fuera_de_rango": 0,
   "faltantes_por_dia": {}
  },
  "mark_1m": {
-  "esperados": 41760,
-  "presentes": 41760,
+  "esperados": 43200,
+  "presentes": 43200,
   "duplicados": 0,
   "fuera_de_rango": 0,
   "faltantes_por_dia": {},
@@ -19,21 +19,21 @@
   }
  },
  "index_1m": {
-  "esperados": 41760,
-  "presentes": 41760,
+  "esperados": 43200,
+  "presentes": 43200,
   "duplicados": 0,
   "fuera_de_rango": 0,
   "faltantes_por_dia": {}
  },
  "premium_1m": {
-  "esperados": 41760,
-  "presentes": 41760,
+  "esperados": 43200,
+  "presentes": 43200,
   "duplicados": 0,
   "fuera_de_rango": 0,
   "faltantes_por_dia": {}
  },
  "metrics_5m": {
-  "filas": 8352,
+  "filas": 8640,
   "duplicados": 0,
   "saltos_distintos_de_5m": 0,
   "nulos_oi": 0
@@ -43,39 +43,38 @@
   0
  ],
  "ids": {
-  "n": 34602624,
+  "n": 36036629,
   "min_id": 3435054521,
-  "max_id": 3469657144,
-  "ids_duplicados": 0,
+  "max_id": 3471091149,
+  "ids_con_contenido_distinto": 0,
   "saltos_agg_id": 0,
-  "saltos_trade_id": 344715
+  "ids_faltantes": 0,
+  "saltos_trade_id": 354916,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [],
+  "fuente": "monthly",
+  "ids_faltantes_vs_mes_anterior": 0
  },
  "bars_1s": {
-  "filas": 2327569
+  "filas": 2408304
  },
  "ordenes_grandes": {
-  "filas": 643086,
+  "filas": 671426,
   "piso_usd": 100000
  },
  "reconstruccion_1m": {
-  "minutos_comparados": 41760,
+  "minutos_comparados": 43200,
   "minutos_solo_klines_con_volumen": 0,
   "minutos_solo_aggtrades": 0,
-  "minutos_high_low_close_distinto": 114,
-  "minutos_open_distinto": 1307,
-  "minutos_volumen_distinto": 4126,
-  "minutos_count_distinto": 14961,
-  "rachas_corrimiento_borde": 299,
-  "rachas_residuales": 5748,
-  "residual_total_btc": 0.054,
-  "residual_total_trades": 25698,
+  "minutos_high_low_close_distinto": 116,
+  "minutos_open_distinto": 1349,
+  "minutos_volumen_distinto": 4243,
+  "minutos_count_distinto": 15426,
+  "rachas_corrimiento_borde": 308,
+  "rachas_residuales": 5961,
+  "residual_total_btc": 0.0,
+  "residual_total_trades": 26444,
   "residuales": [
-   {
-    "desde_utc": "2026-09-29T23:59:00+00:00",
-    "minutos": 1,
-    "dv_btc": 0.054,
-    "dn": 3
-   },
    {
     "desde_utc": "2026-09-04T11:40:00+00:00",
     "minutos": 2,
@@ -189,10 +188,16 @@
     "minutos": 5,
     "dv_btc": 0.0,
     "dn": 4
+   },
+   {
+    "desde_utc": "2026-09-01T01:12:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.0,
+    "dn": 6
    }
   ],
-  "volumen_total_klines_btc": 4090506.024,
-  "volumen_total_aggtrades_btc": 4090506.078
+  "volumen_total_klines_btc": 4267354.779,
+  "volumen_total_aggtrades_btc": 4267354.779
  },
- "segundos_proceso": 345.4
+ "segundos_proceso": 310.3
 }
