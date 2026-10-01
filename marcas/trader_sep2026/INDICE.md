@@ -19,3 +19,8 @@ Lectura preliminar (a revisar en el análisis):
 | lote2_03.jpg | 16 sep, 15:00–20:00 (zoom) | longs 75 533,68 · 75 453,72 · Nado 75 509 · 75 518; short 76 195,07 |
 | lote2_04.jpg | 14 → 16 sep | longs 75 793,30 · 76 279,86 · 75 430,69 + Nado 76 281 · 75 847 · otros 2; short TxFlow 81 511,9 (swing) |
 | lote2_05.jpg | 13 → 15 sep | short 79 217,09 (swing); short TxFlow 81 511,9; long Nado 76 446 |
+| lote3_01.jpg | 13 → 14 sep | longs 76 878,41 · 77 856,90 · Nado 76 446; shorts 77 204,60 · 76 673,14 · 76 969,69 · 78 046,37 · 78 206,60 |
+| lote3_02.jpg | 10 → 11 sep | longs 77 027,55 · 76 497,51 · Nado 76 950 · 76 973; short 77 538,99; TxFlow sell 81 511,9; órdenes buy 76 438,91 / sell 76 960,43 |
+| lote3_03.jpg | 8 → 9 sep | longs 78 265,17 · 77 946,64 · 78 827,83 · 78 914,30 |
+| lote3_04.jpg | 7 → 8 sep | shorts 79 236,05 · 79 154,94; TxFlow sell 81 511,9 |
+| lote3_05.jpg | 3 → 4 sep | longs 78 967,57 · 79 628,18 · 79 330,64 · Nado 76 750 (swing) · RISE 79 664,0 · 79 402,3; short 81 820,43; TxFlow sell 81 511,9 (swing, se repite en varias capturas) |
