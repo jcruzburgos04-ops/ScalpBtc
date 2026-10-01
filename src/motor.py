@@ -283,6 +283,8 @@ def simular(D: Datos, senales: pl.DataFrame, P: Params, todas_las_senales: np.nd
             continue
         largo = s["lado"] == "long"
         s = {**s, "sl": (np.floor if largo else np.ceil)(round(s["sl"] / TICK, 6)) * TICK}  # SL en la grilla de 0,1
+        if s.get("tp") is not None:  # TP absoluto (p. ej. la media): a la grilla, del lado más lejano al fill
+            s = {**s, "tp": (np.floor if largo else np.ceil)(round(s["tp"] / TICK, 6)) * TICK}
         if s.get("tp") is None:  # TP en R fijo desde el fill (orden límite puesta al llenarse la entrada)
             tp = fpx + (1 if largo else -1) * s["tp_r"] * abs(fpx - s["sl"])
             s = {**s, "tp": (np.ceil if largo else np.floor)(round(tp / TICK, 6)) * TICK}  # TP en la grilla

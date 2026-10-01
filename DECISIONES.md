@@ -92,9 +92,11 @@ con y sin · variantes de calendario A–D.
 - [2026-10-01] CONFIRMADA · Juan pide guiarse más por los trades del trader de referencia (quiere aprender de un
   trader mejor). Sus setups (reversión edge-to-edge y mean-to-edge sobre las bandas del dVWAP, momentum loss,
   reclaim/failed reclaim, barrida con volumen) entran como **estrategia B**, al lado de la señal de Juan (estrategia A).
-- [2026-10-01] PENDIENTE · Separación de períodos para la estrategia B: sus ejemplos son de feb–may 2026, así que
-  sus definiciones se calibran con esos trades y se testean en 2023–2025 (fuera de muestra) y en jun 2026; la reserva
-  jul–sep 2026 sigue cerrada. A confirmar con Juan.
+- [2026-10-01] CONFIRMADA · Estrategia B: calibración con los trades del trader (feb–may 2026); test en 2023–2025 y
+  jun 2026 (fuera de muestra); reserva jul–sep 2026 cerrada.
+- [2026-10-01] SUPUESTO · B1 (reversión desde el extremo): empujón con RVOL ≥ 1,5 hasta el nivel (variantes ±2σ,
+  ±1σ, dVAH/dVAL), sin continuación en ≤ 10 velas, vela de señal que cierra adentro y de signo contrario; SL extremo
+  ± 0,25 ATR; TP = VWAP de sesión; una pata; sin los primeros 30 min del día. R mínimo 1 (y 2 como variante).
 
 ## Auditoría F3 (2026-10-01)
 - [2026-10-01] CONFIRMADA · SL por **last price**, resuelto al segundo con aggTrades, sin mark ni trayectorias

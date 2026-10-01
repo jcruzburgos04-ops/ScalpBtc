@@ -169,3 +169,10 @@
   +0,044 → +0,045 R (sin mejora)**. Walk-forward trimestral: OOS +0,056 R. El único filtro que el walk-forward elige
   en todos los trimestres es "ASH de 5m en contra". Conclusión: los indicadores de volumen/OI no arreglan esta señal
   de forma robusta; la señal base ASH/XO en 1m tiene una ventaja muy chica.
+
+## Estrategia B · trader de referencia (2026-10-01)
+- `src/estrategia_b.py` (B1, reversión desde el extremo, TP en la media). Chequeo contra su trade documentado del
+  20-feb-2026: las variantes dVAL/dVAH y ±1σ encuentran sus entradas long de 01:27 y 02:26 UTC (él: ~67 127 y ~67 136;
+  nuestro fill 67 149,9 → TP en la media 67 226,4, +1,7 R). ±2σ no las encuentra (ese día no se tocó la banda).
+- Corrida en la ventana de calibración feb–may 2026 (`reports/b/`); página de revisión con 12 trades (los 2 suyos +
+  5 dVAL/dVAH + 5 ±2σ) antes de mostrar números agregados (regla 2).
