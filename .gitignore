@@ -6,3 +6,4 @@ __pycache__/
 reports/trader_sep/pagina/capturas/
 reports/b2/minutos_sep.parquet
 reports/b2/minutos_jul_sep.parquet
+reports/b2/minutos_20*.parquet
