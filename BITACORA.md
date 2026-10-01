@@ -154,3 +154,18 @@
   > rebote (rebote ≈ 0). Slippage del SL irrelevante (0–5 ticks). Con comisión taker 0,05 % costaría ≈ 0,7 R/trade.
 - **Bug corregido:** en el reporte, `hour()` de polars es Int8 y `hora × 60` desbordaba: la subsesión NY quedaba
   vacía (todo caía en Londres). Se castea a Int32.
+
+## F6 (adelantada a pedido de Juan, 2026-10-01): ¿qué mejora el win rate / la expectativa?
+- `src/f6_variables.py`: 20 variables por pata al cierre de la vela de señal (ubicación VWAP día/semana, cruces ASH y
+  XO, RVOL, CVD 5/15 min, órdenes grandes a mercado, OI 15/60 min, ratio taker, ASH y distancia de 5m, régimen ATR,
+  niveles cercanos) + recorrido a favor antes del SL (MFE).
+- **TP vs win rate:** con cualquier TP la señal queda 1–2 puntos sobre el empate (TP 1R: WR 51 % vs 50 % de empate;
+  2R: 35 % vs 33,3 %; 3R: 26 % vs 25 %). Cambiar el TP mueve el win rate pero no la ventaja.
+- **Variables consistentes en los dos períodos (descriptivo):** pocas o ninguna rotación de las XO en 60 min → pierde;
+  ASH de 5m en contra → pierde; OI subiendo fuerte en 60 min → peor; ≥ 5 órdenes grandes a favor en 5 min → peor
+  (perseguir). Efectos de ±0,05–0,10 R por quintil.
+- **Prueba fuera de muestra (`src/f6_filtros.py`):** filtros elegidos solo con 2023–2024 (excluir ASH 5m en contra,
+  ≥ 5 órdenes grandes a favor, precio pegado a las EMAs de 5m) → entrenamiento +0,053 → +0,095 R; **test 2025–2026
+  +0,044 → +0,045 R (sin mejora)**. Walk-forward trimestral: OOS +0,056 R. El único filtro que el walk-forward elige
+  en todos los trimestres es "ASH de 5m en contra". Conclusión: los indicadores de volumen/OI no arreglan esta señal
+  de forma robusta; la señal base ASH/XO en 1m tiene una ventaja muy chica.

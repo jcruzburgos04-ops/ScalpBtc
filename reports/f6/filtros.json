@@ -1,0 +1,209 @@
+{
+ "estatico": {
+  "filtros": [
+   {
+    "var": "ash5_favor",
+    "excluye": "Q1",
+    "corte": -0.20748901920625057
+   },
+   {
+    "var": "n_grandes5_favor",
+    "excluye": "Q5",
+    "corte": 5.0
+   },
+   {
+    "var": "dist5m_atr",
+    "excluye": "Q1",
+    "corte": 0.2542462610449283
+   }
+  ],
+  "train_sin": {
+   "patas": 16125,
+   "retencion": 1.0,
+   "expectativa_2R": 0.053319156795981336,
+   "win_rate_2R": 0.3514418604651163,
+   "win_rate_1R": 0.5063565891472869,
+   "expectativa_1R_aprox": 0.01271317829457369
+  },
+  "train_con": {
+   "patas": 8053,
+   "retencion": 0.4994108527131783,
+   "expectativa_2R": 0.09487147646839801,
+   "win_rate_2R": 0.36495715882279894,
+   "win_rate_1R": 0.5152117223395009,
+   "expectativa_1R_aprox": 0.030423444679001654
+  },
+  "test_sin": {
+   "patas": 11722,
+   "retencion": 1.0,
+   "expectativa_2R": 0.043685713497842935,
+   "win_rate_2R": 0.3480634703975431,
+   "win_rate_1R": 0.509554683501109,
+   "expectativa_1R_aprox": 0.019109367002218047
+  },
+  "test_con": {
+   "patas": 5865,
+   "retencion": 0.5003412386964682,
+   "expectativa_2R": 0.045012787723791,
+   "win_rate_2R": 0.3483375959079284,
+   "win_rate_1R": 0.5162830349531117,
+   "expectativa_1R_aprox": 0.03256606990622335
+  }
+ },
+ "walk_forward": {
+  "trimestres": [
+   {
+    "trimestre": "2025Q1",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "n_grandes5_favor sin Q5 (5.00)",
+     "dist5m_atr sin Q1 (0.25)"
+    ],
+    "sin": {
+     "patas": 2055,
+     "retencion": 1.0,
+     "expectativa_2R": -0.037956204379559294,
+     "win_rate_2R": 0.32068126520681267,
+     "win_rate_1R": 0.4982968369829684,
+     "expectativa_1R_aprox": -0.0034063260340632673
+    },
+    "con": {
+     "patas": 927,
+     "retencion": 0.4510948905109489,
+     "expectativa_2R": -0.01941747572814956,
+     "win_rate_2R": 0.3268608414239482,
+     "win_rate_1R": 0.5124056094929881,
+     "expectativa_1R_aprox": 0.024811218985976213
+    }
+   },
+   {
+    "trimestre": "2025Q2",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "n_grandes5_favor sin Q5 (6.00)",
+     "z_vwap_w sin Q1 (-1.12)"
+    ],
+    "sin": {
+     "patas": 1915,
+     "retencion": 1.0,
+     "expectativa_2R": 0.051174934725857824,
+     "win_rate_2R": 0.3503916449086162,
+     "win_rate_1R": 0.5075718015665797,
+     "expectativa_1R_aprox": 0.015143603133159322
+    },
+    "con": {
+     "patas": 1031,
+     "retencion": 0.5383812010443865,
+     "expectativa_2R": 0.07662463627547521,
+     "win_rate_2R": 0.3588748787584869,
+     "win_rate_1R": 0.5237633365664404,
+     "expectativa_1R_aprox": 0.047526673132880726
+    }
+   },
+   {
+    "trimestre": "2025Q3",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "n_grandes5_favor sin Q5 (6.00)",
+     "z_vwap_w sin Q1 (-1.13)"
+    ],
+    "sin": {
+     "patas": 1867,
+     "retencion": 1.0,
+     "expectativa_2R": 0.15693626138190048,
+     "win_rate_2R": 0.38564542046063205,
+     "win_rate_1R": 0.533476164970541,
+     "expectativa_1R_aprox": 0.06695232994108191
+    },
+    "con": {
+     "patas": 1016,
+     "retencion": 0.5441885377611141,
+     "expectativa_2R": 0.1515748031496153,
+     "win_rate_2R": 0.3838582677165354,
+     "win_rate_1R": 0.5344488188976378,
+     "expectativa_1R_aprox": 0.06889763779527563
+    }
+   },
+   {
+    "trimestre": "2025Q4",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "oi60 sin Q5 (0.42)",
+     "z_vwap_w sin Q1 (-1.14)"
+    ],
+    "sin": {
+     "patas": 1987,
+     "retencion": 1.0,
+     "expectativa_2R": 0.032299620334551325,
+     "win_rate_2R": 0.3447408152994464,
+     "win_rate_1R": 0.5098137896326119,
+     "expectativa_1R_aprox": 0.019627579265223905
+    },
+    "con": {
+     "patas": 1198,
+     "retencion": 0.602918973326623,
+     "expectativa_2R": 0.05425709515860667,
+     "win_rate_2R": 0.35141903171953254,
+     "win_rate_1R": 0.511686143572621,
+     "expectativa_1R_aprox": 0.023372287145242032
+    }
+   },
+   {
+    "trimestre": "2026Q1",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "z_vwap_w sin Q1 (-1.14)",
+     "rvol sin Q1 (0.53)"
+    ],
+    "sin": {
+     "patas": 1985,
+     "retencion": 1.0,
+     "expectativa_2R": 0.0352644836272024,
+     "win_rate_2R": 0.345088161209068,
+     "win_rate_1R": 0.5027707808564231,
+     "expectativa_1R_aprox": 0.00554156171284631
+    },
+    "con": {
+     "patas": 1008,
+     "retencion": 0.507808564231738,
+     "expectativa_2R": 0.056547619047612525,
+     "win_rate_2R": 0.3521825396825397,
+     "win_rate_1R": 0.5138888888888888,
+     "expectativa_1R_aprox": 0.027777777777777735
+    }
+   },
+   {
+    "trimestre": "2026Q2",
+    "filtros": [
+     "ash5_favor sin Q1 (-0.21)",
+     "z_vwap_w sin Q1 (-1.13)",
+     "rvol sin Q1 (0.53)"
+    ],
+    "sin": {
+     "patas": 1913,
+     "retencion": 1.0,
+     "expectativa_2R": 0.033928169376337206,
+     "win_rate_2R": 0.34500784108729743,
+     "win_rate_1R": 0.5070569785676947,
+     "expectativa_1R_aprox": 0.014113957135389432
+    },
+    "con": {
+     "patas": 957,
+     "retencion": 0.5002613695765813,
+     "expectativa_2R": 0.01008550999407564,
+     "win_rate_2R": 0.33646812957157785,
+     "win_rate_1R": 0.5047021943573667,
+     "expectativa_1R_aprox": 0.009404388714733536
+    }
+   }
+  ],
+  "oos_con": {
+   "patas": 6137,
+   "retencion": 1.0,
+   "expectativa_2R": 0.056485552071755575,
+   "win_rate_2R": 0.35212644614632554,
+   "win_rate_1R": 0.5168649177122373,
+   "expectativa_1R_aprox": 0.03372983542447455
+  }
+ }
+}
