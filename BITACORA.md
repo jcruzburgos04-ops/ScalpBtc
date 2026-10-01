@@ -129,4 +129,4 @@
 - Señales en contra con posición abierta: 9 077 ignoradas (registradas). Patas acumuladas por posición: hasta 29
   (con máx. 4 abiertas a la vez, se liberan lugares al cerrar).
 - Mark sintético: en minutos normales reproduce el high/low del mark con error mediano 3–4 USD (76 % dentro de 2e-4).
-- Auditoría publicada: https://claude.ai/artifact/… (ver mensaje); respuestas en la colección `auditoria`.
+- Auditoría publicada: https://claude.ai/artifact/8oR6e7PW8aVESFw6wisk14 (respuestas en la colección `auditoria`).
