@@ -126,3 +126,9 @@ con y sin · variantes de calendario A–D.
 - [2026-10-01] CONFIRMADA (resultado de la validación) · Filtro de cruces del VWAP DESCARTADO (no se confirma en 2022 y
   en el entrenamiento es un efecto de la hora). El filtro horario de Asia también se descarta. B1 queda: dVAL/dVAH, R ≥ 2,
   1 pata, breakeven 0,5 R, sin filtros de contexto. 2022 ya está usado para B: no sirve más como tramo fresco.
+
+## Trades del trader · septiembre 2026 (2026-10-01)
+- [2026-10-01] CONFIRMADA · Juan envía los trades de septiembre 2026 del trader de referencia (camino 1): se **libera
+  la reserva jul–sep 2026**. Esos meses pasan a calibrar o estudiar sus trades. La confirmación final de F8 pasa
+  a ser **oct–dic 2026** a medida que transcurre (datos que nadie vio). Reemplaza la reserva del §6c.
+- [2026-10-01] PENDIENTE · Zona horaria del eje de sus capturas (para ubicar cada entrada en UTC).
