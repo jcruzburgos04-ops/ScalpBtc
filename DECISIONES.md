@@ -110,6 +110,16 @@ con y sin · variantes de calendario A–D.
 ## Estrategia B · mejoras (2026-10-01)
 - [2026-10-01] CONFIRMADA · Juan aprueba probar las tres mejoras (absorción, scratch/manejo, meta del día) con
   selección estática y walk-forward, sin tocar la reserva.
-- [2026-10-01] PENDIENTE · Adoptar **breakeven a +0,5 R** como manejo de B1 (dVAL/dVAH, R ≥ 2): único componente
+- [2026-10-01] CONFIRMADA · Se adopta **breakeven a +0,5 R** como manejo de B1 (dVAL/dVAH, R ≥ 2): único componente
   que mejora en entrenamiento y en test y que el walk-forward elige solo. Filtros de absorción y de cruces del VWAP: descartados en
   la dirección hipotética; "pocos cruces del VWAP" queda como hipótesis a validar aparte.
+- [2026-10-01] CONFIRMADA · Juan pide validar "pocos cruces del VWAP en el día". Chequeo en entrenamiento (2023–2024,
+  dVAL/dVAH, R ≥ 2, breakeven 0,5 R): el efecto está confundido con la hora. Los cruces se acumulan durante el día,
+  0–4 h UTC rinde +0,141 y el resto ≈ +0,07; dentro de cada tramo de 4 h, pocos vs muchos cruces no tiene un signo consistente.
+- [2026-10-01] SUPUESTO (pre-registro, ANTES de mirar 2022) · Validación en un tramo nunca usado por B: **2022**
+  (hasta ahora solo calentamiento; B usa solo niveles intradía, así que no necesita calentamiento largo).
+  Desvío del §1 documentado. Configuración congelada: B1 dVAL/dVAH, R ≥ 2, 1 pata, breakeven 0,5 R.
+  H0: expectativa total de 2022 > 0.
+  H1: cruces_vwap_dia ≤ 16 (p40 de 2023–2024) rinde más que > 16, global y dentro de cada tramo de 4 h.
+  H2: señales 00:30–04:00 UTC rinden más que el resto de la ventana.
+  Se reporta la diferencia con IC 95 % por bootstrap. Ninguna regla se ajusta después de ver 2022.
