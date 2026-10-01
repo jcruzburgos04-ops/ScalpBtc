@@ -301,3 +301,8 @@
   visual → 16 calaveras, 15 únicas (K10 ≈ K08), en `marcas/trader_sep2026/calaveras.csv` (hora y precio aproximados,
   lado sin confirmar). Con ~93 entradas ganadoras de las tarjetas, su win rate ronda 85 %, coherente con el 86 % de
   "+1 ATR antes de −1 ATR" medido en sus entradas. Corrige lo dicho antes: no es solo sesgo de selección.
+- B2 con filtro R ≥ 2 y distintos TP (`src/b2_tp.py`, una pata, sin comisiones — Variational no cobra): 36 variantes
+  (SL 0,25/0,5/1 ATR × TP 2R/2,5R/3R/VWAP/+1σ/primer nivel a ≥ 2R × BE no/+1R). Elegida en calibración (jul–sep 2026):
+  SL 1 ATR, TP 2,5R, sin BE: +0,052 → test 2023–2025 −0,022 [IC −0,057, +0,012]. Todo el test entre −0,027 y +0,036;
+  la familia SL 0,25 ATR da positivo en test en las 12 variantes (+0,007 a +0,036; TP "nivel" +0,036), pero no fue la
+  elegida en calibración. Win rate 10–35 %. Sin ventaja robusta con 1:2.
