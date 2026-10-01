@@ -40,6 +40,7 @@ class Params:
     inv_m: int = 2
     max_patas: int = 4
     r_min: float = 2.0
+    sl_por: str = "mark"   # "mark" (§1 original) o "last": SL por last price, resuelto al segundo, sin sintético
 
 
 class Datos:
@@ -130,8 +131,40 @@ def _sintetico(D: Datos, i: int, desde_ms: int) -> tuple[dict, bool]:
     return b, reproduce
 
 
+def resolver_pata_last(D: Datos, p: Pata, P: Params, fin_forzado: int | None = None) -> Pata:
+    """SL y TP por last price con barras de 1 s: gana el primer segundo que toca; si los dos caen en el mismo segundo
+    es ambiguo (conservador: SL; optimista: TP). Sin mark ni trayectorias sintéticas."""
+    largo = p.lado == "long"
+    i_tope = D.idx(p.fill_ts + TOPE_MS)
+    i_fin = min(i_tope, D.t.size - 1)
+    if fin_forzado is not None:
+        i_fin = min(i_fin, D.idx(fin_forzado - MS_MIN))
+    b = D.barras_1s(p.fill_ts, int(D.t[i_fin]) + MS_MIN)
+    tp_b = (b["h"] >= p.tp) if largo else (b["l"] <= p.tp)
+    sl_b = (b["l"] <= p.sl) if largo else (b["h"] >= p.sl)
+    k_tp = int(np.argmax(tp_b)) if tp_b.any() else None
+    k_sl = int(np.argmax(sl_b)) if sl_b.any() else None
+    slip = P.slip_sl_ticks * TICK * (-1 if largo else 1)
+    if k_tp is None and k_sl is None:
+        motivo = "invalidacion" if fin_forzado is not None and i_fin < i_tope else "tope_24h"
+        p.salida_ts, p.salida, p.motivo = int(D.t[i_fin]) + MS_MIN - 1, float(D.c[i_fin]), motivo
+    elif k_sl is None or (k_tp is not None and k_tp < k_sl):
+        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_tp]), p.tp, "TP"
+    elif k_tp is None or k_sl < k_tp:
+        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), p.sl + slip, "SL"
+    else:
+        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), p.sl + slip, "SL"
+        p.ambiguo, p.salida_opt, p.motivo_opt = True, p.tp, "TP"
+        p.extra["ambiguo_tipo"] = "sl_y_tp_mismo_segundo"
+    if not p.ambiguo:
+        p.salida_opt, p.motivo_opt = p.salida, p.motivo
+    return p
+
+
 def resolver_pata(D: Datos, p: Pata, P: Params, fin_forzado: int | None = None, _optimista: bool = False) -> Pata:
     """Resuelve la salida de una pata ya llenada. fin_forzado: cierre por invalidación (ms del cierre de la vela)."""
+    if P.sl_por == "last":
+        return resolver_pata_last(D, p, P, fin_forzado)
     largo = p.lado == "long"
     i0 = D.idx(p.fill_ts // MS_MIN * MS_MIN)
     i_tope = D.idx(p.fill_ts + TOPE_MS)
@@ -245,8 +278,10 @@ def simular(D: Datos, senales: pl.DataFrame, P: Params, todas_las_senales: np.nd
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "sin_fill"})
             continue
         largo = s["lado"] == "long"
+        s = {**s, "sl": (np.floor if largo else np.ceil)(round(s["sl"] / TICK, 6)) * TICK}  # SL en la grilla de 0,1
         if s.get("tp") is None:  # TP en R fijo desde el fill (orden límite puesta al llenarse la entrada)
-            s = {**s, "tp": fpx + (1 if largo else -1) * s["tp_r"] * abs(fpx - s["sl"])}
+            tp = fpx + (1 if largo else -1) * s["tp_r"] * abs(fpx - s["sl"])
+            s = {**s, "tp": (np.ceil if largo else np.floor)(round(tp / TICK, 6)) * TICK}  # TP en la grilla
         if (largo and not (s["sl"] < fpx < s["tp"])) or (not largo and not (s["tp"] < fpx < s["sl"])):
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "fill_fuera_de_sl_tp"})
             continue

@@ -95,3 +95,11 @@ con y sin · variantes de calendario A–D.
 - [2026-10-01] PENDIENTE · Separación de períodos para la estrategia B: sus ejemplos son de feb–may 2026, así que
   sus definiciones se calibran con esos trades y se testean en 2023–2025 (fuera de muestra) y en jun 2026; la reserva
   jul–sep 2026 sigue cerrada. A confirmar con Juan.
+
+## Auditoría F3 (2026-10-01)
+- [2026-10-01] PENDIENTE · Disparo del SL por **last price** (resuelto al segundo, sin mark sintético) en lugar de
+  mark price. Juan lo propuso (su exchange lo permite) y no quiere trayectorias sintéticas. El mark quedaría como
+  variante de sensibilidad. Cambia el §1 ("se dispara por MARK PRICE").
+- [2026-10-01] PENDIENTE · Redefinir el cierre por invalidación para que mida oscilación real: desde los 30 min del
+  fill de la pata 1, |close − fill| ≤ 0,5 R, el precio cruzó el fill ≥ 3 veces (cierres de un lado y del otro) y el
+  ASH de 1m cruzó ≥ 3 veces desde la entrada. Y decidir si cierra también patas con menos de 30 min.

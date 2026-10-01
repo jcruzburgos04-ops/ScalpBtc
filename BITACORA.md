@@ -130,3 +130,13 @@
   (con máx. 4 abiertas a la vez, se liberan lugares al cerrar).
 - Mark sintético: en minutos normales reproduce el high/low del mark con error mediano 3–4 USD (76 % dentro de 2e-4).
 - Auditoría publicada: https://claude.ai/artifact/8oR6e7PW8aVESFw6wisk14 (respuestas en la colección `auditoria`).
+
+### Auditoría F3 (Juan, 2026-10-01): 13 sí · 4 no · 3 no sé
+- t04 / t19: el precio quedó a 0,0–0,7 USD del SL (t04) y a 0,4 USD del TP (t19) sin tocarlos; el motor estaba bien.
+  Hallazgo: SL y TP no estaban redondeados al tick → corregido (SL y TP siempre en la grilla de 0,1).
+- t06 / t08: el last tocó el SL antes que el mark (correcto según la regla "SL por mark"); Juan no quiere trayectorias
+  sintéticas y evalúa usar SL por last (su exchange lo permite). Se agregó `sl_por="last"`: SL y TP por last con
+  barras de 1 s, sin sintético. 2023–2024: 0 casos ambiguos (nunca SL y TP en el mismo segundo).
+- t11 / t12 / t13: el cierre por invalidación dispara sin oscilación real: "≥ 2 señales desde la entrada" se cumple
+  casi siempre (~22 señales por sesión). Además la pata 2 de t11 se cerró 1 min después de su entrada porque el
+  reloj de 30 min es el de la pata 1. Hay que redefinir la regla.
