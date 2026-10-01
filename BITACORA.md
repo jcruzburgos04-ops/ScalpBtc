@@ -147,3 +147,10 @@
   2) y descartaba ~3 000 señales en la corrida por last (16 en la de mark). Se agregó tolerancia 1e-9. Corrida final
   por last: 16 125 patas / 8 864 posiciones (sin invalidación); 16 875 / 10 614 (con invalidación).
 - Reauditoría publicada: 12 trades (incluye t06 y t08 con la regla nueva).
+- Reauditoría 12/12 correcta → **F3 cerrada** (2026-10-01).
+- Primer reporte §9 (`reports/f3/reporte_base_tp2.md`), señal base + SL ext10 + TP provisorio 2R, sin comisiones:
+  2023–2024 +0,053 R/pata (IC [+0,024, +0,082]); 2025–2026 (sin reserva) +0,044 R (IC [+0,009, +0,078]), win rate
+  ~35 % (el empate con 2R es 33,3 %). Con invalidación: +0,045 y +0,042. Máx. DD 104 y 154 R. Short > long; continuación
+  > rebote (rebote ≈ 0). Slippage del SL irrelevante (0–5 ticks). Con comisión taker 0,05 % costaría ≈ 0,7 R/trade.
+- **Bug corregido:** en el reporte, `hour()` de polars es Int8 y `hora × 60` desbordaba: la subsesión NY quedaba
+  vacía (todo caía en Londres). Se castea a Int32.

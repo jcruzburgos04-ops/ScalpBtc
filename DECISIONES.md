@@ -103,3 +103,4 @@ con y sin · variantes de calendario A–D.
   reales desde el fill de esa pata, si |close − fill| ≤ 0,5 R, el precio cruzó el fill ≥ 7 veces y el ASH de 1m
   cruzó ≥ 3 veces desde la entrada → se cierra esa pata. Las demás patas siguen hasta su SL/TP (reemplaza "cierra
   todas las patas" del §5.1).
+- [2026-10-01] CONFIRMADA · **F3 cerrada**: reauditoría 12/12 correcta (Juan).
