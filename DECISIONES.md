@@ -137,3 +137,7 @@ con y sin · variantes de calendario A–D.
 - [2026-10-01] SUPUESTO · Se excluyen del estudio la captura del 1-oct (nueva reserva) y las posiciones swing.
   Las entradas se leen con la última vela de 1m cerrada antes del minuto de entrada. PENDIENTE: Juan confirma las
   ubicaciones en la página de revisión.
+- [2026-10-01] PENDIENTE · B2 variante V10 (σ ±1 en contra + volumen 15 min ≥ 1,5× + absorción ≥ 1), SL ext10 ± 0,25 ATR,
+  TP VWAP de sesión, breakeven 0,5 R. Juan revisa 14 casos dibujados antes de medir resultados en 2023–2025.
+  "Volume suite" y las velas ampliadas de TV se aproximan con delta por vela, velas de 1 s/10 s y burbujas de órdenes
+  grandes (supuesto: no tenemos la configuración exacta de su indicador).

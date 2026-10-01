@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .venv/
 reports/trader_sep/pagina/capturas/
+reports/b2/minutos_sep.parquet

@@ -255,3 +255,17 @@
   (vs 21 %), barrida del extremo de 60 min 34 % (vs 15 %, 2,3×), venía en contra 15 min 49 % (vs 37 %), y los
   osciladores en contra al entrar: ASH 5m a favor 23 % (vs 51 %), XO 1m 30 % (vs 50 %), ASH 1m 38 % (vs 50 %).
   Contra el rolling VWAP 68 %. RVOL, CVD, cercanía a niveles y horario: sin diferencia.
+
+## Estrategia B2 · calibración con las entradas del trader de septiembre (2026-10-01)
+- `src/volumen.py`: rasgos de volumen por minuto (delta de la vela, delta de los últimos 10 s con las velas de 1 s,
+  CVD 5/15 min, volumen 15 min relativo, pico en velas de 10 s, absorción esfuerzo/resultado de 5 velas, burbujas de
+  órdenes grandes en 15 min, OI 15/60 min).
+- `src/b2.py`: 12 variantes de la señal, calibradas por coincidencia con sus 93 entradas (no por PnL). Las de precio
+  solo (σ, rolling VWAP, barrida) detectan ~35 % de sus entradas con ~12 % de precisión.
+- Volumen: sus entradas vs señales de precio (V2) que no tomó vs minuto cualquiera:
+  volumen 15 min ≥ 1,5× normal 68 % / 28 % / 31 % (mediana 2,6× / 1,0× / 1,0×); absorción ≥ 2 32 % / 4 % / 5 %;
+  delta de la vela de entrada a favor 52 % / 28 % / 50 % (mediana +1 % / −26 % / 0 %): entra cuando la agresión en
+  contra se agota, no mientras sigue; ≥ 15 burbujas grandes en contra en 15 min 61 % / 24 % / 22 % (mediana 22 / 7 / 6);
+  divergencia del CVD 15 min, pico en velas de 10 s y OI: no distinguen.
+- Variante elegida por coincidencia: V10 = σ + volumen 15 min ≥ 1,5× + absorción ≥ 1 (detecta 41 % de sus entradas,
+  16 % de precisión, ~14 señales/día). Página con 14 casos: https://claude.ai/artifact/3RCjPq8Fi8tnaAfSoeJMui

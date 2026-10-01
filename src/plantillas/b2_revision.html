@@ -1,0 +1,158 @@
+<title>Estrategia B2 · casos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna de lectura tipo terminal; cada entrada = gráfico + lectura, en la misma oscuridad que su TradingView */
+:root {
+  color-scheme: dark;
+  --bg: #0c0e12; --panel: #13161b; --line: #252a32; --fg: #d9dce1; --muted: #8b919b;
+  --accent: #5fc4d3;
+  --long: #3fb68b; --short: #e0605c; --warn: #d9a441;
+  --vwap: #f1f2f4; --vw: #e5484d; --rv: #e3c34a; --band: #5b626d; --lvl: #a08cf0; --e11: #4a9eff; --e25: #f0a35e;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 22px; }
+h1 { font: 600 2.1rem/1.1 var(--display); letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h2 { font: 600 1.35rem/1.2 var(--display); margin: 0; letter-spacing: .02em; }
+p { margin: 0; max-width: 72ch; }
+.sub { color: var(--muted); }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: .86rem; }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 18px; height: 2px; display: inline-block; }
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-block: 10px; }
+.tabs { display: flex; gap: 4px; }
+.tab, .fil, .btn { font: 500 .9rem var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); }
+.tab:focus-visible, .fil:focus-visible, .btn:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.filtros { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+select.fil { padding-right: 8px; }
+.prog { margin-left: auto; color: var(--muted); font-size: .88rem; }
+.prog b { color: var(--fg); font-family: var(--mono); font-weight: 500; }
+.caso { border-top: 1px solid var(--line); padding-block: 18px 6px; display: grid; gap: 12px; }
+.cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.cab .id { font: 600 1.25rem var(--display); }
+.chip { font: 600 .74rem var(--body); text-transform: uppercase; letter-spacing: .06em; border-radius: 4px; padding: 2px 7px; border: 1px solid currentColor; }
+.chip.long { color: var(--long); } .chip.short { color: var(--short); }
+.chip.alta, .chip.Juan, .chip.confirmada { color: var(--long); } .chip.media { color: var(--warn); } .chip.baja { color: var(--muted); }
+.cab .meta { color: var(--muted); font-size: .88rem; }
+.cab a { color: var(--accent); font-size: .88rem; }
+.cuerpo { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 820px) { .cuerpo { grid-template-columns: minmax(0, 1fr); } }
+.graf { height: 320px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+.graf .vacio { color: var(--muted); padding: 16px; font-size: .9rem; }
+.lect { display: grid; gap: 2px; font-size: .9rem; min-width: 0; }
+.fila { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding-block: 3px; border-bottom: 1px dashed var(--line); }
+.fila .k { color: var(--muted); }
+.fila .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .84rem; overflow-wrap: anywhere; }
+.fila .s { font: 600 .7rem var(--body); text-transform: uppercase; letter-spacing: .05em; }
+.s.fav { color: var(--long); } .s.con { color: var(--short); } .s.neu { color: var(--muted); }
+.nota { color: var(--warn); font-size: .86rem; }
+fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+legend { float: left; margin-right: 6px; color: var(--muted); font-size: .9rem; }
+.btn[aria-pressed="true"].bien { border-color: var(--long); color: var(--long); }
+.btn[aria-pressed="true"].mal { border-color: var(--short); color: var(--short); }
+.btn[aria-pressed="true"].nose { border-color: var(--warn); color: var(--warn); }
+textarea { width: 100%; min-height: 2.4rem; resize: vertical; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; font: .9rem var(--body); padding: 6px 8px; box-sizing: border-box; }
+.estado { color: var(--muted); font-size: .8rem; }
+.resumen { display: grid; gap: 16px; }
+.tabla { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .78rem var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+td .barrita { display: block; height: 4px; border-radius: 2px; background: var(--accent); margin-top: 4px; opacity: .8; }
+tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
+.lista { columns: 2 16rem; gap: 24px; padding-left: 1.1rem; margin: 0; color: var(--muted); }
+.lista b { color: var(--fg); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <h1>Estrategia B2 · casos de septiembre</h1>
+    <p class="sub">B2 entra como el trader: lejos del VWAP de sesión (más allá de ±1σ en contra), con el volumen de los últimos 15 min a ≥ 1,5× lo normal y absorción (mucho volumen y poco rango en las últimas 5 velas). Variante __VAR__. Antes de medir resultados, mirá si B2 marca entradas parecidas a las suyas. Hay tres grupos: entradas suyas que B2 detecta, entradas suyas que no detecta y señales de B2 que él no tomó.</p>
+    <div class="leyenda">
+      <span><i style="background:var(--vwap)"></i>VWAP sesión</span>
+      <span><i style="background:var(--band)"></i>±1σ ±2σ</span>
+      <span><i style="background:var(--vw)"></i>VWAP semanal</span>
+      <span><i style="background:var(--rv)"></i>rolling VWAP</span>
+      <span><i style="background:var(--lvl)"></i>dVAH / dVAL</span>
+      <span>Flecha = entrada del trader · círculo = señal B2 · eje en hora del trader (UTC+2)</span>
+    </div>
+  </header>
+  <div class="barra"><div class="prog" id="prog"><b>0</b> / 0 revisados</div></div>
+  <section id="casos"></section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+const CASOS = __CASOS__;
+const TZ = 2 * 3600;
+const css = getComputedStyle(document.documentElement);
+const tok = (n) => css.getPropertyValue(n).trim();
+const p2 = (n) => String(n).padStart(2, "0");
+const hhmm = (t) => { const d = new Date(t * 1000); return p2(d.getUTCHours()) + ":" + p2(d.getUTCMinutes()); };
+const fecha = (ms, off) => { const d = new Date(ms + off * 1000); return p2(d.getUTCDate()) + "/" + p2(d.getUTCMonth() + 1) + " " + p2(d.getUTCHours()) + ":" + p2(d.getUTCMinutes()); };
+let resp = {}, db = null;
+function tarjeta(c) {
+  const s = document.createElement("article"); s.className = "caso"; s.id = "c-" + c.id;
+  s.innerHTML = `<div class="cab"><span class="id">${c.id}</span><span class="chip ${c.lado}">${c.lado}</span>
+    <span class="meta">${c.etiqueta} · ${fecha(c.t, TZ)} hora del trader · ${fecha(c.t, -3 * 3600)} ART</span></div>
+    <div class="cuerpo"><div class="graf" id="g-${c.id}"></div><div class="lect"></div></div>
+    <fieldset><legend>¿Es una entrada que el trader tomaría?</legend>
+      <button class="btn bien" data-v="si" aria-pressed="false">Sí</button>
+      <button class="btn mal" data-v="no" aria-pressed="false">No</button>
+      <button class="btn nose" data-v="nose" aria-pressed="false">No sé</button>
+      <span class="estado" aria-live="polite"></span></fieldset>
+    <textarea id="com-${c.id}" placeholder="Qué falta o qué sobra (opcional)"></textarea>`;
+  const lect = s.querySelector(".lect");
+  Object.entries(c.lect).forEach(([k, v]) => { const f = document.createElement("div"); f.className = "fila";
+    f.innerHTML = '<span class="k"></span><span class="v"></span><span class="s neu"></span>'; f.children[0].textContent = k; f.children[1].textContent = v; lect.appendChild(f); });
+  s.querySelectorAll(".btn").forEach((b) => b.addEventListener("click", () => guardar(c.id, b.dataset.v)));
+  s.querySelector("textarea").addEventListener("change", () => guardar(c.id, null));
+  return s;
+}
+function grafico(c) {
+  const el = document.getElementById("g-" + c.id); if (!el || el.dataset.ok || !window.LightweightCharts) return; el.dataset.ok = "1";
+  const g = LightweightCharts.createChart(el, { autoSize: true,
+    layout: { background: { color: tok("--panel") }, textColor: tok("--muted"), fontFamily: tok("--mono"), fontSize: 11 },
+    grid: { vertLines: { color: tok("--line") }, horzLines: { color: tok("--line") } },
+    rightPriceScale: { borderColor: tok("--line") }, timeScale: { borderColor: tok("--line"), timeVisible: true, tickMarkFormatter: (t) => hhmm(t) },
+    localization: { locale: "es-AR", priceFormatter: (v) => v.toFixed(1), timeFormatter: hhmm }, crosshair: { mode: 0 } });
+  const ts = c.velas.map((v) => v[0] + TZ);
+  const lin = (k, col, w, st) => { const s = g.addLineSeries({ color: col, lineWidth: w, lineStyle: st, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    s.setData(c.lineas[k].map((v, i) => v == null ? { time: ts[i] } : { time: ts[i], value: v })); };
+  lin("p2", tok("--band"), 1, 1); lin("m2", tok("--band"), 1, 1); lin("p1", tok("--band"), 1, 2); lin("m1", tok("--band"), 1, 2);
+  lin("vah", tok("--lvl"), 1, 1); lin("val", tok("--lvl"), 1, 1); lin("vw", tok("--vw"), 2, 0); lin("rv", tok("--rv"), 2, 0); lin("vwap", tok("--vwap"), 2, 0);
+  lin("e25", tok("--e25"), 1, 0); lin("e11", tok("--e11"), 1, 0);
+  const vel = g.addCandlestickSeries({ upColor: tok("--long"), downColor: tok("--short"), borderVisible: false, wickUpColor: tok("--long"), wickDownColor: tok("--short"), priceLineVisible: false, lastValueVisible: false });
+  vel.setData(c.velas.map((v, i) => ({ time: ts[i], open: v[1], high: v[2], low: v[3], close: v[4] })));
+  const mk = [];
+  c.trader.forEach((e) => { const L = e.lado === "long"; mk.push({ time: e.t / 1000 + TZ, position: L ? "belowBar" : "aboveBar", color: L ? tok("--long") : tok("--short"), shape: L ? "arrowUp" : "arrowDown", text: "trader" }); });
+  c.b2.forEach((e) => { const L = e.lado === "long"; mk.push({ time: e.t / 1000 + TZ, position: L ? "belowBar" : "aboveBar", color: tok("--accent"), shape: "circle", text: "B2" }); });
+  mk.sort((a, b) => a.time - b.time); vel.setMarkers(mk);
+  const iE = ts.indexOf(c.t / 1000 + TZ);
+  g.timeScale().setVisibleLogicalRange({ from: Math.max(0, iE - 120), to: Math.min(ts.length - 1, iE + 60) });
+}
+function pintar(id) { const s = document.getElementById("c-" + id); if (!s) return; const r = resp[id] || {};
+  s.querySelectorAll(".btn").forEach((b) => b.setAttribute("aria-pressed", String(r.estado === b.dataset.v)));
+  const ta = s.querySelector("textarea"); if (document.activeElement !== ta && r.comentario != null) ta.value = r.comentario; }
+function progreso() { document.getElementById("prog").innerHTML = `<b>${CASOS.filter((c) => resp[c.id] && resp[c.id].estado).length}</b> / ${CASOS.length} revisados`; }
+async function guardar(id, estado) {
+  const s = document.getElementById("c-" + id); const r = Object.assign({}, resp[id] || {});
+  if (estado) r.estado = estado; r.comentario = s.querySelector("textarea").value; r.actualizado = Date.now();
+  resp[id] = r; pintar(id); progreso(); const st = s.querySelector(".estado");
+  if (!db) { st.textContent = "No se puede guardar en esta vista"; return; }
+  st.textContent = "Guardando…";
+  try { await db.collection("b2_revision").doc(id).set(r); st.textContent = "Guardado"; } catch (e) { st.textContent = "No se guardó. Probá de nuevo."; }
+}
+const cont = document.getElementById("casos"); CASOS.forEach((c) => cont.appendChild(tarjeta(c)));
+const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) grafico(CASOS.find((c) => "g-" + c.id === e.target.id)); }), { rootMargin: "800px 0px" }) : null;
+document.querySelectorAll(".graf").forEach((g) => io ? io.observe(g) : grafico(CASOS.find((c) => "g-" + c.id === g.id)));
+progreso();
+(async () => { try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
+  if (!db) return; db.collection("b2_revision").onSnapshot((snap) => { snap.docs.forEach((d) => { resp[d.id] = d.data(); pintar(d.id); }); progreso(); }); })();
+</script>
