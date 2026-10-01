@@ -1,0 +1,22 @@
+ESTÁTICO · elegido con 2023–2024: dVAL/dVAH · R ≥ 2 · breakeven 1R · absorcion ≥ 1.59, cruces_vwap_dia ≥ 16.00 (entrenamiento +0.104 R)
+   test 2025–2026: 1438 trades · WR 15.0% · exp -0.006 [-0.088, +0.080]
+   test sin feb–may 2026: 1114 trades · WR 14.3% · exp -0.031 [-0.126, +0.064]
+   (referencia: dVAL/dVAH R≥2 sin manejo ni filtros en 2025–2026: exp +0.062)
+WALK-FORWARD trimestral (cada trimestre elegido con todo lo anterior):
+   2025Q1: dVAL/dVAH · R ≥ 2 · breakeven 1R · absorcion ≥ 1.59, cruces_vwap_dia ≥ 16.00 → 236 trades · WR 14.0% · exp -0.098
+   2025Q2: dVAL/dVAH · R ≥ 2 · breakeven 0,5R · cruces_vwap_dia ≥ 22.00 → 260 trades · WR 8.8% · exp -0.033
+   2025Q3: dVAL/dVAH · R ≥ 2 · breakeven 0,5R · sin filtros → 810 trades · WR 9.9% · exp +0.113
+   2025Q4: dVAL/dVAH · R ≥ 2 · breakeven 0,5R · absorcion ≥ 2.15 → 267 trades · WR 11.2% · exp +0.054
+   2026Q1: dVAL/dVAH · R ≥ 2 · breakeven 0,5R · sin filtros → 735 trades · WR 14.3% · exp +0.161
+   2026Q2: dVAL/dVAH · R ≥ 2 · breakeven 0,5R · sin filtros → 676 trades · WR 15.5% · exp +0.193
+   OOS concatenado: 2984 trades · WR 12.6% · exp +0.108 [+0.049, +0.170]
+   OOS sin feb–may 2026: 2064 trades · WR 11.6% · exp +0.091 [+0.017, +0.167]
+DESCRIPTIVO (dVAL/dVAH, R ≥ 1): expectativa por manejo, entrenamiento 2023–2024 / test 2025–2026
+   sin manejo      : +0.005 (WR 30%) / +0.024 (WR 29%)
+   breakeven 0,5R  : +0.053 (WR 17%) / +0.079 (WR 17%)
+   breakeven 1R    : +0.037 (WR 24%) / +0.066 (WR 23%)
+   corte 10 min    : +0.016 (WR 31%) / +0.035 (WR 29%)
+   corte 20 min    : +0.010 (WR 30%) / +0.022 (WR 28%)
+   absorcion        quintiles  entrenamiento: +0.054 +0.037 -0.001 -0.049 -0.019  |  test: +0.119 -0.038 +0.085 -0.099 +0.045
+   cruces_vwap_dia  quintiles  entrenamiento: +0.086 +0.010 -0.017 -0.027 -0.021  |  test: +0.182 +0.053 +0.004 -0.078 -0.032
+   delta_empujon    quintiles  entrenamiento: -0.010 +0.033 -0.060 -0.023 +0.082  |  test: -0.052 +0.068 -0.011 +0.025 +0.086

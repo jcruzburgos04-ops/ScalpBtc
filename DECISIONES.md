@@ -106,3 +106,10 @@ con y sin · variantes de calendario A–D.
   cruzó ≥ 3 veces desde la entrada → se cierra esa pata. Las demás patas siguen hasta su SL/TP (reemplaza "cierra
   todas las patas" del §5.1).
 - [2026-10-01] CONFIRMADA · **F3 cerrada**: reauditoría 12/12 correcta (Juan).
+
+## Estrategia B · mejoras (2026-10-01)
+- [2026-10-01] CONFIRMADA · Juan aprueba probar las tres mejoras (absorción, scratch/manejo, meta del día) con
+  selección estática y walk-forward, sin tocar la reserva.
+- [2026-10-01] PENDIENTE · Adoptar **breakeven a +0,5 R** como manejo de B1 (dVAL/dVAH, R ≥ 2): único componente
+  que mejora en entrenamiento y en test y que el walk-forward elige solo. Filtros de absorción y de cruces del VWAP: descartados en
+  la dirección hipotética; "pocos cruces del VWAP" queda como hipótesis a validar aparte.

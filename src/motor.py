@@ -42,6 +42,9 @@ class Params:
     max_patas: int = 4
     r_min: float = 2.0
     sl_por: str = "last"   # "last" (confirmado 2026-10-01): SL por last al segundo, sin sintético · "mark": variante
+    be_r: float | None = None      # scratch: al llegar a +be_r R a favor, el SL pasa a la entrada (breakeven)
+    corte_min: int | None = None   # scratch por tiempo: si a los corte_min minutos no llegó a +corte_r R, sale a mercado
+    corte_r: float = 0.5
     inv_cruces_fill: int = 7  # invalidación: el precio cruzó el fill de la pata al menos estas veces (cierres de 1m)
     inv_cruces_ash: int = 3   # invalidación: el ASH de 1m cruzó (Bulls/Bears) al menos estas veces desde la entrada
 
@@ -140,27 +143,59 @@ def _sintetico(D: Datos, i: int, desde_ms: int) -> tuple[dict, bool]:
 
 def resolver_pata_last(D: Datos, p: Pata, P: Params, fin_forzado: int | None = None) -> Pata:
     """SL y TP por last price con barras de 1 s: gana el primer segundo que toca; si los dos caen en el mismo segundo
-    es ambiguo (conservador: SL; optimista: TP). Sin mark ni trayectorias sintéticas."""
+    es ambiguo (conservador: SL; optimista: TP). Sin mark ni trayectorias sintéticas.
+    Manejo opcional (scratch del trader): breakeven al llegar a +be_r R y corte por tiempo a los corte_min minutos si
+    no llegó a +corte_r R (sale al cierre de esa vela de 1m)."""
     largo = p.lado == "long"
+    sg = 1.0 if largo else -1.0
     i_tope = D.idx(p.fill_ts + TOPE_MS)
     i_fin = min(i_tope, D.t.size - 1)
-    if fin_forzado is not None:
-        i_fin = min(i_fin, D.idx(fin_forzado - MS_MIN))
+    motivo_fin = "tope_24h"
+    if fin_forzado is not None and D.idx(fin_forzado - MS_MIN) < i_fin:
+        i_fin, motivo_fin = D.idx(fin_forzado - MS_MIN), "invalidacion"
     b = D.barras_1s(p.fill_ts, int(D.t[i_fin]) + MS_MIN)
+    fav = (b["h"] - p.fill) if largo else (p.fill - b["l"])  # recorrido a favor por segundo
+    mfe_acum = np.maximum.accumulate(fav) if fav.size else fav
+    # corte por tiempo: la vela de 1m que cierra a los corte_min minutos del fill
+    if P.corte_min is not None and fav.size:
+        i_c = D.idx(p.fill_ts + P.corte_min * MS_MIN - MS_MIN)
+        if int(D.t[i_c]) + MS_MIN < p.fill_ts + P.corte_min * MS_MIN:
+            i_c += 1
+        if i_c < i_fin:
+            k_c = int(np.searchsorted(b["ts"], int(D.t[i_c]) + MS_MIN)) - 1
+            if k_c >= 0 and mfe_acum[k_c] < P.corte_r * p.riesgo:
+                i_fin, motivo_fin = i_c, "corte_tiempo"
+                b = {x: v[:k_c + 1] for x, v in b.items()}
+                fav, mfe_acum = fav[:k_c + 1], mfe_acum[:k_c + 1]
     tp_b = (b["h"] >= p.tp) if largo else (b["l"] <= p.tp)
     sl_b = (b["l"] <= p.sl) if largo else (b["h"] >= p.sl)
+    motivo_sl, precio_sl = "SL", p.sl
+    if P.be_r is not None and fav.size:
+        alcanzo = mfe_acum >= P.be_r * p.riesgo
+        if alcanzo.any():
+            k_be = int(np.argmax(alcanzo))
+            # después del segundo en que llegó a +be_r R, el stop está en la entrada
+            be_b = (b["l"] <= p.fill) if largo else (b["h"] >= p.fill)
+            be_b[:k_be + 1] = False
+            sl_antes = sl_b.copy()
+            sl_antes[k_be + 1:] = False
+            k1 = int(np.argmax(sl_antes)) if sl_antes.any() else None
+            k2 = int(np.argmax(be_b)) if be_b.any() else None
+            if k1 is None and k2 is not None:
+                sl_b, motivo_sl, precio_sl = be_b, "breakeven", p.fill
+            else:
+                sl_b = sl_antes
     k_tp = int(np.argmax(tp_b)) if tp_b.any() else None
     k_sl = int(np.argmax(sl_b)) if sl_b.any() else None
-    slip = P.slip_sl_ticks * TICK * (-1 if largo else 1)
+    slip = P.slip_sl_ticks * TICK * (-sg)
     if k_tp is None and k_sl is None:
-        motivo = "invalidacion" if fin_forzado is not None and i_fin < i_tope else "tope_24h"
-        p.salida_ts, p.salida, p.motivo = int(D.t[i_fin]) + MS_MIN - 1, float(D.c[i_fin]), motivo
+        p.salida_ts, p.salida, p.motivo = int(D.t[i_fin]) + MS_MIN - 1, float(D.c[i_fin]), motivo_fin
     elif k_sl is None or (k_tp is not None and k_tp < k_sl):
         p.salida_ts, p.salida, p.motivo = int(b["ts"][k_tp]), p.tp, "TP"
     elif k_tp is None or k_sl < k_tp:
-        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), p.sl + slip, "SL"
+        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), precio_sl + slip, motivo_sl
     else:
-        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), p.sl + slip, "SL"
+        p.salida_ts, p.salida, p.motivo = int(b["ts"][k_sl]), precio_sl + slip, motivo_sl
         p.ambiguo, p.salida_opt, p.motivo_opt = True, p.tp, "TP"
         p.extra["ambiguo_tipo"] = "sl_y_tp_mismo_segundo"
     if not p.ambiguo:

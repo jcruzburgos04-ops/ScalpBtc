@@ -191,3 +191,25 @@
   Conclusión: la parte mecánica del setup (nivel + rechazo + TP en la media) no tiene ventaja robusta en BTC 1m
   2023–2025. Lo que el trader agrega y no está codificado: lectura de orderflow (Aggr 10 s: esfuerzo sin resultado,
   absorción), selección del contexto ("meta" del día) y manejo del trade (scratch rápido, parciales).
+
+## Estrategia B · tres mejoras: absorción, scratch y meta del día (2026-10-01)
+- `src/b_variables.py` (esfuerzo, resultado, absorción, delta del empujón, cruces del VWAP en el día, rango del día)
+  y manejo opcional en `motor.resolver_pata_last` (breakeven al llegar a +be_r R; corte por tiempo). Selección en
+  `src/b_seleccion.py` → `reports/b/seleccion.txt`. Período 2023-01 → 2026-06 (sin la reserva).
+- Bug: `pl.col("mes").is_between("2026-02", "2026-05")` toma los strings como nombres de columna → `pl.lit(...)`.
+- **Estático** (elige con 2023–2024): dVAL/dVAH · R ≥ 2 · breakeven 1R · absorción ≥ p40 · cruces VWAP ≥ p60,
+  +0,104 R en entrenamiento → **−0,006 R en 2025–2026** [−0,088, +0,080] (sin filtros ni manejo: +0,062).
+  Sobreajuste: la combinación de filtros no sobrevive.
+- **Walk-forward trimestral** 2025Q1–2026Q2: OOS **+0,108 R** [+0,049, +0,170], 2984 trades, WR 12,6 %; sin
+  feb–may 2026 (usados para calibrar B1): +0,091 [+0,017, +0,167]. Desde 2025Q2 el walk-forward elige siempre
+  **breakeven 0,5 R**; los filtros entran y salen.
+- Por componente (dVAL/dVAH, R ≥ 1, entrenamiento / test): sin manejo +0,005 / +0,024 · **breakeven 0,5R +0,053 /
+  +0,079** · breakeven 1R +0,037 / +0,066 · corte 10 min +0,016 / +0,035 · corte 20 min +0,010 / +0,022.
+  Con R ≥ 2: sin manejo +0,037 / +0,062 → breakeven 0,5R +0,087 / +0,123 (52 % de los trades salen en 0).
+- Absorción ("high effort, unrewarded"): la hipótesis va AL REVÉS en entrenamiento (quintil bajo +0,054, alto −0,019)
+  y en el test no es monótona. No sirve como filtro.
+- Cruces del VWAP en el día (meta rotacional): también al revés de la hipótesis. Los días con POCOS cruces dan más
+  (Q1 +0,086 entrenamiento / +0,182 test; Q5 −0,021 / −0,032). Sólo se probó la dirección "≥" (fijada antes), así que
+  la dirección contraria es una hipótesis nueva vista en el test: no se adopta sin otra validación.
+- Riesgo mediano 63 USD (~630 ticks): el slippage de pocos ticks en el stop de breakeven no cambia nada. Con
+  comisión taker 0,05 % por lado (~0,7 R por lado con ese riesgo) todo esto sería negativo; el proyecto es sin comisiones.
