@@ -11,8 +11,10 @@ Una PATA = un trade independiente con su fill, su SL, su TP y su resolución int
     y TP en el optimista (§4.2).
   · Tope técnico 24 h: sale al cierre de la última vela.
 POSICIÓN (§4.3): una a la vez; señales a favor agregan patas (máx. 4 abiertas, cada una con R ≥ R_MIN hasta su TP);
-señales en contra se ignoran y se registran. INVALIDACIÓN (§5.1, opcional): desde los 30 min del fill de la pata 1,
-al cierre de cada vela, si |close − fill1| ≤ x·R1 y hubo ≥ m señales desde la entrada → cierra todas las patas.
+señales en contra se ignoran y se registran. INVALIDACIÓN (§5.1, opcional, redefinida por Juan 2026-10-01), POR PATA:
+al cierre de la primera vela con ≥ 30 min reales desde el fill de esa pata, |close − fill| ≤ 0,5 R, el precio cruzó
+el fill ≥ 7 veces y el ASH de 1m cruzó ≥ 3 veces desde su entrada → se cierra esa pata; las demás siguen.
+SL: por defecto por LAST price al segundo (confirmado por Juan 2026-10-01); el modo "mark" queda como variante.
 Todo en ms UTC; resultados en R.
 """
 from __future__ import annotations
@@ -37,10 +39,11 @@ class Params:
     invalidacion: bool = False
     inv_min: int = 30
     inv_x_r: float = 0.5
-    inv_m: int = 2
     max_patas: int = 4
     r_min: float = 2.0
-    sl_por: str = "mark"   # "mark" (§1 original) o "last": SL por last price, resuelto al segundo, sin sintético
+    sl_por: str = "last"   # "last" (confirmado 2026-10-01): SL por last al segundo, sin sintético · "mark": variante
+    inv_cruces_fill: int = 7  # invalidación: el precio cruzó el fill de la pata al menos estas veces (cierres de 1m)
+    inv_cruces_ash: int = 3   # invalidación: el ASH de 1m cruzó (Bulls/Bears) al menos estas veces desde la entrada
 
 
 class Datos:
@@ -54,6 +57,10 @@ class Datos:
         mm = pl.DataFrame({"open_time": self.t}).join(m, on="open_time", how="left")
         self.mo, self.mh, self.ml, self.mc = (mm[x].to_numpy() for x in ("open", "high", "low", "close"))
         self.mrec = mm["reconstruido"].fill_null(False).to_numpy()
+        import indicadores
+        ia = indicadores.cargar(desde, hasta).select("open_time", "ash_bulls", "ash_bears")
+        ia = pl.DataFrame({"open_time": self.t}).join(ia, on="open_time", how="left")
+        self.ash_signo = np.sign((ia["ash_bulls"] - ia["ash_bears"]).fill_null(0).to_numpy())
         self._s: dict[str, dict] = {}
 
     def idx(self, t_ms: int) -> int:
@@ -254,7 +261,6 @@ def simular(D: Datos, senales: pl.DataFrame, P: Params, todas_las_senales: np.nd
     ignoradas: list[dict] = []
     abiertas: list[Pata] = []
     pos_id, lado_pos, fin_pos = 0, None, -1
-    inval_ts = None
     if todas_las_senales is None:
         todas_las_senales = senales["open_time"].to_numpy()
     for s in senales.sort("open_time").iter_rows(named=True):
@@ -271,8 +277,6 @@ def simular(D: Datos, senales: pl.DataFrame, P: Params, todas_las_senales: np.nd
         if lado_pos is not None and len(abiertas) >= P.max_patas:
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "max_patas"})
             continue
-        if lado_pos is not None and inval_ts is not None and cierre >= inval_ts:
-            continue
         fts, fpx = fill_de(D, t)
         if fts is None:
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "sin_fill"})
@@ -285,37 +289,49 @@ def simular(D: Datos, senales: pl.DataFrame, P: Params, todas_las_senales: np.nd
         if (largo and not (s["sl"] < fpx < s["tp"])) or (not largo and not (s["tp"] < fpx < s["sl"])):
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "fill_fuera_de_sl_tp"})
             continue
-        if abs(s["tp"] - fpx) / abs(fpx - s["sl"]) < P.r_min:
+        if abs(s["tp"] - fpx) / abs(fpx - s["sl"]) < P.r_min - 1e-9:  # tolerancia de punto flotante
             ignoradas.append({"open_time": t, "lado": s["lado"], "motivo": "r_menor_al_minimo"})
             continue
         nueva = lado_pos is None
         if nueva:
             pos_id += 1
             lado_pos = s["lado"]
-            inval_ts = None
         p = Pata(pos_id, 1 if nueva else len([x for x in patas if x.pos_id == pos_id]) + 1, s["lado"], t, fts, fpx, s["sl"], s["tp"])
         p.extra = {k: v for k, v in s.items() if k not in ("open_time", "lado", "sl", "tp", "en_ventana")}
         p.extra["close_senal"] = float(D.c[D.idx(t)])
-        if P.invalidacion and nueva:
-            inval_ts = _tiempo_invalidacion(D, p, P, todas_las_senales)
-        resolver_pata(D, p, P, inval_ts if P.invalidacion else None)
+        # invalidación por pata: cada una con su propio fill y su propio reloj de 30 min reales
+        resolver_pata(D, p, P, _tiempo_invalidacion(D, p, P) if P.invalidacion else None)
         patas.append(p)
         abiertas.append(p)
     return patas, ignoradas
 
 
-def _tiempo_invalidacion(D: Datos, p: Pata, P: Params, todas: np.ndarray) -> int | None:
-    """Cierre (ms) de la primera vela, desde fill+30 min, con |close − fill| ≤ x·R y ≥ m señales desde la entrada."""
-    i_a = D.idx((p.fill_ts + P.inv_min * MS_MIN) // MS_MIN * MS_MIN)
+def _cruces(signo: np.ndarray) -> np.ndarray:
+    """Cantidad acumulada de cambios de lado (los ceros arrastran el último lado no nulo)."""
+    sg = signo.copy()
+    for k in range(1, sg.size):
+        if sg[k] == 0:
+            sg[k] = sg[k - 1]
+    cambia = (sg[1:] != sg[:-1]) & (sg[1:] != 0) & (sg[:-1] != 0)
+    return np.concatenate([[0], np.cumsum(cambia)])
+
+
+def _tiempo_invalidacion(D: Datos, p: Pata, P: Params) -> int | None:
+    """Regla de Juan (redefinida 2026-10-01), POR PATA: al cierre de la primera vela de 1m con ≥ 30 min reales desde
+    el fill de la pata, |close − fill| ≤ x·R, el precio cruzó el fill ≥ inv_cruces_fill veces y el ASH de 1m cruzó
+    ≥ inv_cruces_ash veces desde la entrada. Devuelve el ms del cierre de esa vela."""
+    i_e = D.idx(p.fill_ts // MS_MIN * MS_MIN)
+    i_a = D.idx(p.fill_ts + P.inv_min * MS_MIN - MS_MIN)  # primera vela cuyo CIERRE cae con 30 min ya cumplidos
+    if int(D.t[i_a]) + MS_MIN < p.fill_ts + P.inv_min * MS_MIN:
+        i_a += 1
     i_b = min(D.idx(p.fill_ts + TOPE_MS), D.t.size - 1)
-    cerca = np.abs(D.c[i_a:i_b] - p.fill) <= P.inv_x_r * p.riesgo
-    if not cerca.any():
+    if i_a >= i_b:
         return None
-    a = np.searchsorted(todas, p.t_senal, side="right")
-    for k in np.flatnonzero(cerca):
-        i = i_a + int(k)
-        n = np.searchsorted(todas, D.t[i], side="right") - a
-        if n >= P.inv_m:
+    cf = _cruces(np.sign(D.c[i_e:i_b] - p.fill))
+    ca = _cruces(D.ash_signo[i_e:i_b])
+    for i in range(i_a, i_b):
+        k = i - i_e
+        if abs(D.c[i] - p.fill) <= P.inv_x_r * p.riesgo and cf[k] >= P.inv_cruces_fill and ca[k] >= P.inv_cruces_ash:
             return int(D.t[i]) + MS_MIN
     return None
 

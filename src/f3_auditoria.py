@@ -31,6 +31,15 @@ CUPOS = [  # (archivo, filtro, cantidad, etiqueta)
     ("sin", pl.col("pata") >= 2, 2, "pata de ampliación"),
 ]
 ARCH = {"sin": "trades_2023-01_2024-12_tp2_slip0", "inv": "trades_2023-01_2024-12_tp2_inv_slip0"}
+# Mini-auditoría tras los cambios de Juan (SL por last, invalidación por pata con 30 min reales y ≥ 7 cruces)
+ARCH2 = {"sin": "trades_2023-01_2024-12_tp2_slip0_sllast", "inv": "trades_2023-01_2024-12_tp2_inv_slip0_sllast"}
+CUPOS2 = [
+    ("sin", pl.col("motivo") == "TP", 2, "TP (por last)"),
+    ("sin", (pl.col("motivo") == "SL") & (pl.col("pata") == 1), 3, "SL (por last)"),
+    ("inv", (pl.col("motivo") == "invalidacion") & (pl.col("pata") == 1), 3, "cierre por invalidación"),
+    ("inv", (pl.col("motivo") == "invalidacion") & (pl.col("pata") >= 2), 1, "cierre por invalidación (pata de ampliación)"),
+    ("sin", pl.col("pata") >= 2, 1, "pata de ampliación"),
+]
 ART = dt.timedelta(hours=-3)
 
 
@@ -38,7 +47,7 @@ def hora(ms: int) -> str:
     return (dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc) + ART).strftime("%Y-%m-%d %H:%M:%S")
 
 
-def caso(r: dict, etiqueta: str, version: str, i: int) -> dict:
+def caso(r: dict, etiqueta: str, version: str, i: int, modo: str = "mark") -> dict:
     mes0 = dt.datetime.fromtimestamp(r["t_senal"] / 1000, dt.timezone.utc).strftime("%Y-%m")
     mes1 = dt.datetime.fromtimestamp(r["salida_ts"] / 1000, dt.timezone.utc).strftime("%Y-%m")
     D = motor.Datos(mes0, mes1)
@@ -59,7 +68,12 @@ def caso(r: dict, etiqueta: str, version: str, i: int) -> dict:
     b = D.barras_1s(s0 - 90_000, s0 + 150_000)
     seg = [{"t": int(b["ts"][j]) // 1000, "o": float(b["o"][j]), "h": float(b["h"][j]), "l": float(b["l"][j]),
             "c": float(b["c"][j])} for j in range(b["ts"].size)]
-    sint, rep = motor._sintetico(D, D.idx(s0), r["fill_ts"])
+    if modo == "last":  # sin mark ni trayectoria sintética
+        for v in velas:
+            v["mh"] = v["ml"] = v["mc"] = None
+        sint, rep = {}, False
+    else:
+        sint, rep = motor._sintetico(D, D.idx(s0), r["fill_ts"])
     sint_l = [{"t": int(sint["ts"][j]) // 1000, "sh": float(sint["sh"][j]), "sl": float(sint["sl"][j])}
               for j in range(sint["ts"].size)] if "sh" in sint else []
     lg = r["lado"] == "long"
@@ -73,8 +87,30 @@ def caso(r: dict, etiqueta: str, version: str, i: int) -> dict:
         "ambiguo_tipo": r["ambiguo_tipo"], "sintetico_reproduce": bool(rep), "mark_reconstruido": r["mark_reconstruido"],
         "riesgo_usd": round(r["riesgo"], 1), "riesgo_atr": round(r["riesgo"] / r["atr14"], 2),
         "nocional_x": round(r["nocional_x_equity"], 1), "minutos": round(r["minutos"], 1),
-        "velas": velas, "seg": seg, "sint": sint_l,
+        "velas": velas, "seg": seg, "sint": sint_l, "modo": modo,
     }
+
+
+def mini(semilla: int = 11) -> None:
+    rnd = random.Random(semilla)
+    tablas = {k: pl.read_parquet(F / f"{v}.parquet") for k, v in ARCH2.items()}
+    previos = {c["id"]: c for c in json.loads((F / "auditoria" / "casos.json").read_text())}
+    casos = []
+    # los mismos trades t06 y t08 de la auditoría anterior, resueltos con la regla nueva
+    for tid in ("t06", "t08"):
+        c0 = previos[tid]
+        r = tablas["sin"].filter((pl.col("t_senal") == c0["senal_t"] * 1000) & (pl.col("lado") == c0["lado"]))
+        if r.height:
+            casos.append(caso(r.row(0, named=True), f"{tid} de la auditoría anterior, ahora con SL por last", "sin", len(casos) + 1, "last"))
+    for ver, filtro, n, et in CUPOS2:
+        filas = tablas[ver].filter(filtro).to_dicts()
+        rnd.shuffle(filas)
+        for r in filas[:n]:
+            casos.append(caso(r, et, ver, len(casos) + 1, "last"))
+    out = F / "auditoria2"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "casos.json").write_text(json.dumps(casos, separators=(",", ":")), encoding="utf-8")
+    print(len(casos), "trades;", [c["etiqueta"] for c in casos])
 
 
 def main(semilla: int = 3) -> None:
@@ -99,4 +135,5 @@ def main(semilla: int = 3) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    mini() if "--mini" in sys.argv else main()

@@ -140,3 +140,10 @@
 - t11 / t12 / t13: el cierre por invalidación dispara sin oscilación real: "≥ 2 señales desde la entrada" se cumple
   casi siempre (~22 señales por sesión). Además la pata 2 de t11 se cerró 1 min después de su entrada porque el
   reloj de 30 min es el de la pata 1. Hay que redefinir la regla.
+- Cambios de Juan aplicados: SL por last (por defecto) e invalidación por pata (30 min reales, ≤ 0,5 R, ≥ 7 cruces
+  del fill, ≥ 3 cruces del ASH). 2023–2024 con invalidación: 1 674 cierres por invalidación (antes 4 896), mínimo
+  30,0 min, mediana 44. Verificados 3 a mano (cruces contados aparte).
+- **Bug corregido:** con el SL y el TP redondeados al tick, el chequeo R ≥ 2 fallaba por punto flotante (1,9999999 <
+  2) y descartaba ~3 000 señales en la corrida por last (16 en la de mark). Se agregó tolerancia 1e-9. Corrida final
+  por last: 16 125 patas / 8 864 posiciones (sin invalidación); 16 875 / 10 614 (con invalidación).
+- Reauditoría publicada: 12 trades (incluye t06 y t08 con la regla nueva).

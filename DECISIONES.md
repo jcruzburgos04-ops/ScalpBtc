@@ -97,9 +97,9 @@ con y sin · variantes de calendario A–D.
   jul–sep 2026 sigue cerrada. A confirmar con Juan.
 
 ## Auditoría F3 (2026-10-01)
-- [2026-10-01] PENDIENTE · Disparo del SL por **last price** (resuelto al segundo, sin mark sintético) en lugar de
-  mark price. Juan lo propuso (su exchange lo permite) y no quiere trayectorias sintéticas. El mark quedaría como
-  variante de sensibilidad. Cambia el §1 ("se dispara por MARK PRICE").
-- [2026-10-01] PENDIENTE · Redefinir el cierre por invalidación para que mida oscilación real: desde los 30 min del
-  fill de la pata 1, |close − fill| ≤ 0,5 R, el precio cruzó el fill ≥ 3 veces (cierres de un lado y del otro) y el
-  ASH de 1m cruzó ≥ 3 veces desde la entrada. Y decidir si cierra también patas con menos de 30 min.
+- [2026-10-01] CONFIRMADA · SL por **last price**, resuelto al segundo con aggTrades, sin mark ni trayectorias
+  sintéticas (reemplaza "se dispara por MARK PRICE" del §1). El mark queda solo como variante de sensibilidad.
+- [2026-10-01] CONFIRMADA · Cierre por invalidación redefinido, POR PATA: al cierre de la primera vela con 30 min
+  reales desde el fill de esa pata, si |close − fill| ≤ 0,5 R, el precio cruzó el fill ≥ 7 veces y el ASH de 1m
+  cruzó ≥ 3 veces desde la entrada → se cierra esa pata. Las demás patas siguen hasta su SL/TP (reemplaza "cierra
+  todas las patas" del §5.1).

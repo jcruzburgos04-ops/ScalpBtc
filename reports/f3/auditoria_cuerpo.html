@@ -21,11 +21,11 @@
     <div class="graficos">
       <div class="meta" id="meta"></div>
       <div class="panel">
-        <p class="rot">1m · <span><i style="background:var(--vwap)"></i>mark price (cierre)</span><span><i style="background:var(--lvl)"></i>mark high/low</span><span><i style="background:var(--accent)"></i>fill</span><span><i style="background:var(--no)"></i>SL</span><span><i style="background:var(--ok)"></i>TP</span></p>
+        <p class="rot">1m · <span class="solo-mark"><i style="background:var(--vwap)"></i>mark price (cierre)</span><span class="solo-mark"><i style="background:var(--lvl)"></i>mark high/low</span><span><i style="background:var(--accent)"></i>fill</span><span><i style="background:var(--no)"></i>SL</span><span><i style="background:var(--ok)"></i>TP</span></p>
         <div class="c1m" id="g1m"></div>
       </div>
       <div class="panel">
-        <p class="rot">1 s alrededor de la salida · <span><i style="background:var(--lvl)"></i>mark sintético (high/low)</span></p>
+        <p class="rot">1 s alrededor de la salida <span class="solo-mark">· <i style="background:var(--lvl)"></i>mark sintético (high/low)</span></p>
         <div class="c1s" id="g1s"></div>
       </div>
     </div>
@@ -67,6 +67,13 @@ const hhmmss = (t) => hhmm(t) + ":" + dos(new Date(t * 1000).getUTCSeconds());
 const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const usd = (v) => v == null ? "—" : v.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
+const EXPLICA_LAST = {
+  "TP (por last)": "El last tocó el TP antes que el SL. Todo se resuelve con los trades reales, segundo a segundo.",
+  "SL (por last)": "El last tocó el SL antes que el TP (regla nueva: SL por last price, sin mark ni nada sintético). La salida es el primer segundo que toca el SL.",
+  "cierre por invalidación": "Regla nueva, por pata: con 30 min reales desde el fill de esta pata, el precio a menos de 0,5 R del fill, el precio cruzó el fill al menos 7 veces y el ASH de 1m cruzó al menos 3 veces desde la entrada. Se cierra al cierre de esa vela.",
+  "cierre por invalidación (pata de ampliación)": "Misma regla de invalidación, aplicada a una pata de ampliación con su propio fill y sus propios 30 minutos. Las demás patas siguen hasta su SL/TP.",
+  "pata de ampliación": "Pata agregada a una posición abierta por una señal a favor; tiene su propio fill, SL y TP.",
+};
 const EXPLICA = {
   "TP": "El last tocó el TP antes de que el mark tocara el SL. La hora de salida es el primer segundo de aggTrades que alcanza el TP.",
   "SL": "El mark price tocó el SL antes de que el last tocara el TP. La salida se registra al SL (sin slippage en esta corrida).",
@@ -148,7 +155,8 @@ function info() {
   fila("salida", `${usd(c.salida)} a las ${c.salida_hora.slice(11)} · ${c.minutos} min`);
   fila("resultado", c.r === c.r_opt ? `${c.r > 0 ? "+" : ""}${c.r} R` : `${c.r} R conservador · +${c.r_opt} R optimista`, c.r >= 0 ? "r-pos" : "r-neg");
   fila("nocional", `${c.nocional_x}× el capital para arriesgar 1 %`);
-  $("explica").textContent = EXPLICA[c.etiqueta] || "";
+  $("explica").textContent = c.modo === "last" ? (EXPLICA_LAST[c.etiqueta] || "Mismo trade de la auditoría anterior, resuelto con SL por last price (sin mark ni nada sintético).") : (EXPLICA[c.etiqueta] || "");
+  document.querySelectorAll(".solo-mark").forEach(el => el.hidden = c.modo === "last");
   document.querySelectorAll('input[name="ok"]').forEach(x => x.checked = x.value === r.ok);
   $("com").value = r.comentario ?? "";
   $("prev").disabled = idx === 0;

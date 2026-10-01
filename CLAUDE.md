@@ -51,7 +51,7 @@ código Pine, no la intuición ni la documentación de TradingView.
 | VWAP | fuente **hl2** · curva 1 = sesión (ancla diaria 00:00 UTC) · curva 2 = semana (lunes 00:00 UTC) · bandas ±1σ y ±2σ |
 | Perfil diario | velas de 1m · 24 filas · área de valor 70 % (dVAH/dVAL/dPOC) |
 | Comisiones | ninguna |
-| Stop loss | apenas más allá del **mínimo (long) / máximo (short) más reciente del swing en 1m**. NO es un número fijo de velas (ver §4.1). También puede venir marcado por un indicador de volumen/posiciones. **Se dispara por MARK PRICE** |
+| Stop loss | apenas más allá del **mínimo (long) / máximo (short) más reciente del swing en 1m**. Calibrado con las marcas de Juan (F3): **extremo de las últimas 10 velas ± 0,25 ATR(14)**. **Se dispara por LAST PRICE** al segundo (confirmado 2026-10-01; antes mark price) |
 | Riesgo | **1 % del capital por operación** (1R = 1 % del equity) |
 | Entrada | **al cierre de la vela de señal** de 1m |
 | Take profit | NO es fijo: es objeto de investigación (§5). Filtro duro: **no se entra si el R hasta el objetivo es < 2** |

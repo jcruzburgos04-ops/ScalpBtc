@@ -30,7 +30,7 @@ def main() -> None:
     ap.add_argument("--invalidacion", action="store_true")
     ap.add_argument("--tp_r", type=float, default=2.0)
     ap.add_argument("--slip", type=float, default=0.0)
-    ap.add_argument("--sl_por", default="mark", choices=["mark", "last"])
+    ap.add_argument("--sl_por", default="last", choices=["mark", "last"])
     a = ap.parse_args()
     t0 = time.time()
     s, todas = preparar(a.desde, a.hasta, a.tp_r)
