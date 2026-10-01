@@ -85,6 +85,7 @@ tr.fuerte td:first-child { color: var(--fg); font-weight: 600; }
       <span><i style="background:var(--e11)"></i>EMA 11</span>
       <span><i style="background:var(--e25)"></i>EMA 25</span>
       <span>Eje: hora del trader (UTC+2 = ART + 5 h)</span>
+      <span>Flecha = donde la ubiqué · círculo gris = otro momento en que Binance pasó por su precio (arrastrá el gráfico para ver 4 h antes y 2 h después)</span>
     </div>
   </header>
 
@@ -183,7 +184,7 @@ function tarjeta(c, i) {
       <button class="btn nose" data-v="nose" aria-pressed="false">No sé</button>
       <span class="estado" aria-live="polite"></span>
     </fieldset>
-    <textarea id="com-${c.id}" placeholder="Si está mal: dónde entró (hora de la captura) o qué vio para entrar"></textarea>`;
+    <textarea id="com-${c.id}" placeholder="Si está mal: en qué hora del trader entró (o qué círculo gris es)"></textarea>`;
   if (c.t) {
     const lect = s.querySelector(".lect");
     lectura(c).forEach(([k, v, e, cls]) => {
@@ -224,9 +225,16 @@ function grafico(c) {
   const vel = g.addCandlestickSeries({ upColor: tok("--long"), downColor: tok("--short"), borderVisible: false, wickUpColor: tok("--long"), wickDownColor: tok("--short"), priceLineVisible: false, lastValueVisible: false });
   vel.setData(c.velas.map((v, i) => ({ time: ts[i], open: v[1], high: v[2], low: v[3], close: v[4] })));
   const L = c.lado === "long";
-  vel.setMarkers([{ time: c.t / 1000 + TZ, position: L ? "belowBar" : "aboveBar", color: L ? tok("--long") : tok("--short"), shape: L ? "arrowUp" : "arrowDown", text: c.id }]);
+  const t0 = ts[0], t1 = ts[ts.length - 1];
+  const mk = (c.cand || []).filter((x) => x !== c.t).map((x, j) => ({ time: x / 1000 + TZ, n: j }))
+    .filter((m) => m.time >= t0 && m.time <= t1)
+    .map((m) => ({ time: m.time, position: L ? "belowBar" : "aboveBar", color: tok("--muted"), shape: "circle", text: "otro paso " + hhmm(m.time) }));
+  mk.push({ time: c.t / 1000 + TZ, position: L ? "belowBar" : "aboveBar", color: L ? tok("--long") : tok("--short"), shape: L ? "arrowUp" : "arrowDown", text: c.id });
+  mk.sort((a, b) => a.time - b.time);
+  vel.setMarkers(mk);
   vel.createPriceLine({ price: c.entrada, color: L ? tok("--long") : tok("--short"), lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: "su precio" });
-  g.timeScale().fitContent();
+  const iE = ts.indexOf(c.t / 1000 + TZ);
+  g.timeScale().setVisibleLogicalRange({ from: Math.max(0, iE - 150), to: Math.min(ts.length - 1, iE + 90) });
 }
 
 function pintarRespuesta(id) {

@@ -14,7 +14,7 @@ import trader_sep as ts
 
 RAIZ = Path(__file__).resolve().parent.parent
 OUT = RAIZ / "reports" / "trader_sep" / "pagina"
-ANTES, DESPUES = 60, 30
+ANTES, DESPUES = 240, 120
 SERIES = {"vwap": "vwap_d", "p1": "vwap_d_p1", "m1": "vwap_d_m1", "p2": "vwap_d_p2", "m2": "vwap_d_m2",
           "vw": "vwap_w", "rv": "rVWAP", "vah": "dVAH", "val": "dVAL", "e11": "ema11", "e25": "ema25"}
 
@@ -33,13 +33,14 @@ def main() -> None:
     t = df["open_time"].to_list()
     idx = {v: i for i, v in enumerate(t)}
     casos = []
-    tr = tr.with_columns(_n=pl.col("id").str.slice(1).cast(pl.Int32)).sort("_n")
+    tr = tr.sort("t_entrada", nulls_last=True)
     for r in tr.iter_rows(named=True):
         c = {k: r[k] for k in ("id", "captura", "plataforma", "lado", "entrada", "exacta", "nota", "confianza", "episodios", "dif_min",
                                "nivel1", "nivel2", "precio_vs_xo")}
         lote, k = r["captura"].replace("lote", "").split("_")
         c["n_captura"] = (int(lote) - 1) * 5 + int(k)   # orden en que Juan mandó las capturas (1–18)
         c["t"] = r["t_entrada"]
+        c["cand"] = r["candidatos"] or []
         if r["t_entrada"] is not None:
             i = idx[r["t_entrada"]]
             x = df.slice(max(0, i - ANTES), ANTES + DESPUES + 1)

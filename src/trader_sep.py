@@ -84,20 +84,22 @@ def ubicar(tr: pl.DataFrame, df: pl.DataFrame) -> pl.DataFrame:
         a, b, ap = a_utc_ms(r["desde"]), a_utc_ms(r["hasta"]), a_utc_ms(r["aprox"])
         if r["exacta"] == "si":
             m = ap // 60_000 * 60_000
-            filas.append({"id": r["id"], "t_entrada": m, "episodios": 1, "dif_min": 0, "toca": True})
+            filas.append({"id": r["id"], "t_entrada": m, "episodios": 1, "dif_min": 0, "toca": True, "candidatos": [m]})
             continue
         i0, i1 = np.searchsorted(t, a), np.searchsorted(t, b, side="right")
         ok = (l[i0:i1] - PREMIO_LO <= p) & (p <= h[i0:i1] + PREMIO_HI)
         if not ok.any():
-            filas.append({"id": r["id"], "t_entrada": None, "episodios": 0, "dif_min": None, "toca": False})
+            filas.append({"id": r["id"], "t_entrada": None, "episodios": 0, "dif_min": None, "toca": False, "candidatos": []})
             continue
         k = np.flatnonzero(ok)
-        epis = 1 + int((np.diff(k) > 3).sum())
+        cortes = np.flatnonzero(np.diff(k) > 3) + 1
+        epis = 1 + cortes.size
+        candidatos = [int(t[i0 + k[0]])] + [int(t[i0 + k[c]]) for c in cortes]   # primer minuto de cada paso del precio
         j = k[np.argmin(np.abs(t[i0 + k] - ap))]
         filas.append({"id": r["id"], "t_entrada": int(t[i0 + j]), "episodios": epis,
-                      "dif_min": int((t[i0 + j] - ap) // 60_000), "toca": True})
+                      "dif_min": int((t[i0 + j] - ap) // 60_000), "toca": True, "candidatos": candidatos})
     return tr.join(pl.DataFrame(filas, schema={"id": pl.Utf8, "t_entrada": pl.Int64, "episodios": pl.Int64,
-                                               "dif_min": pl.Int64, "toca": pl.Boolean}), on="id")
+                                               "dif_min": pl.Int64, "toca": pl.Boolean, "candidatos": pl.List(pl.Int64)}), on="id")
 
 
 def leer_indicadores(tr: pl.DataFrame, df: pl.DataFrame) -> pl.DataFrame:
