@@ -148,7 +148,11 @@ con y sin · variantes de calendario A–D.
   sin comisiones (Variational). Test 2023–2025: 2 619 trades, gana 13 %, +0,064 R [IC 95 % −0,011, +0,148].
   No se modifica más; se mide en la reserva oct–dic 2026 a medida que se publiquen los datos.
 - [2026-10-02] CONFIRMADA · Juan: win rate mínimo operable 50 %.
-- [2026-10-02] PENDIENTE · Estrategia A + EMA 200 de 45m + salida TP 3R con 50 % cobrado en +1R y breakeven del resto
+- [2026-10-02] CONFIRMADA (congelada) · Estrategia A + EMA 200 de 45m + salida TP 3R con 50 % cobrado en +1R y breakeven del resto
   (elegida en calibración 2023–24 con gana ≥ 50 %): test 2025-01..2026-06 +0,080 R [+0,052, +0,113], gana 52 %.
   Advertencia: la dirección de la señal A no supera al azar en el control; la ventaja es del SL en el swing, la
   tendencia de 45m y el manejo.
+- [2026-10-02] CONFIRMADA · Los recordatorios de oct/nov/dic (5-nov, 5-dic, 6-ene) miden B2 final y A congelada.
+- [2026-10-02] SUPUESTO · Liquidation Bands de Leviathan (código protegido): banda = base × (1 ± 1/L), L = 100/75/50/25
+  (1 %, 1,33 %, 2 %, 4 %), base VWAP de sesión o EMA 200 de 1m. PENDIENTE: Juan confirma base, largo de la EMA y si
+  descuenta margen de mantenimiento leyendo la configuración en su TradingView.
