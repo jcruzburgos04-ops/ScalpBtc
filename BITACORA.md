@@ -367,3 +367,7 @@
   favor de sus 93 ganadoras (mediana 8 ATR): MNDAY-H 8 % (12× el placebo), VWAP +2σ sesión 6 % (5,5×), dVAH 6 % (4,9×),
   VWAP +2σ semanal 5 % (12×), dVAL 6 %, pdVAL 4 %, MNDAY-L 4 %. Sus 7 cierres con hora del 28-sep: solo 1 cerca de un
   nivel (rolling VWAP).
+- A + EMA 45m con TP en el nivel opuesto del trader (`src/a_tp_nivel.py`; primer nivel a ≥ 2R entre MNDAY-H/L,
+  VWAP ±2σ sesión, dVAH/dVAL, VWAP ±2σ semanal): con 50 % en +1R +0,045 → test +0,076 [+0,044, +0,112], gana 52 %
+  (≈ A congelada, +0,080); sin parcial +0,090 → +0,136 [+0,053, +0,218] pero gana 23 %. El nivel como TP no mejora a la
+  A congelada con el requisito de gana ≥ 50 %; sin parcial da el mayor R medido hasta ahora (win rate bajo).
