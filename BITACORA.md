@@ -358,3 +358,12 @@
   VWAP, semanales, mensuales, anuales).
 - Trader (sept 2026): pocas entradas pegadas a un nivel; las más frecuentes frente al placebo: VWAP semanal −2σ (6 %,
   6,5×), semanal −1σ (5 %, 2,5×), VWAP de sesión −1σ (4 %, 1,9×), pdVAL (3 %, 2,4×). Muestras chicas.
+- Estrategias nuevas (`src/nuevas_mr.py`, `reports/mr/nuevas.md`; calibración 2023–24 → test 2025–jun 2026, motor 1 s):
+  retroceso a favor de la EMA 200 45m (sin ASH/XO), TP 3R + 50 % en +1R: +0,033 → +0,038 [+0,019, +0,055], gana 51 %
+  (elegida). Liquidation Bands (base VWAP, banda 100x = 1 %): sin tendencia negativa (−0,05 a −0,09); con tendencia 45m
+  +0,01 a +0,04 con IC que cruzan 0. Base EMA 200 1m: ≈ 0. Las bandas no agregan ventaja medible.
+- Salidas del trader (`src/trader_salidas.py`, `reports/trader_sep/salidas.md`): las cajas de TV son demasiado tenues
+  para detección automática (falsos positivos con el perfil de volumen; descartado `trader_cajas.py`). Fin del recorrido a
+  favor de sus 93 ganadoras (mediana 8 ATR): MNDAY-H 8 % (12× el placebo), VWAP +2σ sesión 6 % (5,5×), dVAH 6 % (4,9×),
+  VWAP +2σ semanal 5 % (12×), dVAL 6 %, pdVAL 4 %, MNDAY-L 4 %. Sus 7 cierres con hora del 28-sep: solo 1 cerca de un
+  nivel (rolling VWAP).
