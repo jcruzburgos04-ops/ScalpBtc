@@ -313,3 +313,11 @@
   ASH 1m 53 % vs 38 %), menos volumen (1,9× vs 2,6×) y menos absorción (0,47 vs 1,20), CVD a favor 53 % vs 27 %.
   O sea: sus pérdidas son entradas "de confirmación" a mitad de camino; sus ganadoras, las de extremo con absorción.
   n = 15: descriptivo.
+- Rasgos nuevos (`src/b2_filtro_niveles.py`, sep 2026): ganadas vs señales B2 que no tomó en sus horas: tendencia 4h a
+  favor (sobre EMA 200 4h en long) 78 % vs 36 % (perdidas 87 %: es su criterio de selección, no lo que separa ganar de
+  perder; él opera 80 % longs en un mes alcista); soporte en rVAH/rVAL/rVWAP 17 % vs 0 %; ASH 5m mejorando 42 % vs 30 %.
+  pd-levels, nPOC, EMAs 4h como soporte, semana/mes: sin diferencia.
+- Test del filtro de tendencia 4h (`src/b2_tendencia.py`, regla fijada antes; 36 salidas con R ≥ 2): promedio en test
+  2023–2025 de −0,003 → +0,014 R; positivas 14/36 → 23/36; mitad de trades. Elegida en calibración (SL 0,25 ATR, TP 3R):
+  +0,027 [IC −0,025, +0,084]. Mejora consistente pero chica; ninguna variante con IC claramente > 0 salvo por selección
+  posterior (TP banda +0,094, TP VWAP +0,063 con SL 0,25 ATR).
