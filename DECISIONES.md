@@ -166,3 +166,7 @@ con y sin · variantes de calendario A–D.
 - [2026-10-02] PENDIENTE · Trendlines con volumen (Juan: "cuando rompe debe ser con volumen"): la vela de 1m que cierra
   del otro lado de la línea tiene RVOL (volumen / SMA 20, el del ASH) ≥ 1,5. Variantes a calibrar: 1,5 / 2,5 y
   además delta taker de la vela a favor. Ejemplos con panel de volumen en `reports/trendlines/ejemplos_v2.png`.
+- [2026-10-02] CONFIRMADA · Trazado de trendlines v2 aprobado por Juan (pivots de 10). RVOL 2,5 descartado ("no lo
+  uses"). Confirmaciones de volumen a probar: delta a favor (compras/ventas agresivas a favor) o liquidación de los
+  contrarios (proxy de `src/liq_proxy.py`). SUPUESTO: delta a favor = ≥ 0,2 en la vela que rompe; liquidación contraria
+  = proxy encendido en la vela de ruptura o las 2 anteriores.

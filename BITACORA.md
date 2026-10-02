@@ -386,3 +386,8 @@
 - Trendlines v2 + volumen: en la ventana operativa de ene–mar 2024 (pivots 10) hay 1406 rupturas; con RVOL ≥ 1,5 quedan
   427 (30 %), con ≥ 2,5 quedan 187. Exigir además delta a favor casi no saca nada (411 de 427): las rupturas con
   volumen ya vienen con agresión a favor.
+- Proxy de liquidaciones (`src/liq_proxy.py`, `reports/trendlines/liq_proxy.md`): orden a mercado que barre ≥ 3 precios,
+  ≥ p90 móvil de 7 días, con el OI de 5m bajando. Contra las liquidaciones reales COIN-M (2023-07..2024-09): cuando el
+  proxy se enciende hay liquidación real del mismo lado en el 19–27 % de los minutos vs 1 % cuando no (lift 17–18×).
+  Se enciende en ~3,5 % de los minutos. En ene–mar 2024: 123 de 1406 rupturas tienen liquidación contraria; delta ≥ 0,2
+  a favor, 1083.
