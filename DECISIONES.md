@@ -159,3 +159,7 @@ con y sin · variantes de calendario A–D.
 - [2026-10-02] CONFIRMADA · Se suma a la medición de la reserva (oct–dic 2026) la variante A + EMA 45m + TP en el nivel
   opuesto SIN parcial (`python src/a_tp_nivel.py AAAA-MM AAAA-MM`; test 2025–jun 2026 +0,136 R, gana 23 %). Solo para
   medir; no es la versión operable (gana < 50 %).
+- [2026-10-02] PENDIENTE · Trendlines v2 ("aceitadas", `rupturas_v2` en `src/trendlines.py`): misma línea (dos últimos
+  pivots confirmados, una por lado) más (1) línea limpia: si un cierre ya la cruzó entre el pivot 1 y la confirmación
+  del pivot 2, no da señal; (2) vence a 2× la distancia entre pivots después del pivot 2; (3) toques = episodios con la
+  mecha a ≤ 0,15 ATR de la línea (informativo). Ejemplos en `reports/trendlines/ejemplos_v2.png`. Juan valida el trazado.
