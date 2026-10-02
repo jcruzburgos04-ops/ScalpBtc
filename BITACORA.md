@@ -371,3 +371,7 @@
   VWAP ±2σ sesión, dVAH/dVAL, VWAP ±2σ semanal): con 50 % en +1R +0,045 → test +0,076 [+0,044, +0,112], gana 52 %
   (≈ A congelada, +0,080); sin parcial +0,090 → +0,136 [+0,053, +0,218] pero gana 23 %. El nivel como TP no mejora a la
   A congelada con el requisito de gana ≥ 50 %; sin parcial da el mayor R medido hasta ahora (win rate bajo).
+- Ruptura de líneas de tendencia automáticas (`src/trendlines.py`, `reports/trendlines/`): una línea por lado (dos
+  últimos pivots confirmados), señal al cierre que la rompe; pivots 5/10/20, con y sin EMA 45m, TP 3R + 50 % en +1R o
+  TP 2R. Elegida en calibración (gana ≥ 50 %): pivots de 10 + EMA 45m + parcial → test +0,042 [+0,007, +0,077], gana
+  51 %. Pivots de 20 + EMA 45m + parcial: +0,052 → +0,065 [+0,024, +0,106]. Por debajo de la A congelada (+0,080).
