@@ -375,3 +375,8 @@
   últimos pivots confirmados), señal al cierre que la rompe; pivots 5/10/20, con y sin EMA 45m, TP 3R + 50 % en +1R o
   TP 2R. Elegida en calibración (gana ≥ 50 %): pivots de 10 + EMA 45m + parcial → test +0,042 [+0,007, +0,077], gana
   51 %. Pivots de 20 + EMA 45m + parcial: +0,052 → +0,065 [+0,024, +0,106]. Por debajo de la A congelada (+0,080).
+- Ruptura de trendline + TP en el nivel opuesto (`src/trendlines_nivel.py`, `reports/trendlines/trendlines_nivel.md`;
+  niveles del trader + mVAH/mVAL + rVAH/rVAL, primero a ≥ 2R). Elegida en calibración (gana ≥ 50 %): pivots de 10 +
+  EMA 45m + 50 % en +1R → cal +0,058 → test +0,043 [+0,006, +0,080], gana 51 %. Pivots de 20 + EMA 45m + parcial:
+  +0,056 → +0,071 [+0,020, +0,124]. Sin parcial ≈ +0,08/+0,09 pero gana 23–25 %. Ninguna supera a la A congelada (+0,080).
+  Las capturas en vivo de Juan del 2-oct (reserva) solo se comentan cualitativamente; no se miden.
