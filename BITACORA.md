@@ -306,3 +306,4 @@
   SL 1 ATR, TP 2,5R, sin BE: +0,052 → test 2023–2025 −0,022 [IC −0,057, +0,012]. Todo el test entre −0,027 y +0,036;
   la familia SL 0,25 ATR da positivo en test en las 12 variantes (+0,007 a +0,036; TP "nivel" +0,036), pero no fue la
   elegida en calibración. Win rate 10–35 %. Sin ventaja robusta con 1:2.
+- Relación 1:2 (b2_vs_trader.py): +2 ATR antes de −1 ATR: sus entradas 81 %, señales B2 34 % (azar ≈ 33 %). Con sus entradas el 1:2 conserva el win rate; con B2 cae al azar.

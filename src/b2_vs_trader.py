@@ -20,7 +20,7 @@ ent = [(a, b, c - 20) for a, b, c in tr.select("t_entrada", "lado", "entrada").i
 s = bt.senales(m, "hondo_ag")
 b2s = [(a, b, c) for a, b, c in s.iter_rows()]
 l_ = ["| Salida: +X ATR a favor antes de −Y ATR en contra | Sus entradas (93) | Señales B2 (" + str(len(b2s)) + ") |", "|---|---|---|"]
-for x, y in [(0.5, 1), (0.5, 2), (0.5, 3), (1, 1), (1, 2), (1, 3), (2, 2), (2, 3)]:
+for x, y in [(0.5, 1), (1, 1), (1, 2), (1, 0.5), (2, 1), (3, 1.5), (3, 1)]:
     a = np.mean([gana(*e, x, y) for e in ent]); b = np.mean([gana(*e, x, y) for e in b2s])
     l_.append(f"| +{x:g} / −{y:g} ATR | {a:.0%} | {b:.0%} |")
 txt = "\n".join(l_); (RAIZ / "reports/b2/trader_vs_b2.md").write_text(txt + "\n"); print(txt)
