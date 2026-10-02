@@ -336,3 +336,14 @@
   las patas ya simuladas): base +0,053 → +0,044 (gana 35 %); + EMA 200 de 45m +0,087 [+0,045, +0,131] → test
   +0,080 [+0,037, +0,129] (gana 36 %, la mitad de patas); + breakeven 0,5R +0,060 → +0,072 (gana 20 %); ambos
   +0,073 → +0,084 (gana 21 %). El filtro de 45m casi duplica la ventaja de A en los dos períodos sin bajar el win rate.
+- Auditoría del motor (`src/auditoria_motor.py`): recalculo independiente de 300 patas con barras de 1 s → 300/300
+  coinciden; SL del lado correcto 100 %, TP a 2R exacto 100 %, fill vs close de la señal mediana 0,000 R; R de SL = −1
+  y de TP = +2 exactos. No hay errores de precios.
+- Control con lado al azar (`src/control_azar.py`, mismas horas que A, SL en el extremo de 10 velas del lado sorteado,
+  TP 2R, 1 pata, 3 sorteos): 2023–24 +0,043 a +0,061 (gana 35 %), 2025–26 +0,033 a +0,044; señal A real con 1 pata
+  +0,029 / +0,018. Con EMA 200 45m: azar +0,064 a +0,095 vs A real +0,067 / +0,075. La dirección de la señal A no agrega
+  sobre el azar: la ventaja viene de poner el SL detrás del swing de 10 velas (el precio respeta esos extremos algo más
+  que un paseo al azar: 34,8 % vs 33,3 %) y de operar a favor de la EMA 200 de 45m.
+- Parciales en el motor (`motor.Params.parcial_r/parcial_f`; `f3_correr.py --parcial --ema45`, filtro antes de simular).
+  A + EMA 45m (`reports/f3/a_parciales.md`): sin parcial +0,087 → +0,084 (36 %); TP 3R con 50 % en +1R +0,056 → test
+  +0,080 [+0,052, +0,113] con 52 % de ganadoras (elegida en calibración con el criterio de Juan: gana ≥ 50 %).

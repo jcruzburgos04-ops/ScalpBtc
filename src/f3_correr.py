@@ -24,6 +24,18 @@ def preparar(desde: str, hasta: str, tp_r: float) -> tuple[pl.DataFrame, pl.Seri
     return s, s["open_time"]
 
 
+def filtro_ema45(s: pl.DataFrame, desde: str) -> pl.DataFrame:
+    """Deja solo las señales a favor de la EMA 200 de 45m con la vela de 45m en formación (calentamiento desde 2022)."""
+    from b2_tendencias import ema_tf
+    from datos import leer_velas_1m
+    k = leer_velas_1m("2022-01", None).select("open_time", "close").sort("open_time")
+    v, _ = ema_tf(k["open_time"].to_numpy(), k["close"].to_numpy(), 45, 200)
+    k = k.with_columns(e45=pl.Series(v)).select("open_time", pl.col("close").alias("c45"), "e45")
+    x = s.join(k, on="open_time", how="left")
+    sg = pl.when(pl.col("lado") == "long").then(1.0).otherwise(-1.0)
+    return x.filter((sg * (pl.col("c45") - pl.col("e45"))) > 0).drop("c45", "e45")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("desde"); ap.add_argument("hasta")
@@ -32,17 +44,23 @@ def main() -> None:
     ap.add_argument("--slip", type=float, default=0.0)
     ap.add_argument("--sl_por", default="last", choices=["mark", "last"])
     ap.add_argument("--be", type=float, default=None)   # breakeven al llegar a +be R
+    ap.add_argument("--parcial", type=float, default=None)  # toma parcial en +X R (y breakeven del resto)
+    ap.add_argument("--parcial_f", type=float, default=0.5)
+    ap.add_argument("--ema45", action="store_true")      # solo señales a favor de la EMA 200 de 45m (vivo)
     a = ap.parse_args()
     t0 = time.time()
     s, todas = preparar(a.desde, a.hasta, a.tp_r)
     D = motor.Datos(a.desde, a.hasta)
-    P = motor.Params(slip_sl_ticks=a.slip, invalidacion=a.invalidacion, sl_por=a.sl_por, be_r=a.be)
+    P = motor.Params(slip_sl_ticks=a.slip, invalidacion=a.invalidacion, sl_por=a.sl_por, be_r=a.be,
+                     parcial_r=a.parcial, parcial_f=a.parcial_f)
+    if a.ema45:
+        s = filtro_ema45(s, a.desde)
     cols = ["open_time", "lado", "en_ventana", "sl", "tp", "tp_r", "tipo", "atr14", "z_favor", "cruces_ash30", "rvol", "dist5m_atr"]
     patas, ign = motor.simular(D, s.select(cols), P, todas.sort().to_numpy())
     tabla = motor.a_tabla(patas)
     out = RAIZ / "reports" / "f3"
     out.mkdir(parents=True, exist_ok=True)
-    nom = f"trades_{a.desde}_{a.hasta}_tp{a.tp_r:g}{'_inv' if a.invalidacion else ''}_slip{a.slip:g}_sl{a.sl_por}{f'_be{a.be:g}' if a.be else ''}"
+    nom = f"trades_{a.desde}_{a.hasta}_tp{a.tp_r:g}{'_inv' if a.invalidacion else ''}_slip{a.slip:g}_sl{a.sl_por}{f'_be{a.be:g}' if a.be else ''}{f'_parc{a.parcial_f:g}en{a.parcial:g}' if a.parcial else ''}{'_ema45' if a.ema45 else ''}"
     tabla.write_parquet(out / f"{nom}.parquet")
     pl.DataFrame(ign).write_parquet(out / f"{nom}_ignoradas.parquet") if ign else None
     print(f"{tabla.height} patas en {tabla['pos_id'].n_unique() if tabla.height else 0} posiciones, {len(ign)} señales ignoradas, {time.time() - t0:.0f} s")

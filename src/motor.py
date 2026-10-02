@@ -43,6 +43,8 @@ class Params:
     r_min: float = 2.0
     sl_por: str = "last"   # "last" (confirmado 2026-10-01): SL por last al segundo, sin sintético · "mark": variante
     be_r: float | None = None      # scratch: al llegar a +be_r R a favor, el SL pasa a la entrada (breakeven)
+    parcial_r: float | None = None  # toma parcial: al llegar a +parcial_r R se cierra parcial_f de la pata (orden límite)
+    parcial_f: float = 0.5          # y el SL del resto pasa a la entrada
     corte_min: int | None = None   # scratch por tiempo: si a los corte_min minutos no llegó a +corte_r R, sale a mercado
     corte_r: float = 0.5
     inv_cruces_fill: int = 7  # invalidación: el precio cruzó el fill de la pata al menos estas veces (cierres de 1m)
@@ -120,7 +122,9 @@ class Pata:
 
     def r(self, precio: float) -> float:
         s = 1 if self.lado == "long" else -1
-        return s * (precio - self.fill) / self.riesgo
+        r = s * (precio - self.fill) / self.riesgo
+        f = self.extra.get("parcial_f", 0.0)       # fracción cobrada en +parcial_r R antes de la salida del resto
+        return f * self.extra.get("parcial_r", 0.0) + (1 - f) * r if f else r
 
 
 def _sintetico(D: Datos, i: int, desde_ms: int) -> tuple[dict, bool]:
@@ -170,8 +174,9 @@ def resolver_pata_last(D: Datos, p: Pata, P: Params, fin_forzado: int | None = N
     tp_b = (b["h"] >= p.tp) if largo else (b["l"] <= p.tp)
     sl_b = (b["l"] <= p.sl) if largo else (b["h"] >= p.sl)
     motivo_sl, precio_sl = "SL", p.sl
-    if P.be_r is not None and fav.size:
-        alcanzo = mfe_acum >= P.be_r * p.riesgo
+    be_r = P.parcial_r if P.parcial_r is not None else P.be_r
+    if be_r is not None and fav.size:
+        alcanzo = mfe_acum >= be_r * p.riesgo
         if alcanzo.any():
             k_be = int(np.argmax(alcanzo))
             # después del segundo en que llegó a +be_r R, el stop está en la entrada
@@ -181,6 +186,8 @@ def resolver_pata_last(D: Datos, p: Pata, P: Params, fin_forzado: int | None = N
             sl_antes[k_be + 1:] = False
             k1 = int(np.argmax(sl_antes)) if sl_antes.any() else None
             k2 = int(np.argmax(be_b)) if be_b.any() else None
+            if k1 is None and P.parcial_r is not None:      # el parcial se cobró antes de tocar el SL
+                p.extra["parcial_f"], p.extra["parcial_r"] = P.parcial_f, P.parcial_r
             if k1 is None and k2 is not None:
                 sl_b, motivo_sl, precio_sl = be_b, "breakeven", p.fill
             else:
