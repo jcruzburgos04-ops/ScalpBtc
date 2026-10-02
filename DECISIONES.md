@@ -141,3 +141,9 @@ con y sin · variantes de calendario A–D.
   TP VWAP de sesión, breakeven 0,5 R. Juan revisa 14 casos dibujados antes de medir resultados en 2023–2025.
   "Volume suite" y las velas ampliadas de TV se aproximan con delta por vela, velas de 1 s/10 s y burbujas de órdenes
   grandes (supuesto: no tenemos la configuración exacta de su indicador).
+
+## B2 final (2026-10-02)
+- [2026-10-02] CONFIRMADA · Juan aprueba congelar B2 + EMA 200 de 45m (`src/b2_final.py`). Salida elegida en calibración
+  (jul–sep 2026) con filtro R ≥ 2: SL extremo de 10 velas ± 0,25 ATR, TP VWAP de sesión, breakeven a +1R, una pata,
+  sin comisiones (Variational). Test 2023–2025: 2 619 trades, gana 13 %, +0,064 R [IC 95 % −0,011, +0,148].
+  No se modifica más; se mide en la reserva oct–dic 2026 a medida que se publiquen los datos.

@@ -329,3 +329,6 @@
   - EMA 21>50 de 15m: calib +0,074 → test −0,064 (0/36). EMA 50 de 15/30/45m: negativas en calibración.
   - Pasan calibración Y test: EMA 200 de 45m (+0,049 30/36 → +0,030 33/36, 2 772 trades), EMA 200 de 1h (+0,013 →
     +0,028, 28/36), EMA 50 de 4h (+0,016 → +0,027, 27/36). 24 filtros probados: comparaciones múltiples.
+- B2 congelada (`src/b2_final.py`, `reports/b2/b2_final.md`): filtro EMA 200 45m + salida elegida en calibración
+  (SL 0,25 ATR, TP VWAP, BE +1R): calibración +0,196 [−0,097, +0,549] (241 trades) → test 2023–2025 +0,064
+  [−0,011, +0,148] (2 619 trades, gana 13 %).
