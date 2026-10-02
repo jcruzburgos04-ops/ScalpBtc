@@ -332,3 +332,7 @@
 - B2 congelada (`src/b2_final.py`, `reports/b2/b2_final.md`): filtro EMA 200 45m + salida elegida en calibración
   (SL 0,25 ATR, TP VWAP, BE +1R): calibración +0,196 [−0,097, +0,549] (241 trades) → test 2023–2025 +0,064
   [−0,011, +0,148] (2 619 trades, gana 13 %).
+- Estrategia A + lo aprendido del trader (`src/a_filtros.py`; TP 2R, hasta 4 patas, sin comisiones; filtro aplicado a
+  las patas ya simuladas): base +0,053 → +0,044 (gana 35 %); + EMA 200 de 45m +0,087 [+0,045, +0,131] → test
+  +0,080 [+0,037, +0,129] (gana 36 %, la mitad de patas); + breakeven 0,5R +0,060 → +0,072 (gana 20 %); ambos
+  +0,073 → +0,084 (gana 21 %). El filtro de 45m casi duplica la ventaja de A en los dos períodos sin bajar el win rate.
