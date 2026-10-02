@@ -391,3 +391,8 @@
   proxy se enciende hay liquidación real del mismo lado en el 19–27 % de los minutos vs 1 % cuando no (lift 17–18×).
   Se enciende en ~3,5 % de los minutos. En ene–mar 2024: 123 de 1406 rupturas tienen liquidación contraria; delta ≥ 0,2
   a favor, 1083.
+- Trendlines v2 + confirmación de volumen (`reports/trendlines/trendlines_volumen.md`; pivots 10, EMA 45m, TP nivel
+  opuesto). Elegida en calibración (gana ≥ 50 %): delta a favor ≥ 0,2 + 50 % en +1R → cal +0,072 → test +0,052
+  [+0,001, +0,102], gana 51 %. Sin confirmación: +0,059 → +0,041. RVOL ≥ 1,5 + parcial: +0,061 → +0,099 [+0,024, +0,182]
+  (no elegida: menor R en calibración). Liquidación contraria (proxy) sola: sin ventaja (n chico, ~310–360). Ninguna
+  elegida supera a la A congelada (+0,080). Nota: el IC del bootstrap varía ±0,004 entre corridas (sin semilla común).
