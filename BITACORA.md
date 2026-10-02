@@ -347,3 +347,14 @@
 - Parciales en el motor (`motor.Params.parcial_r/parcial_f`; `f3_correr.py --parcial --ema45`, filtro antes de simular).
   A + EMA 45m (`reports/f3/a_parciales.md`): sin parcial +0,087 → +0,084 (36 %); TP 3R con 50 % en +1R +0,056 → test
   +0,080 [+0,052, +0,113] con 52 % de ganadoras (elegida en calibración con el criterio de Juan: gana ≥ 50 %).
+
+## F5 · Importancia de los niveles (2026-10-02, `src/f5_niveles.py`, `reports/f5/niveles.md`)
+- 2025-01 → 2026-09, 46 niveles, toque tras 30 min sin tocar, rechazo/ruptura a 1 ATR en 60 min, placebo = mismo nivel
+  desplazado ±0,2–1 % por día (5 sorteos), BH q = 5 %.
+- Significativos con BH: MNDAY-L +8,5 pts (62 % vs 53 %), MNDAY-H +7,9 pts → funcionan como soporte/resistencia, más
+  desde el 2.º toque (1.º 46–57 %, 3.º+ 64–67 %). En contra (el precio los atraviesa MÁS que el placebo): VWAP de sesión
+  −4,5, VWAP ±1σ −4,5/−5,9 (1.er toque de −1σ: 39 % de rechazo), dPOC −4,6, DO −3,8.
+- VWAP ±2σ de sesión +2,6/+2,7 pts (IC > 0, no pasa BH). El resto ≈ placebo (dVAH/dVAL, pd-levels, EMAs 4h, rolling
+  VWAP, semanales, mensuales, anuales).
+- Trader (sept 2026): pocas entradas pegadas a un nivel; las más frecuentes frente al placebo: VWAP semanal −2σ (6 %,
+  6,5×), semanal −1σ (5 %, 2,5×), VWAP de sesión −1σ (4 %, 1,9×), pdVAL (3 %, 2,4×). Muestras chicas.
