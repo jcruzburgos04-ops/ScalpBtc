@@ -156,3 +156,6 @@ con y sin · variantes de calendario A–D.
 - [2026-10-02] SUPUESTO · Liquidation Bands de Leviathan (código protegido): banda = base × (1 ± 1/L), L = 100/75/50/25
   (1 %, 1,33 %, 2 %, 4 %), base VWAP de sesión o EMA 200 de 1m. PENDIENTE: Juan confirma base, largo de la EMA y si
   descuenta margen de mantenimiento leyendo la configuración en su TradingView.
+- [2026-10-02] CONFIRMADA · Se suma a la medición de la reserva (oct–dic 2026) la variante A + EMA 45m + TP en el nivel
+  opuesto SIN parcial (`python src/a_tp_nivel.py AAAA-MM AAAA-MM`; test 2025–jun 2026 +0,136 R, gana 23 %). Solo para
+  medir; no es la versión operable (gana < 50 %).

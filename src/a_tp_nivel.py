@@ -38,6 +38,14 @@ def con_tp(s: pl.DataFrame, desde: str, hasta: str) -> pl.DataFrame:
     return x.with_columns(tp=pl.Series(tp), tp_r=pl.lit(None, dtype=pl.Float64)).filter(pl.col("tp").is_not_nan())
 
 
+def medir(desde: str, hasta: str) -> None:
+    """Variante para la reserva: TP en el nivel opuesto SIN parcial, sobre [desde, hasta] (python src/a_tp_nivel.py AAAA-MM AAAA-MM)."""
+    s, todas = preparar(desde, hasta, 2.0)
+    s = con_tp(filtro_ema45(s, desde), desde, hasta)
+    patas, _ = motor.simular(motor.Datos(desde, hasta), s.select(COLS), motor.Params(sl_por="last"), todas.sort().to_numpy())
+    print(f"A + EMA 45m + TP nivel opuesto sin parcial, {desde}..{hasta}: {met(motor.a_tabla(patas))[0]}")
+
+
 def main() -> None:
     l = ["A + EMA 200 de 45m · patas · gana · R medio [IC 95 % por posición] · motor 1 s, sin comisiones.", "",
          "| Salida | Calibración 2023–2024 | Test 2025-01..2026-06 |", "|---|---|---|"]
@@ -61,4 +69,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    medir(sys.argv[1], sys.argv[2]) if len(sys.argv) == 3 else main()
