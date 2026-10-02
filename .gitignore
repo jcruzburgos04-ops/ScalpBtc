@@ -8,3 +8,4 @@ reports/b2/minutos_sep.parquet
 reports/b2/minutos_jul_sep.parquet
 reports/b2/minutos_20*.parquet
 reports/b2/minutos_tend_*.parquet
+reports/mr/*.parquet
