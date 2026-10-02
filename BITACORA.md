@@ -321,3 +321,11 @@
   2023–2025 de −0,003 → +0,014 R; positivas 14/36 → 23/36; mitad de trades. Elegida en calibración (SL 0,25 ATR, TP 3R):
   +0,027 [IC −0,025, +0,084]. Mejora consistente pero chica; ninguna variante con IC claramente > 0 salvo por selección
   posterior (TP banda +0,094, TP VWAP +0,063 con SL 0,25 ATR).
+- Tendencia multi-marco (`src/b2_tendencias.py`; descriptivo sep 2026 + filtro de B2 con 36 salidas R ≥ 2 en
+  calibración y test). Nota: "precio a favor de la EMA" y "EMA apuntando a favor" son la misma condición con la EMA en
+  vivo (pendiente degenerada). El 4h acá se calcula sin calentamiento largo (cachés por año): usar b2_tendencia.py.
+  - Rolling VWAP 24 h (indicador de Juan): precio a favor 32 % ganadas / 47 % perdidas / 2 % B2 no tomadas; como filtro
+    calib +0,283 (pocos trades) → test −0,025 (11/36). Pendiente 60/240 min: test −0,038 / −0,015. No sirve como filtro.
+  - EMA 21>50 de 15m: calib +0,074 → test −0,064 (0/36). EMA 50 de 15/30/45m: negativas en calibración.
+  - Pasan calibración Y test: EMA 200 de 45m (+0,049 30/36 → +0,030 33/36, 2 772 trades), EMA 200 de 1h (+0,013 →
+    +0,028, 28/36), EMA 50 de 4h (+0,016 → +0,027, 27/36). 24 filtros probados: comparaciones múltiples.
