@@ -31,17 +31,18 @@ def main() -> None:
     ap.add_argument("--tp_r", type=float, default=2.0)
     ap.add_argument("--slip", type=float, default=0.0)
     ap.add_argument("--sl_por", default="last", choices=["mark", "last"])
+    ap.add_argument("--be", type=float, default=None)   # breakeven al llegar a +be R
     a = ap.parse_args()
     t0 = time.time()
     s, todas = preparar(a.desde, a.hasta, a.tp_r)
     D = motor.Datos(a.desde, a.hasta)
-    P = motor.Params(slip_sl_ticks=a.slip, invalidacion=a.invalidacion, sl_por=a.sl_por)
+    P = motor.Params(slip_sl_ticks=a.slip, invalidacion=a.invalidacion, sl_por=a.sl_por, be_r=a.be)
     cols = ["open_time", "lado", "en_ventana", "sl", "tp", "tp_r", "tipo", "atr14", "z_favor", "cruces_ash30", "rvol", "dist5m_atr"]
     patas, ign = motor.simular(D, s.select(cols), P, todas.sort().to_numpy())
     tabla = motor.a_tabla(patas)
     out = RAIZ / "reports" / "f3"
     out.mkdir(parents=True, exist_ok=True)
-    nom = f"trades_{a.desde}_{a.hasta}_tp{a.tp_r:g}{'_inv' if a.invalidacion else ''}_slip{a.slip:g}_sl{a.sl_por}"
+    nom = f"trades_{a.desde}_{a.hasta}_tp{a.tp_r:g}{'_inv' if a.invalidacion else ''}_slip{a.slip:g}_sl{a.sl_por}{f'_be{a.be:g}' if a.be else ''}"
     tabla.write_parquet(out / f"{nom}.parquet")
     pl.DataFrame(ign).write_parquet(out / f"{nom}_ignoradas.parquet") if ign else None
     print(f"{tabla.height} patas en {tabla['pos_id'].n_unique() if tabla.height else 0} posiciones, {len(ign)} señales ignoradas, {time.time() - t0:.0f} s")
