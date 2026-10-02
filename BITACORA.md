@@ -383,3 +383,6 @@
 - Trendlines v2: en ene–mar 2024 con pivots de 10 quedan 2019 rupturas de 2847 (−29 %): la regla de línea limpia saca
   ~25 % (líneas que nacieron rotas) y el vencimiento a 2× otro ~4 %. Con pivots de 20: 1015 de 1563. Sin resultados
   todavía: primero Juan revisa el dibujo (`src/trendlines_grafico.py`).
+- Trendlines v2 + volumen: en la ventana operativa de ene–mar 2024 (pivots 10) hay 1406 rupturas; con RVOL ≥ 1,5 quedan
+  427 (30 %), con ≥ 2,5 quedan 187. Exigir además delta a favor casi no saca nada (411 de 427): las rupturas con
+  volumen ya vienen con agresión a favor.

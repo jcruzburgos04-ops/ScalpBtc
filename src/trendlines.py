@@ -22,6 +22,7 @@ from numba import njit
 import indicadores as ind
 import motor
 import senales
+from datos import leer_velas_1m
 from f3_correr import SL_MARGEN_ATR, filtro_ema45
 from nuevas_mr import COLS, met
 
@@ -155,8 +156,17 @@ def rupturas_v2(h, l, c, atr, n, vida, tol):
 VIDA, TOL = 2.0, 0.15   # v2: vence a 2× la distancia entre pivots · toque = mecha a ≤ 0,15 ATR de la línea
 
 
-def senales_tl(desde: str, hasta: str, n: int, v2: bool = False) -> pl.DataFrame:
-    df = ind.cargar(desde, hasta).select("open_time", "high", "low", "close", "atr14").sort("open_time")
+RVOL_MIN = 1.5          # v2 con volumen (Juan 2026-10-02): la vela que rompe con RVOL ≥ 1,5 (umbral del ASH)
+
+
+def senales_tl(desde: str, hasta: str, n: int, v2: bool = False, rvol_min: float | None = None,
+               delta_favor: bool = False) -> pl.DataFrame:
+    """rvol_min: RVOL (volumen / SMA 20) mínimo de la vela que rompe. delta_favor: además, compras − ventas taker de esa
+    vela a favor de la ruptura."""
+    df = ind.cargar(desde, hasta).select("open_time", "high", "low", "close", "atr14", "volume", "rvol").sort("open_time")
+    tk = leer_velas_1m(desde, hasta).select("open_time", "taker_buy_volume")
+    df = df.join(tk, on="open_time", how="left").with_columns(
+        delta1=(2 * pl.col("taker_buy_volume") - pl.col("volume")) / pl.col("volume")).drop("taker_buy_volume")
     hlc = [df[x].to_numpy() for x in ("high", "low", "close")]
     if v2:
         r, lin, i1, i2, tq = rupturas_v2(*hlc, df["atr14"].to_numpy(), n, VIDA, TOL)
@@ -169,11 +179,15 @@ def senales_tl(desde: str, hasta: str, n: int, v2: bool = False) -> pl.DataFrame
                          en_ventana=senales.ventana_operativa(pl.col("open_time")))
     s = df.filter((pl.col("rup") != 0) & pl.col("en_ventana")).with_columns(
         lado=pl.when(pl.col("rup") > 0).then(pl.lit("long")).otherwise(pl.lit("short")))
+    if rvol_min is not None:
+        s = s.filter(pl.col("rvol") >= rvol_min)
+    if delta_favor:
+        s = s.filter(pl.col("delta1") * pl.col("rup") > 0)
     return s.with_columns(
         sl=pl.when(pl.col("lado") == "long").then(pl.col("min10") - SL_MARGEN_ATR * pl.col("atr14"))
         .otherwise(pl.col("max10") + SL_MARGEN_ATR * pl.col("atr14")),
         tp=pl.lit(None, dtype=pl.Float64), tipo=pl.lit(f"TL{n}"), z_favor=pl.lit(0.0), cruces_ash30=pl.lit(0),
-        rvol=pl.lit(0.0), dist5m_atr=pl.lit(0.0))
+        dist5m_atr=pl.lit(0.0))
 
 
 def main() -> None:

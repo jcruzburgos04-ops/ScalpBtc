@@ -163,3 +163,6 @@ con y sin · variantes de calendario A–D.
   pivots confirmados, una por lado) más (1) línea limpia: si un cierre ya la cruzó entre el pivot 1 y la confirmación
   del pivot 2, no da señal; (2) vence a 2× la distancia entre pivots después del pivot 2; (3) toques = episodios con la
   mecha a ≤ 0,15 ATR de la línea (informativo). Ejemplos en `reports/trendlines/ejemplos_v2.png`. Juan valida el trazado.
+- [2026-10-02] PENDIENTE · Trendlines con volumen (Juan: "cuando rompe debe ser con volumen"): la vela de 1m que cierra
+  del otro lado de la línea tiene RVOL (volumen / SMA 20, el del ASH) ≥ 1,5. Variantes a calibrar: 1,5 / 2,5 y
+  además delta taker de la vela a favor. Ejemplos con panel de volumen en `reports/trendlines/ejemplos_v2.png`.
