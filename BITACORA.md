@@ -307,3 +307,9 @@
   la familia SL 0,25 ATR da positivo en test en las 12 variantes (+0,007 a +0,036; TP "nivel" +0,036), pero no fue la
   elegida en calibración. Win rate 10–35 %. Sin ventaja robusta con 1:2.
 - Relación 1:2 (b2_vs_trader.py): +2 ATR antes de −1 ATR: sus entradas 81 %, señales B2 34 % (azar ≈ 33 %). Con sus entradas el 1:2 conserva el win rate; con B2 cae al azar.
+- Pérdidas del trader (15 calaveras, lado confirmado por Juan 2026-10-02; `src/trader_perdidas.py`, ubicación
+  aproximada, 11/15 por precio) vs 93 ganadas: las perdidas NO están en el extremo (z mediana −0,21σ vs −1,01σ; más
+  allá de −1σ 20 % vs 51 %), casi sin barrida (13 % vs 34 %), con los osciladores ya a favor (XO 1m 53 % vs 30 %,
+  ASH 1m 53 % vs 38 %), menos volumen (1,9× vs 2,6×) y menos absorción (0,47 vs 1,20), CVD a favor 53 % vs 27 %.
+  O sea: sus pérdidas son entradas "de confirmación" a mitad de camino; sus ganadoras, las de extremo con absorción.
+  n = 15: descriptivo.
