@@ -22,12 +22,16 @@
 
 ## 2. Mark price reconstruido
 
-5762 minutos reconstruidos (`data/proc/mark_1m_reconstruido.parquet`). `datos.leer_mark_1m()` ya los aplica.
+13015 minutos reconstruidos (`data/proc/mark_1m_reconstruido.parquet`). `datos.leer_mark_1m()` ya los aplica.
 
 Método: mark ≈ last + b(t), b = mark − last interpolada entre la mediana de los 60 min previos y la de los 60 posteriores al hueco.
 
 | Tramo (UTC) | Minutos |
 |---|---|
+| 2020-01-19 13:09 | 29 |
+| 2020-12-17 07:32 | 24 |
+| 2021-07-01 00:00 | 1440 |
+| 2021-07-24 00:00 | 5760 |
 | 2022-07-31 00:00 | 1440 |
 | 2022-10-02 00:00 | 1440 |
 | 2023-02-24 00:00 | 1440 |
@@ -38,13 +42,13 @@ Método: mark ≈ last + b(t), b = mark − last interpolada entre la mediana de
 
 | Métrica | Valor |
 |---|---|
-| Error absoluto del close, mediana | 1.90 USD |
-| Error absoluto del close, p95 | 17.72 USD (0.0203 %) |
-| Minutos con high reconstruido > high real | 71.9 % |
-| Minutos con low reconstruido < low real | 68.9 % |
-| Exceso del high, mediana | 0.25 USD |
-| Exceso del low, mediana | 2.58 USD |
-| Rango H−L del mark real, mediana | 34.30 USD |
+| Error absoluto del close, mediana | 1.46 USD |
+| Error absoluto del close, p95 | 17.14 USD (0.0190 %) |
+| Minutos con high reconstruido > high real | 72.5 % |
+| Minutos con low reconstruido < low real | 65.1 % |
+| Exceso del high, mediana | 0.33 USD |
+| Exceso del low, mediana | 1.98 USD |
+| Rango H−L del mark real, mediana | 32.22 USD |
 
 Lectura: si high/low reconstruidos superan al real en la mayoría de los minutos, el SL por mark se dispara
 más seguido que en la realidad en esos días (sesgo conservador). Los trades que caigan en minutos

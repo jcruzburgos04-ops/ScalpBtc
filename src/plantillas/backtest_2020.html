@@ -119,15 +119,29 @@ td.izq, th.izq { text-align: left; white-space: normal; }
     <h2>Resumen</h2>
     <div class="duo" id="duo"></div>
     <div class="lectura" id="lectura">
-      <!--__LECTURA__-->
+      <p><b>Las dos ganan en los siete años</b>, incluido 2020–2022, que nunca se usó para elegir ninguna regla: ahí A da +0,041 R por pata (IC 95 % +0,019 a +0,060) y Trendlines +0,059 R (+0,026 a +0,093). Ganan el 51–52 % de las patas y ningún año cierra en negativo. El mejor tramo de A es 2023–2026, justo el que se usó para elegir sus reglas: por eso el número que vale es el de 2020–2022.</p>
+      <p><b>La ventaja por pata es chica y se juega en muchas patas.</b> A toma unas 17 patas por día dentro de la ventana y Trendlines unas 5. Eso da un Sharpe diario alto (2,9 y 2,0), pero también caídas largas medidas en R: A perdió 98,7 R entre abril y junio de 2022 y tardó hasta septiembre en recuperarlo; Trendlines perdió 46,3 R entre diciembre de 2023 y febrero de 2024. Con 1 % por pata y interés compuesto eso es −65 % y −38 % del capital. Para una caída de alrededor del 20 % hay que bajar a 0,25 % por pata en A o a 0,5 % en Trendlines.</p>
+      <p><b>Todo depende de que ejecutar no cueste nada.</b> El SL mediano está a 0,16 % del precio en A y a 0,21 % en Trendlines, así que cualquier costo pesa mucho en R: una comisión de 0,01 % por lado ya deja a A en negativo. La ventaja aguanta unos 2 USD por BTC de spread y deslizamiento de ida y vuelta en A y unos 3 USD en Trendlines. Antes de operarlo hay que medir el spread real de Variational en esos horarios.</p>
     </div>
   </section>
 
   <section id="curva">
     <h2>Curva de resultados</h2>
-    <p class="sub">Ganancia acumulada en % del capital inicial con riesgo fijo (1 % del capital inicial por pata, sin interés compuesto). Abajo, la caída desde el máximo anterior. Pasá el cursor para ver cada día.</p>
+    <p class="sub">R acumulados (1 R = lo que se arriesga por pata; con 1 % fijo del capital inicial, 1 R = 1 % del capital inicial). Abajo, la caída desde el máximo anterior. La curva es diaria; la caída máxima de las tablas se mide pata por pata y por eso da algo más. Pasá el cursor para ver cada día.</p>
     <div class="leyenda" id="leyenda"></div>
     <div class="fig" id="fig-curva"></div>
+  </section>
+
+  <section id="riesgo">
+    <h2>Cuánto arriesgar por pata</h2>
+    <p class="sub">Los mismos trades con interés compuesto: cada pata arriesga esa fracción del capital vigente. Retorno anual compuesto y peor caída del capital, ene-2020 → sep-2026.</p>
+    <div class="tabla"><table id="t-riesgo"></table></div>
+  </section>
+
+  <section id="costos">
+    <h2>Lo que se come la ventaja</h2>
+    <p class="sub" id="costos-txt"></p>
+    <div class="tabla"><table id="t-costos"></table></div>
   </section>
 
   <section id="periodos">
@@ -138,7 +152,7 @@ td.izq, th.izq { text-align: left; white-space: normal; }
 
   <section id="anios">
     <h2>Año por año</h2>
-    <p class="sub">Retorno y caída máxima en % del capital inicial (riesgo fijo). "BTC" es la variación del precio en el año, como referencia del contexto.</p>
+    <p class="sub">R total y caída máxima en R del año. "BTC" es la variación del precio en el año, como referencia del contexto.</p>
     <div class="tabla"><table id="t-anios"></table></div>
   </section>
 
@@ -190,9 +204,9 @@ COD.forEach((c) => {
   const t = E[c].total;
   const d = document.createElement("div"); d.className = "estr";
   const kp = [
-    [fpp(t.ret_anual_pct, 0), "retorno por año"],
+    [fs(t.ret_anual_pct, 0) + " R", "por año"],
     [f(t.sharpe, 2), "Sharpe"],
-    ["−" + f(-t.dd_r, 1) + " %", "caída máxima"],
+    ["−" + f(-t.dd_r, 1) + " R", "caída máxima"],
     [fp(t.gana), "patas que ganan"],
     [fs(t.r_medio, 3) + " R", "por pata"],
     [f(t.pf, 2), "profit factor"],
@@ -238,11 +252,11 @@ function dibujarCurva() {
   // grillas
   ticks(y1lo, y1hi, 5).forEach((v) => {
     el("line", { x1: m.l, x2: W - m.r, y1: y1(v), y2: y1(v), stroke: v === 0 ? "var(--faint)" : "var(--grid)", "stroke-width": 1 }, svg);
-    el("text", { x: m.l - 8, y: y1(v) + 4, "text-anchor": "end" }, svg).textContent = (v > 0 ? "+" : "") + f(v, 0) + " %";
+    el("text", { x: m.l - 8, y: y1(v) + 4, "text-anchor": "end" }, svg).textContent = (v > 0 ? "+" : "") + f(v, 0) + " R";
   });
   ticks(y2lo, 0, 2).forEach((v) => {
     el("line", { x1: m.l, x2: W - m.r, y1: y2(v), y2: y2(v), stroke: v === 0 ? "var(--faint)" : "var(--grid)", "stroke-width": 1 }, svg);
-    el("text", { x: m.l - 8, y: y2(v) + 4, "text-anchor": "end" }, svg).textContent = (v < 0 ? "−" : "") + f(Math.abs(v), 0) + " %";
+    el("text", { x: m.l - 8, y: y2(v) + 4, "text-anchor": "end" }, svg).textContent = (v < 0 ? "−" : "") + f(Math.abs(v), 0) + " R";
   });
   el("text", { x: m.l, y: top2 - 8, class: "etq" }, svg).textContent = "Caída desde el máximo";
   for (let a = 2020; a <= 2026; a++) {
@@ -268,7 +282,7 @@ function dibujarCurva() {
     for (let k = 1; k < fins.length; k++) if (fins[k].y - fins[k - 1].y < 30) fins[k].y = fins[k - 1].y + 30;
     fins.forEach((o) => {
       el("circle", { cx: x(N - 1), cy: y1(E[o.c].curva[N - 1]), r: 4, fill: COLOR[o.c], stroke: "var(--surface)", "stroke-width": 2 }, svg);
-      el("text", { x: x(N - 1) + 10, y: o.y - 2, class: "fin" }, svg).textContent = fpp(o.v, 0);
+      el("text", { x: x(N - 1) + 10, y: o.y - 2, class: "fin" }, svg).textContent = fs(o.v, 0) + " R";
       el("text", { x: x(N - 1) + 10, y: o.y + 13, class: "etq" }, svg).textContent = o.c === "A" ? "A congelada" : "Trendlines";
     });
   }
@@ -288,7 +302,7 @@ function dibujarCurva() {
       pts[2 * k + 1].setAttribute("cx", x(i)); pts[2 * k + 1].setAttribute("cy", y2(E[c].dd[i])); pts[2 * k + 1].setAttribute("visibility", "visible");
     });
     tip.innerHTML = `<div class="f">${fecha(i)}</div>` + COD.map((c) =>
-      `<div class="r"><span><span class="sw ${SW[c]}"></span>${c === "A" ? "A" : "Trendlines"}</span><span>${fpp(E[c].curva[i], 1)} · caída ${E[c].dd[i] < 0 ? "−" + f(-E[c].dd[i], 1) : "0"} %</span></div>`).join("");
+      `<div class="r"><span><span class="sw ${SW[c]}"></span>${c === "A" ? "A" : "Trendlines"}</span><span>${fs(E[c].curva[i], 1)} R · caída ${E[c].dd[i] < 0 ? "−" + f(-E[c].dd[i], 1) : "0"} R</span></div>`).join("");
     tip.hidden = false;
     const cx = x(i) / esc + 8, ancho_t = tip.offsetWidth;
     tip.style.left = (cx + ancho_t + 12 > r.width ? cx - ancho_t - 24 : cx + 8) + "px";
@@ -308,9 +322,9 @@ const filasMet = [
   ["Ganan", (t) => fp(t.gana)],
   ["R por pata", (t) => fs(t.r_medio, 3)],
   ["IC 95 % del R por pata", (t) => "[" + fs(t.ic[0], 3) + "; " + fs(t.ic[1], 3) + "]"],
-  ["Retorno total (riesgo fijo)", (t) => fpp(t.ret_fijo_pct, 0)],
-  ["Retorno por año (riesgo fijo)", (t) => fpp(t.ret_anual_pct, 0)],
-  ["Caída máxima", (t) => "−" + f(-t.dd_r, 1) + " %"],
+  ["R total", (t) => fs(t.r_total, 0)],
+  ["R por año", (t) => fs(t.ret_anual_pct, 0)],
+  ["Caída máxima (R)", (t) => "−" + f(-t.dd_r, 1)],
   ["Sharpe (diario, anualizado)", (t) => f(t.sharpe, 2)],
 ];
 function tablaPeriodos() {
@@ -326,7 +340,7 @@ function tablaAnios() {
   const tb = document.getElementById("t-anios");
   const anios = Object.keys(E[COD[0]].anios);
   const cols = [["Patas", (t) => f(t.patas, 0)], ["Ganan", (t) => fp(t.gana)], ["R/pata", (t) => fs(t.r_medio, 3)],
-                ["Retorno", (t) => fpp(t.r_total, 0)], ["Caída máx.", (t) => "−" + f(-t.dd_r, 1) + " %"], ["Sharpe", (t) => f(t.sharpe, 2)]];
+                ["R total", (t) => fs(t.r_total, 0)], ["Caída máx. R", (t) => "−" + f(-t.dd_r, 1)], ["Sharpe", (t) => f(t.sharpe, 2)]];
   let h = `<thead><tr class="grupo"><th></th><th></th>${COD.map((c) => `<th colspan="${cols.length}" class="sep" style="text-align:center"><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr>
     <tr><th>Año</th><th class="n">BTC</th>${COD.map(() => cols.map(([n], k) => `<th class="${k ? "" : "sep"}">${n}</th>`).join("")).join("")}</tr></thead><tbody>`;
   anios.forEach((a) => {
@@ -343,7 +357,7 @@ function mapas() {
   const caja = document.getElementById("heats");
   const vals = COD.flatMap((c) => Object.values(E[c].mensual).map((v) => Math.abs(v[0]))).sort((a, b) => a - b);
   const tope = vals[Math.floor(vals.length * 0.95)] || 1;
-  document.getElementById("escala-txt").textContent = "· color saturado a ±" + f(tope, 0) + " % del capital por mes";
+  document.getElementById("escala-txt").textContent = "· R del mes; color saturado a ±" + f(tope, 0) + " R";
   COD.forEach((c) => {
     const anios = Object.keys(E[c].anios);
     let h = `<h3><span class="sw ${SW[c]}"></span>${E[c].nombre}</h3><div class="tabla"><table class="heat"><thead><tr><th>Año</th>${MESES.map((m) => `<th>${m}</th>`).join("")}<th>Año</th></tr></thead><tbody>`;
@@ -354,7 +368,7 @@ function mapas() {
         if (!v) { h += `<td style="color:var(--faint)">·</td>`; continue; }
         const p = Math.round(Math.min(1, Math.abs(v[0]) / tope) * 100);
         const bg = `color-mix(in oklab, ${v[0] >= 0 ? "var(--pos)" : "var(--neg)"} ${p}%, var(--mid))`;
-        h += `<td style="background:${bg};color:${p > 55 ? "var(--on-strong)" : "var(--fg)"}" title="${MESES[k - 1]} ${a}: ${fpp(v[0], 1)} · ${v[1]} patas">${fs(v[0], 0)}</td>`;
+        h += `<td style="background:${bg};color:${p > 55 ? "var(--on-strong)" : "var(--fg)"}" title="${MESES[k - 1]} ${a}: ${fs(v[0], 1)} R · ${v[1]} patas">${fs(v[0], 0)}</td>`;
       }
       const tt = E[c].anios[a].r_total;
       h += `<td class="tot">${fs(tt, 0)}</td></tr>`;
@@ -363,6 +377,35 @@ function mapas() {
   });
 }
 mapas();
+
+function tablaRiesgo() {
+  const fil = E[COD[0]].riesgo.map((x) => x.f);
+  let h = `<thead><tr class="grupo"><th></th>${COD.map((c) => `<th colspan="3" class="sep" style="text-align:center"><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr>
+    <tr><th>Riesgo por pata</th>${COD.map(() => `<th class="sep">Retorno por año</th><th>Caída máxima</th><th>Capital final</th>`).join("")}</tr></thead><tbody>`;
+  fil.forEach((fr, k) => {
+    h += `<tr><td>${f(fr * 100, fr < 0.005 && fr !== 0.001 ? 2 : 1)} %${fr === 0.01 ? '<span class="tag">el del proyecto</span>' : ""}</td>` + COD.map((c) => {
+      const x = E[c].riesgo[k];
+      const mult = x.mult >= 1e4 ? x.mult.toExponential(1).replace(".", ",").replace("e+", " × 10^") : f(x.mult, 1);
+      return `<td class="n sep">${fpp(x.cagr * 100, 0)}</td><td class="n">${fpp(x.dd * 100, 1)}</td><td class="n">×${mult}</td>`;
+    }).join("") + "</tr>";
+  });
+  document.getElementById("t-riesgo").innerHTML = h + "</tbody>";
+}
+tablaRiesgo();
+
+function tablaCostos() {
+  const fees = E[COD[0]].costos.map((x) => x.fee);
+  let h = `<thead><tr><th>Comisión por lado</th>${COD.map((c) => `<th><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr></thead><tbody>`;
+  fees.forEach((fe, k) => {
+    h += `<tr><td>${fe === 0 ? "0 (Variational)" : f(fe * 100, 3).replace(/0+$/, "") + " %"}</td>` +
+      COD.map((c) => { const r = E[c].costos[k].r; return `<td class="n${r < 0 ? " neg" : ""}">${fs(r, 3)} R por pata</td>`; }).join("") + "</tr>";
+  });
+  document.getElementById("t-costos").innerHTML = h + "</tbody>";
+  document.getElementById("costos-txt").textContent = COD.map((c) =>
+    `${E[c].nombre}: SL mediano a ${f(E[c].sl_pct_mediana, 2)} % del precio (${f(E[c].riesgo_usd_mediana, 0)} USD por BTC); la ventaja aguanta hasta ~${f(E[c].equilibrio_usd, 1)} USD por BTC de costo de ida y vuelta (spread + deslizamiento).`).join(" ") +
+    " La comisión se cobra sobre el nocional en la entrada y en la salida.";
+}
+tablaCostos();
 
 function tablaMetricas() {
   const filas = [
@@ -377,19 +420,18 @@ function tablaMetricas() {
     ["R medio ganadora / perdedora", (t) => fs(t.r_gana, 2) + " / " + fs(t.r_pierde, 2)],
     ["Profit factor", (t) => f(t.pf, 2)],
     ["R total", (t) => fs(t.r_total, 0)],
-    ["Retorno total · riesgo fijo", (t) => fpp(t.ret_fijo_pct, 0)],
-    ["Retorno por año · riesgo fijo", (t) => fpp(t.ret_anual_pct, 1)],
-    ["Caída máxima · riesgo fijo", (t) => "−" + f(-t.dd_r, 1) + " % (" + f(-t.dd_r, 1) + " R)"],
+    ["R por año", (t) => fs(t.ret_anual_pct, 1)],
+    ["Caída máxima desde un máximo", (t) => "−" + f(-t.dd_r, 1) + " R"],
     ["Racha más larga bajo el máximo", (t) => f(t.dd_dias, 0) + " días"],
-    ["Calmar (retorno anual / caída máx.)", (t) => t.calmar == null ? "–" : f(t.calmar, 2)],
+    ["Calmar (R por año / caída máx. en R)", (t) => t.calmar == null ? "–" : f(t.calmar, 2)],
     ["Sharpe (diario × √365)", (t) => f(t.sharpe, 2)],
     ["Sortino (diario × √365)", (t) => f(t.sortino, 2)],
-    ["Peor día / mejor día", (t) => fpp(t.peor_dia_pct, 1) + " / " + fpp(t.mejor_dia_pct, 1)],
+    ["Peor día / mejor día", (t) => fs(t.peor_dia_pct, 1) + " R / " + fs(t.mejor_dia_pct, 1) + " R"],
     ["Racha perdedora más larga", (t) => f(t.racha, 0) + " patas"],
     ["Posiciones con 4 patas en SL", (t) => f(t.pos_4_sl, 0)],
-    ["Interés compuesto: capital final", (t) => "×" + (t.mult_comp >= 1e4 ? t.mult_comp.toExponential(1).replace(".", ",") : f(t.mult_comp, 1))],
-    ["Interés compuesto: retorno anual", (t) => fpp(t.cagr_comp * 100, 0)],
-    ["Interés compuesto: caída máxima", (t) => fpp(t.dd_comp_pct, 1)],
+    ["Con 1 % por pata compuesto: capital final", (t) => "×" + (t.mult_comp >= 1e4 ? t.mult_comp.toExponential(1).replace(".", ",") : f(t.mult_comp, 1))],
+    ["Con 1 % por pata compuesto: retorno anual", (t) => fpp(t.cagr_comp * 100, 0)],
+    ["Con 1 % por pata compuesto: caída máxima", (t) => fpp(t.dd_comp_pct, 1)],
   ];
   let h = `<thead><tr><th>Métrica</th>${COD.map((c) => `<th><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr></thead><tbody>`;
   filas.forEach(([n, fn]) => { h += `<tr><td class="izq">${n}</td>${COD.map((c) => `<td class="n">${fn(E[c].total)}</td>`).join("")}</tr>`; });
@@ -403,7 +445,7 @@ const SUP = [
   ["Salidas", "TP con orden límite y SL por last price, resueltos al segundo. Toma parcial: 50 % en +1R y el SL del resto pasa a la entrada."],
   ["Riesgo", "1 % del capital por pata, hasta 4 patas en la misma dirección (4 % como máximo). Cada pata tiene su propio SL."],
   ["Costos", "sin comisiones (Variational no cobra) y sin deslizamiento en el SL. Un SL a mercado con deslizamiento empeora el R; acá no está restado."],
-  ["Riesgo fijo vs compuesto", "las cifras principales usan riesgo fijo (1 % del capital inicial). Con interés compuesto los números crecen sin límite porque el tamaño de la posición escala con el capital; en la práctica lo frena la liquidez del libro y el apalancamiento máximo."],
+  ["R y capital", "las cifras principales están en R. La tabla de riesgo por pata pasa a % del capital con interés compuesto (cada pata arriesga una fracción del capital vigente). Con mucho capital, la liquidez del libro y el apalancamiento máximo frenan ese crecimiento; acá no se modelan."],
   ["Sharpe y Sortino", "sobre el resultado diario (días sin trades = 0), 365 días por año, tasa libre de riesgo 0."],
   ["Caída máxima", "sobre la curva de patas cerradas: no incluye la pérdida flotante de las patas todavía abiertas."],
   ["Calendario", "entradas solo de 00:00 UTC a 12:00 de Nueva York, todos los días (fines de semana y feriados incluidos). Enero de 2020 arranca sin trades la primera semana: es el calentamiento de la EMA de 45m."],

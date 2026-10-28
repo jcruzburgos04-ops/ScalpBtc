@@ -112,6 +112,21 @@ def main() -> None:
             continue
         t = pl.read_parquet(f).with_columns(anio=pl.from_epoch("fill_ts", time_unit="ms").dt.year())
         e = {"nombre": nom, "total": metricas(t, d0, d1)}
+        # cuánto arriesgar: interés compuesto con distintos riesgos por pata
+        r = t.sort("salida_ts")["r"].to_numpy()
+        anios_tot = (d1 - d0 + 1) / 365.0
+        e["riesgo"] = []
+        for f in (0.001, 0.0025, 0.005, 0.01):
+            eq = np.cumprod(1 + f * r)
+            ddc = eq / np.maximum.accumulate(np.r_[1.0, eq])[1:] - 1
+            e["riesgo"].append({"f": f, "cagr": float(eq[-1] ** (1 / anios_tot) - 1), "dd": float(ddc.min()), "mult": float(eq[-1])})
+        # costos de ejecución: comisión por lado sobre el nocional (entrada + salida) y spread de ida y vuelta en USD
+        fr = 100 * t["nocional_x_equity"].to_numpy()                      # precio / riesgo en USD
+        riesgo_usd = t["fill"].to_numpy() / fr
+        e["costos"] = [{"fee": fee, "r": float((t["r"].to_numpy() - 2 * fee * fr).mean())} for fee in (0.0, 0.00005, 0.0001, 0.0002, 0.0005)]
+        e["equilibrio_usd"] = float(t["r"].mean() / np.mean(1 / riesgo_usd))
+        e["riesgo_usd_mediana"] = float(np.median(riesgo_usd))
+        e["sl_pct_mediana"] = float(np.median(100 / fr))
         lim = int(dt.datetime(LIMPIO + 1, 1, 1, tzinfo=dt.timezone.utc).timestamp() * 1000) // DIA
         e["limpio"] = metricas(t.filter(pl.col("anio") <= LIMPIO), d0, lim - 1)
         e["usado"] = metricas(t.filter(pl.col("anio") > LIMPIO), lim, d1)

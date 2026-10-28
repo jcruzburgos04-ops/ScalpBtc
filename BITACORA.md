@@ -396,3 +396,23 @@
   [+0,001, +0,102], gana 51 %. Sin confirmación: +0,059 → +0,041. RVOL ≥ 1,5 + parcial: +0,061 → +0,099 [+0,024, +0,182]
   (no elegida: menor R en calibración). Liquidación contraria (proxy) sola: sin ventaja (n chico, ~310–360). Ninguna
   elegida supera a la A congelada (+0,080). Nota: el IC del bootstrap varía ±0,004 entre corridas (sin semilla común).
+
+## Backtest 2020-01 → 2026-09 (2026-10-28)
+- Datos nuevos: 2020-01 → 2021-12 bajados de Binance (klines, mark, index, premium, aggTrades → barras de 1 s y
+  órdenes grandes). `metrics` (OI) recién existe desde 2020-09: no se bajó (no lo usan A ni Trendlines + agresión).
+  Integridad: velas 1m completas en los 24 meses; aggTrades con huecos en 2020-04 (46 ids), 2021-02 (22 806) y
+  2021-05-19 13:15–13:40 UTC (557 026 ids, caída de Binance: también falta en los diarios). Dos patas de A estaban
+  abiertas en ese hueco. Mark reconstruido: 7 200 minutos de 2021 (5 días sin mark; el SL va por last).
+- Caché de indicadores recalculada desde 2020-01 (3,55 M velas). `filtro_ema45` usa ahora todo el historial (antes
+  desde 2022); 2023–2024 da idéntico a lo publicado (A: 12 546 patas, +0,056).
+- `src/backtest_2020.py` (por año, motor 1 s, sin comisiones) + `src/backtest_2020_reporte.py` → HTML
+  https://claude.ai/artifact/D2h1WtoBD9vkT74bZMkUrw (`reports/backtest_2020/`).
+  - A congelada: 41 982 patas, gana 51 %, +0,054 R [+0,040, +0,069], ~17 patas/día, Sharpe diario 2,94,
+    caída máxima 98,7 R (abr–jun 2022). 2020–2022 (nunca usado para elegir): +0,041 [+0,019, +0,060].
+  - Trendlines + agresión: 12 766 patas, gana 52 %, +0,063 R [+0,040, +0,086], ~5 patas/día, Sharpe 2,02, caída
+    máxima 46,3 R (dic-2023 → feb-2024). 2020–2022: +0,059 [+0,026, +0,093].
+  - Todos los años positivos en las dos. Con 1 % por pata compuesto la caída sería −65 % (A) y −38 % (TL); ~20 % de
+    caída pide 0,25 % por pata en A y 0,5 % en TL.
+  - Costos: SL mediano a 0,16 % (A) / 0,21 % (TL) del precio. Comisión de 0,01 % por lado ya da A −0,10 R y TL −0,06 R.
+    La ventaja aguanta ~2 USD (A) y ~3 USD (TL) por BTC de spread + deslizamiento de ida y vuelta. Pendiente: medir el
+    spread real de Variational.
