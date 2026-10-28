@@ -1,0 +1,197 @@
+{
+ "klines_1m": {
+  "esperados": 43200,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "mark_1m": {
+  "esperados": 43200,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {},
+  "desacople": {
+   "max_pct": 0.9109,
+   "min_>0.1%": 131,
+   "min_>0.5%": 2
+  }
+ },
+ "index_1m": {
+  "esperados": 43200,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "premium_1m": {
+  "esperados": 43200,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {}
+ },
+ "ids": {
+  "n": 12640277,
+  "min_id": 136192838,
+  "max_id": 148833114,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 0,
+  "ids_faltantes": 0,
+  "saltos_trade_id": 1904,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [],
+  "fuente": "monthly",
+  "ids_faltantes_vs_mes_anterior": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "bars_1s": {
+  "filas": 2126790
+ },
+ "ordenes_grandes": {
+  "filas": 109282,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 43198,
+  "minutos_solo_klines_con_volumen": 0,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 60,
+  "minutos_open_distinto": 370,
+  "minutos_volumen_distinto": 1166,
+  "minutos_count_distinto": 1193,
+  "rachas_corrimiento_borde": 536,
+  "rachas_residuales": 37,
+  "residual_total_btc": 0.0,
+  "residual_total_trades": 1673,
+  "residuales": [
+   {
+    "desde_utc": "2020-09-02T11:09:00+00:00",
+    "minutos": 5,
+    "dv_btc": 0.0,
+    "dn": 104
+   },
+   {
+    "desde_utc": "2020-09-02T11:21:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.0,
+    "dn": 52
+   },
+   {
+    "desde_utc": "2020-09-02T14:57:00+00:00",
+    "minutos": 3,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-03T12:11:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.0,
+    "dn": 390
+   },
+   {
+    "desde_utc": "2020-09-03T12:25:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.0,
+    "dn": 372
+   },
+   {
+    "desde_utc": "2020-09-03T15:34:00+00:00",
+    "minutos": 5,
+    "dv_btc": 0.0,
+    "dn": 38
+   },
+   {
+    "desde_utc": "2020-09-03T23:25:00+00:00",
+    "minutos": 9,
+    "dv_btc": 0.0,
+    "dn": 486
+   },
+   {
+    "desde_utc": "2020-09-04T07:42:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 11
+   },
+   {
+    "desde_utc": "2020-09-04T11:19:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-04T14:52:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.0,
+    "dn": 24
+   },
+   {
+    "desde_utc": "2020-09-05T09:15:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2020-09-05T12:32:00+00:00",
+    "minutos": 3,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-05T12:39:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-05T13:03:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.0,
+    "dn": 5
+   },
+   {
+    "desde_utc": "2020-09-05T18:53:00+00:00",
+    "minutos": 4,
+    "dv_btc": 0.0,
+    "dn": 23
+   },
+   {
+    "desde_utc": "2020-09-07T11:00:00+00:00",
+    "minutos": 3,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-07T22:30:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 6
+   },
+   {
+    "desde_utc": "2020-09-08T22:33:00+00:00",
+    "minutos": 5,
+    "dv_btc": 0.0,
+    "dn": 24
+   },
+   {
+    "desde_utc": "2020-09-12T22:11:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2020-09-13T11:31:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.0,
+    "dn": 7
+   }
+  ],
+  "volumen_total_klines_btc": 6442697.051,
+  "volumen_total_aggtrades_btc": 6442697.051
+ },
+ "segundos_proceso": 36.5
+}

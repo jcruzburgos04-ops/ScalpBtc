@@ -25,10 +25,11 @@ def preparar(desde: str, hasta: str, tp_r: float) -> tuple[pl.DataFrame, pl.Seri
 
 
 def filtro_ema45(s: pl.DataFrame, desde: str) -> pl.DataFrame:
-    """Deja solo las señales a favor de la EMA 200 de 45m con la vela de 45m en formación (calentamiento desde 2022)."""
+    """Deja solo las señales a favor de la EMA 200 de 45m con la vela de 45m en formación (calentamiento desde el
+    inicio de los datos: 2020-01 desde el 2026-10-28, antes 2022-01; la EMA converge en días, no cambia 2023+)."""
     from b2_tendencias import ema_tf
     from datos import leer_velas_1m
-    k = leer_velas_1m("2022-01", None).select("open_time", "close").sort("open_time")
+    k = leer_velas_1m(None, None).select("open_time", "close").sort("open_time")
     v, _ = ema_tf(k["open_time"].to_numpy(), k["close"].to_numpy(), 45, 200)
     k = k.with_columns(e45=pl.Series(v)).select("open_time", pl.col("close").alias("c45"), "e45")
     x = s.join(k, on="open_time", how="left")

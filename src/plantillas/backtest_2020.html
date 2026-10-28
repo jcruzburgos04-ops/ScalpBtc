@@ -1,0 +1,413 @@
+<title>Backtest BTC 2020–2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87,500;87,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: informe de una columna; cada sección = título + figura o tabla; números en mono tabular. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #15181d; --muted: #5a6170; --faint: #8b92a0;
+  --line: #dde1e8; --grid: #eceef2; --band: #eef1f6; --chip: #e7ebf2;
+  --s1: #2a78d6; --s2: #eb6834;            /* A congelada · Trendlines */
+  --pos: #2a78d6; --neg: #e34948; --mid: #f0efec; --on-strong: #ffffff;
+  --good: #0ca30c; --critical: #d03b3b;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101216; --surface: #171a20; --fg: #e8eaee; --muted: #a0a7b3; --faint: #737b88;
+    --line: #2b3039; --grid: #22262d; --band: #1c2028; --chip: #252a33;
+    --s1: #3987e5; --s2: #d95926;
+    --pos: #3987e5; --neg: #e66767; --mid: #383835; --on-strong: #ffffff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101216; --surface: #171a20; --fg: #e8eaee; --muted: #a0a7b3; --faint: #737b88;
+  --line: #2b3039; --grid: #22262d; --band: #1c2028; --chip: #252a33;
+  --s1: #3987e5; --s2: #d95926;
+  --pos: #3987e5; --neg: #e66767; --mid: #383835; --on-strong: #ffffff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.pagina { max-width: 1120px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 87%; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-size: 24px; font-weight: 700; }
+h3 { font-size: 17px; font-weight: 500; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.cabeza { display: flex; flex-direction: column; gap: 14px; }
+.lede { font-size: 17px; color: var(--fg); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--f-mono); font-size: 12px; padding: 3px 9px; border-radius: 4px; background: var(--chip); color: var(--muted); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.sub { color: var(--muted); font-size: 14px; }
+.num, td.n, th.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 8px; }
+.sw.s1 { background: var(--s1); } .sw.s2 { background: var(--s2); }
+
+/* resumen */
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.estr { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.estr .def { color: var(--muted); font-size: 13.5px; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
+.kpi { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kpi .v { font-family: var(--f-mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 12.5px; color: var(--muted); }
+.lectura { display: flex; flex-direction: column; gap: 10px; }
+.lectura p { font-size: 15.5px; }
+
+/* gráfico */
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; }
+.fig { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 8px 6px; }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig text { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
+.fig .etq { font-family: var(--f-body); font-size: 12px; fill: var(--muted); }
+.fig .fin { font-family: var(--f-mono); font-size: 12px; font-weight: 500; fill: var(--fg); }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.12); min-width: 190px; z-index: 2; }
+.tip .f { font-family: var(--f-mono); color: var(--muted); margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 14px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* tablas */
+.tabla { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); }
+th { font-weight: 600; color: var(--muted); font-size: 12px; }
+th:first-child, td:first-child { text-align: left; }
+tr:last-child td { border-bottom: 0; }
+thead tr.grupo th { border-bottom: 0; padding-bottom: 0; font-family: var(--f-body); color: var(--fg); font-size: 13px; }
+td.izq, th.izq { text-align: left; white-space: normal; }
+.tag { font-family: var(--f-mono); font-size: 11px; padding: 1px 6px; border-radius: 3px; background: var(--chip); color: var(--muted); margin-left: 6px; }
+.sep { border-left: 1px solid var(--line); }
+.neg { color: var(--neg); }
+
+/* mapa mensual */
+.heat td { text-align: center; padding: 6px 4px; min-width: 46px; font-family: var(--f-mono); font-size: 12px; border: 2px solid var(--surface); border-radius: 0; }
+.heat th { text-align: center; }
+.heat td:first-child, .heat th:first-child { text-align: left; padding-left: 12px; }
+.heat td.tot { font-weight: 500; }
+.escala { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+.escala .barra { width: 180px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, var(--neg), var(--mid), var(--pos)); }
+
+.supuestos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px 28px; padding: 0; margin: 0; list-style: none; }
+.supuestos li { font-size: 14px; color: var(--muted); padding-left: 14px; border-left: 2px solid var(--line); }
+.supuestos b { color: var(--fg); font-weight: 600; }
+.aviso { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 560px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pagina { gap: 44px; padding-block: 28px 56px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="pagina">
+  <header class="cabeza">
+    <div class="eyebrow">BTCUSDT perpetuo · Binance USD-M · velas de 1m y ticks</div>
+    <h1>Backtest 2020–2026</h1>
+    <p class="lede" id="lede"></p>
+    <div class="chips" id="chips"></div>
+  </header>
+
+  <section id="resumen">
+    <h2>Resumen</h2>
+    <div class="duo" id="duo"></div>
+    <div class="lectura" id="lectura">
+      <!--__LECTURA__-->
+    </div>
+  </section>
+
+  <section id="curva">
+    <h2>Curva de resultados</h2>
+    <p class="sub">Ganancia acumulada en % del capital inicial con riesgo fijo (1 % del capital inicial por pata, sin interés compuesto). Abajo, la caída desde el máximo anterior. Pasá el cursor para ver cada día.</p>
+    <div class="leyenda" id="leyenda"></div>
+    <div class="fig" id="fig-curva"></div>
+  </section>
+
+  <section id="periodos">
+    <h2>Antes y después de 2023</h2>
+    <p class="sub">2020–2022 no se usó para elegir ninguna regla: es la prueba más limpia. 2023–2026 se usó en parte para calibrar las señales, elegir el filtro de 45m y las salidas.</p>
+    <div class="tabla"><table id="t-periodos"></table></div>
+  </section>
+
+  <section id="anios">
+    <h2>Año por año</h2>
+    <p class="sub">Retorno y caída máxima en % del capital inicial (riesgo fijo). "BTC" es la variación del precio en el año, como referencia del contexto.</p>
+    <div class="tabla"><table id="t-anios"></table></div>
+  </section>
+
+  <section id="meses">
+    <h2>Mes por mes</h2>
+    <div class="escala"><span>pérdida</span><span class="barra"></span><span>ganancia</span><span id="escala-txt"></span></div>
+    <div id="heats" style="display:flex;flex-direction:column;gap:24px"></div>
+  </section>
+
+  <section id="metricas">
+    <h2>Todas las métricas</h2>
+    <div class="tabla"><table id="t-metricas"></table></div>
+  </section>
+
+  <section id="supuestos-sec">
+    <h2>Cómo se calculó</h2>
+    <ul class="supuestos" id="supuestos"></ul>
+  </section>
+</main>
+
+<script>
+const DATOS = /*__DATOS__*/null;
+const E = DATOS.estrategias;
+const COD = Object.keys(E);
+const COLOR = { A: "var(--s1)", TL: "var(--s2)" };
+const SW = { A: "s1", TL: "s2" };
+const DEF = {
+  A: "Señal ASH + XO de 1m, a favor de la EMA 200 de 45m. SL en el extremo de 10 velas ± 0,25 ATR. Cobra 50 % en +1R (el resto pasa a breakeven) y el resto busca 3R.",
+  TL: "Ruptura de trendline (pivots de 10, línea limpia) con agresión a favor (delta ≥ 0,2), a favor de la EMA 200 de 45m. Cobra 50 % en +1R; el resto busca el nivel opuesto (primero a ≥ 2R)."
+};
+const nfc = (d) => new Intl.NumberFormat("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const f = (x, d = 1) => nfc(d).format(x);
+const fs = (x, d = 1) => (x > 0 ? "+" : x < 0 ? "−" : "") + nfc(d).format(Math.abs(x));
+const fp = (x, d = 0) => nfc(d).format(x * 100) + " %";
+const fpp = (x, d = 1) => fs(x, d) + " %";
+const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const fecha = (i) => { const t = new Date((DATOS.dia0 + i) * 86400000); return t.getUTCDate() + " " + MESES[t.getUTCMonth()].toLowerCase() + " " + t.getUTCFullYear(); };
+
+// cabecera
+document.getElementById("lede").textContent =
+  "Las dos estrategias que ganan al menos la mitad de las veces, corridas del " + DATOS.desde.split("-").reverse().join("/") + " al " +
+  DATOS.hasta.split("-").reverse().join("/") + " con el mismo motor de 1 segundo que el resto del proyecto. Resultados en R (1R = lo que se arriesga por pata) y en % del capital.";
+["Sin comisiones (Variational)", "1 % por pata · hasta 4 patas", "Entradas 00:00 UTC → 12:00 NY", "Todos los días, fines de semana incluidos", "Reserva oct–dic 2026 sin tocar"]
+  .forEach((c) => { const s = document.createElement("span"); s.className = "chip"; s.textContent = c; document.getElementById("chips").appendChild(s); });
+
+// resumen
+const duo = document.getElementById("duo");
+COD.forEach((c) => {
+  const t = E[c].total;
+  const d = document.createElement("div"); d.className = "estr";
+  const kp = [
+    [fpp(t.ret_anual_pct, 0), "retorno por año"],
+    [f(t.sharpe, 2), "Sharpe"],
+    ["−" + f(-t.dd_r, 1) + " %", "caída máxima"],
+    [fp(t.gana), "patas que ganan"],
+    [fs(t.r_medio, 3) + " R", "por pata"],
+    [f(t.pf, 2), "profit factor"],
+  ];
+  d.innerHTML = `<h3><span class="sw ${SW[c]}"></span>${E[c].nombre}</h3><p class="def">${DEF[c]}</p>
+    <div class="kpis">${kp.map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("")}</div>`;
+  duo.appendChild(d);
+});
+
+// leyenda
+document.getElementById("leyenda").innerHTML = COD.map((c) => `<span><span class="sw ${SW[c]}"></span>${E[c].nombre}</span>`).join("");
+
+// gráfico curva + drawdown
+function ticks(lo, hi, n) {
+  const paso0 = (hi - lo) / n, p10 = Math.pow(10, Math.floor(Math.log10(paso0)));
+  const paso = [1, 2, 2.5, 5, 10].map((m) => m * p10).find((p) => p >= paso0);
+  const out = []; for (let v = Math.ceil(lo / paso) * paso; v <= hi + 1e-9; v += paso) out.push(Math.round(v * 1e6) / 1e6);
+  return out;
+}
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, at, padre) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (padre) padre.appendChild(e); return e; };
+function dibujarCurva() {
+  const caja = document.getElementById("fig-curva");
+  caja.innerHTML = "";
+  const W = Math.max(320, caja.clientWidth - 16), ancho = W > 640;
+  const H = ancho ? 470 : 380;
+  const m = { l: 52, r: ancho ? 120 : 12, t: 26, b: 26 };
+  const h1 = (H - m.t - m.b) * 0.66, gap = 30, h2 = H - m.t - m.b - h1 - gap;
+  const N = E[COD[0]].curva.length;
+  const x = (i) => m.l + (i / (N - 1)) * (W - m.l - m.r);
+  const todos = COD.flatMap((c) => E[c].curva), dds = COD.flatMap((c) => E[c].dd);
+  const y1lo = Math.min(0, ...todos), y1hi = Math.max(...todos) * 1.04;
+  const y2lo = Math.min(...dds) * 1.08;
+  const y1 = (v) => m.t + h1 - ((v - y1lo) / (y1hi - y1lo)) * h1;
+  const top2 = m.t + h1 + gap;
+  const y2 = (v) => top2 + (v / y2lo) * h2;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Curva de ganancia acumulada y caída desde el máximo" }, caja);
+  // banda 2020–2022
+  const i2023 = Math.round((Date.UTC(2023, 0, 1) / 86400000) - DATOS.dia0);
+  el("rect", { x: x(0), y: m.t - 18, width: x(i2023) - x(0), height: H - m.t - m.b + 18, fill: "var(--band)" }, svg);
+  el("text", { x: x(0) + 6, y: m.t - 5, class: "etq" }, svg).textContent = ancho ? "2020–2022 · nunca usado para elegir" : "2020–2022 limpio";
+  el("text", { x: x(i2023) + 6, y: m.t - 5, class: "etq" }, svg).textContent = ancho ? "2023–2026 · usado para calibrar y elegir" : "2023–2026";
+  // grillas
+  ticks(y1lo, y1hi, 5).forEach((v) => {
+    el("line", { x1: m.l, x2: W - m.r, y1: y1(v), y2: y1(v), stroke: v === 0 ? "var(--faint)" : "var(--grid)", "stroke-width": 1 }, svg);
+    el("text", { x: m.l - 8, y: y1(v) + 4, "text-anchor": "end" }, svg).textContent = (v > 0 ? "+" : "") + f(v, 0) + " %";
+  });
+  ticks(y2lo, 0, 2).forEach((v) => {
+    el("line", { x1: m.l, x2: W - m.r, y1: y2(v), y2: y2(v), stroke: v === 0 ? "var(--faint)" : "var(--grid)", "stroke-width": 1 }, svg);
+    el("text", { x: m.l - 8, y: y2(v) + 4, "text-anchor": "end" }, svg).textContent = (v < 0 ? "−" : "") + f(Math.abs(v), 0) + " %";
+  });
+  el("text", { x: m.l, y: top2 - 8, class: "etq" }, svg).textContent = "Caída desde el máximo";
+  for (let a = 2020; a <= 2026; a++) {
+    const i = Math.round(Date.UTC(a, 0, 1) / 86400000 - DATOS.dia0);
+    if (i < 0 || i >= N) continue;
+    el("line", { x1: x(i), x2: x(i), y1: m.t, y2: H - m.b, stroke: "var(--grid)" }, svg);
+    el("text", { x: x(i) + 4, y: H - m.b + 16 }, svg).textContent = a;
+  }
+  // series
+  const paso = Math.max(1, Math.floor(N / (W * 1.5)));
+  COD.forEach((c) => {
+    const cu = E[c].curva, dd = E[c].dd;
+    let p1 = "", p2 = `M${x(0)},${y2(0)}`;
+    for (let i = 0; i < N; i += paso) { p1 += (i ? "L" : "M") + x(i).toFixed(1) + "," + y1(cu[i]).toFixed(1); p2 += "L" + x(i).toFixed(1) + "," + y2(dd[i]).toFixed(1); }
+    p1 += "L" + x(N - 1).toFixed(1) + "," + y1(cu[N - 1]).toFixed(1);
+    p2 += "L" + x(N - 1).toFixed(1) + "," + y2(dd[N - 1]).toFixed(1) + `L${x(N - 1)},${y2(0)}Z`;
+    el("path", { d: p2, fill: COLOR[c], "fill-opacity": 0.18, stroke: COLOR[c], "stroke-width": 1.25, "stroke-linejoin": "round" }, svg);
+    el("path", { d: p1, fill: "none", stroke: COLOR[c], "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+  });
+  // etiquetas al final (evitando choque)
+  if (ancho) {
+    const fins = COD.map((c) => ({ c, y: y1(E[c].curva[N - 1]), v: E[c].curva[N - 1] })).sort((a, b) => a.y - b.y);
+    for (let k = 1; k < fins.length; k++) if (fins[k].y - fins[k - 1].y < 30) fins[k].y = fins[k - 1].y + 30;
+    fins.forEach((o) => {
+      el("circle", { cx: x(N - 1), cy: y1(E[o.c].curva[N - 1]), r: 4, fill: COLOR[o.c], stroke: "var(--surface)", "stroke-width": 2 }, svg);
+      el("text", { x: x(N - 1) + 10, y: o.y - 2, class: "fin" }, svg).textContent = fpp(o.v, 0);
+      el("text", { x: x(N - 1) + 10, y: o.y + 13, class: "etq" }, svg).textContent = o.c === "A" ? "A congelada" : "Trendlines";
+    });
+  }
+  // hover
+  const guia = el("line", { y1: m.t, y2: H - m.b, stroke: "var(--faint)", "stroke-dasharray": "3 3", visibility: "hidden" }, svg);
+  const pts = COD.flatMap((c) => [el("circle", { r: 4, fill: COLOR[c], stroke: "var(--surface)", "stroke-width": 2, visibility: "hidden" }, svg),
+                                  el("circle", { r: 3.5, fill: COLOR[c], stroke: "var(--surface)", "stroke-width": 2, visibility: "hidden" }, svg)]);
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; caja.appendChild(tip);
+  const zona = el("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" }, svg);
+  const mover = (ev) => {
+    const r = svg.getBoundingClientRect(), esc = W / r.width;
+    const px = (ev.clientX - r.left) * esc;
+    const i = Math.max(0, Math.min(N - 1, Math.round(((px - m.l) / (W - m.l - m.r)) * (N - 1))));
+    guia.setAttribute("x1", x(i)); guia.setAttribute("x2", x(i)); guia.setAttribute("visibility", "visible");
+    COD.forEach((c, k) => {
+      pts[2 * k].setAttribute("cx", x(i)); pts[2 * k].setAttribute("cy", y1(E[c].curva[i])); pts[2 * k].setAttribute("visibility", "visible");
+      pts[2 * k + 1].setAttribute("cx", x(i)); pts[2 * k + 1].setAttribute("cy", y2(E[c].dd[i])); pts[2 * k + 1].setAttribute("visibility", "visible");
+    });
+    tip.innerHTML = `<div class="f">${fecha(i)}</div>` + COD.map((c) =>
+      `<div class="r"><span><span class="sw ${SW[c]}"></span>${c === "A" ? "A" : "Trendlines"}</span><span>${fpp(E[c].curva[i], 1)} · caída ${E[c].dd[i] < 0 ? "−" + f(-E[c].dd[i], 1) : "0"} %</span></div>`).join("");
+    tip.hidden = false;
+    const cx = x(i) / esc + 8, ancho_t = tip.offsetWidth;
+    tip.style.left = (cx + ancho_t + 12 > r.width ? cx - ancho_t - 24 : cx + 8) + "px";
+    tip.style.top = "36px";
+  };
+  zona.addEventListener("pointermove", mover);
+  zona.addEventListener("pointerdown", mover);
+  zona.addEventListener("pointerleave", () => { tip.hidden = true; guia.setAttribute("visibility", "hidden"); pts.forEach((p) => p.setAttribute("visibility", "hidden")); });
+}
+dibujarCurva();
+let rto; window.addEventListener("resize", () => { clearTimeout(rto); rto = setTimeout(dibujarCurva, 120); });
+
+// tablas
+const filasMet = [
+  ["Patas (trades)", (t) => f(t.patas, 0)],
+  ["Patas por día", (t) => f(t.patas_por_dia, 1)],
+  ["Ganan", (t) => fp(t.gana)],
+  ["R por pata", (t) => fs(t.r_medio, 3)],
+  ["IC 95 % del R por pata", (t) => "[" + fs(t.ic[0], 3) + "; " + fs(t.ic[1], 3) + "]"],
+  ["Retorno total (riesgo fijo)", (t) => fpp(t.ret_fijo_pct, 0)],
+  ["Retorno por año (riesgo fijo)", (t) => fpp(t.ret_anual_pct, 0)],
+  ["Caída máxima", (t) => "−" + f(-t.dd_r, 1) + " %"],
+  ["Sharpe (diario, anualizado)", (t) => f(t.sharpe, 2)],
+];
+function tablaPeriodos() {
+  const tb = document.getElementById("t-periodos");
+  let h = `<thead><tr class="grupo"><th></th>${COD.map((c) => `<th colspan="2" class="sep" style="text-align:center"><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr>
+    <tr><th></th>${COD.map(() => `<th class="sep">2020–2022</th><th>2023–2026</th>`).join("")}</tr></thead><tbody>`;
+  filasMet.forEach(([nom, fn]) => { h += `<tr><td>${nom}</td>${COD.map((c) => `<td class="n sep">${fn(E[c].limpio)}</td><td class="n">${fn(E[c].usado)}</td>`).join("")}</tr>`; });
+  tb.innerHTML = h + "</tbody>";
+}
+tablaPeriodos();
+
+function tablaAnios() {
+  const tb = document.getElementById("t-anios");
+  const anios = Object.keys(E[COD[0]].anios);
+  const cols = [["Patas", (t) => f(t.patas, 0)], ["Ganan", (t) => fp(t.gana)], ["R/pata", (t) => fs(t.r_medio, 3)],
+                ["Retorno", (t) => fpp(t.r_total, 0)], ["Caída máx.", (t) => "−" + f(-t.dd_r, 1) + " %"], ["Sharpe", (t) => f(t.sharpe, 2)]];
+  let h = `<thead><tr class="grupo"><th></th><th></th>${COD.map((c) => `<th colspan="${cols.length}" class="sep" style="text-align:center"><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr>
+    <tr><th>Año</th><th class="n">BTC</th>${COD.map(() => cols.map(([n], k) => `<th class="${k ? "" : "sep"}">${n}</th>`).join("")).join("")}</tr></thead><tbody>`;
+  anios.forEach((a) => {
+    const tag = +a <= 2022 ? "limpio" : "usado";
+    const btc = DATOS.btc_anio[a];
+    h += `<tr><td>${a}${a === "2026" ? " (ene–sep)" : ""}<span class="tag">${tag}</span></td><td class="n">${fpp(btc * 100, 0)}</td>` +
+      COD.map((c) => { const t = E[c].anios[a]; return cols.map(([, fn], k) => `<td class="n ${k ? "" : "sep"}${k === 3 && t.r_total < 0 ? " neg" : ""}">${t ? fn(t) : "–"}</td>`).join(""); }).join("") + "</tr>";
+  });
+  tb.innerHTML = h + "</tbody>";
+}
+tablaAnios();
+
+function mapas() {
+  const caja = document.getElementById("heats");
+  const vals = COD.flatMap((c) => Object.values(E[c].mensual).map((v) => Math.abs(v[0]))).sort((a, b) => a - b);
+  const tope = vals[Math.floor(vals.length * 0.95)] || 1;
+  document.getElementById("escala-txt").textContent = "· color saturado a ±" + f(tope, 0) + " % del capital por mes";
+  COD.forEach((c) => {
+    const anios = Object.keys(E[c].anios);
+    let h = `<h3><span class="sw ${SW[c]}"></span>${E[c].nombre}</h3><div class="tabla"><table class="heat"><thead><tr><th>Año</th>${MESES.map((m) => `<th>${m}</th>`).join("")}<th>Año</th></tr></thead><tbody>`;
+    anios.forEach((a) => {
+      h += `<tr><td>${a}</td>`;
+      for (let k = 1; k <= 12; k++) {
+        const v = E[c].mensual[`${a}-${String(k).padStart(2, "0")}`];
+        if (!v) { h += `<td style="color:var(--faint)">·</td>`; continue; }
+        const p = Math.round(Math.min(1, Math.abs(v[0]) / tope) * 100);
+        const bg = `color-mix(in oklab, ${v[0] >= 0 ? "var(--pos)" : "var(--neg)"} ${p}%, var(--mid))`;
+        h += `<td style="background:${bg};color:${p > 55 ? "var(--on-strong)" : "var(--fg)"}" title="${MESES[k - 1]} ${a}: ${fpp(v[0], 1)} · ${v[1]} patas">${fs(v[0], 0)}</td>`;
+      }
+      const tt = E[c].anios[a].r_total;
+      h += `<td class="tot">${fs(tt, 0)}</td></tr>`;
+    });
+    caja.insertAdjacentHTML("beforeend", h + "</tbody></table></div>");
+  });
+}
+mapas();
+
+function tablaMetricas() {
+  const filas = [
+    ["Período", () => "ene-2020 → sep-2026"],
+    ["Patas (trades individuales)", (t) => f(t.patas, 0)],
+    ["Posiciones (patas agrupadas)", (t) => f(t.posiciones, 0)],
+    ["Patas por día", (t) => f(t.patas_por_dia, 1)],
+    ["Ganan (R > 0)", (t) => fp(t.gana)],
+    ["Salen en TP / breakeven / SL", (t) => fp(t.tp) + " / " + fp(t.be) + " / " + fp(t.sl)],
+    ["R medio por pata", (t) => fs(t.r_medio, 3)],
+    ["IC 95 % (bootstrap por posición)", (t) => "[" + fs(t.ic[0], 3) + "; " + fs(t.ic[1], 3) + "]"],
+    ["R medio ganadora / perdedora", (t) => fs(t.r_gana, 2) + " / " + fs(t.r_pierde, 2)],
+    ["Profit factor", (t) => f(t.pf, 2)],
+    ["R total", (t) => fs(t.r_total, 0)],
+    ["Retorno total · riesgo fijo", (t) => fpp(t.ret_fijo_pct, 0)],
+    ["Retorno por año · riesgo fijo", (t) => fpp(t.ret_anual_pct, 1)],
+    ["Caída máxima · riesgo fijo", (t) => "−" + f(-t.dd_r, 1) + " % (" + f(-t.dd_r, 1) + " R)"],
+    ["Racha más larga bajo el máximo", (t) => f(t.dd_dias, 0) + " días"],
+    ["Calmar (retorno anual / caída máx.)", (t) => t.calmar == null ? "–" : f(t.calmar, 2)],
+    ["Sharpe (diario × √365)", (t) => f(t.sharpe, 2)],
+    ["Sortino (diario × √365)", (t) => f(t.sortino, 2)],
+    ["Peor día / mejor día", (t) => fpp(t.peor_dia_pct, 1) + " / " + fpp(t.mejor_dia_pct, 1)],
+    ["Racha perdedora más larga", (t) => f(t.racha, 0) + " patas"],
+    ["Posiciones con 4 patas en SL", (t) => f(t.pos_4_sl, 0)],
+    ["Interés compuesto: capital final", (t) => "×" + (t.mult_comp >= 1e4 ? t.mult_comp.toExponential(1).replace(".", ",") : f(t.mult_comp, 1))],
+    ["Interés compuesto: retorno anual", (t) => fpp(t.cagr_comp * 100, 0)],
+    ["Interés compuesto: caída máxima", (t) => fpp(t.dd_comp_pct, 1)],
+  ];
+  let h = `<thead><tr><th>Métrica</th>${COD.map((c) => `<th><span class="sw ${SW[c]}"></span>${E[c].nombre}</th>`).join("")}</tr></thead><tbody>`;
+  filas.forEach(([n, fn]) => { h += `<tr><td class="izq">${n}</td>${COD.map((c) => `<td class="n">${fn(E[c].total)}</td>`).join("")}</tr>`; });
+  document.getElementById("t-metricas").innerHTML = h + "</tbody>";
+}
+tablaMetricas();
+
+const SUP = [
+  ["Datos reales", "velas de 1m y ticks (aggTrades) de Binance USD-M BTCUSDT, bajados del archivo público y verificados con su checksum."],
+  ["Entrada", "al primer tick después del cierre de la vela de señal, no al close: el fill es a mercado."],
+  ["Salidas", "TP con orden límite y SL por last price, resueltos al segundo. Toma parcial: 50 % en +1R y el SL del resto pasa a la entrada."],
+  ["Riesgo", "1 % del capital por pata, hasta 4 patas en la misma dirección (4 % como máximo). Cada pata tiene su propio SL."],
+  ["Costos", "sin comisiones (Variational no cobra) y sin deslizamiento en el SL. Un SL a mercado con deslizamiento empeora el R; acá no está restado."],
+  ["Riesgo fijo vs compuesto", "las cifras principales usan riesgo fijo (1 % del capital inicial). Con interés compuesto los números crecen sin límite porque el tamaño de la posición escala con el capital; en la práctica lo frena la liquidez del libro y el apalancamiento máximo."],
+  ["Sharpe y Sortino", "sobre el resultado diario (días sin trades = 0), 365 días por año, tasa libre de riesgo 0."],
+  ["Caída máxima", "sobre la curva de patas cerradas: no incluye la pérdida flotante de las patas todavía abiertas."],
+  ["Calendario", "entradas solo de 00:00 UTC a 12:00 de Nueva York, todos los días (fines de semana y feriados incluidos). Enero de 2020 arranca sin trades la primera semana: es el calentamiento de la EMA de 45m."],
+  ["Lo que no se mira", "octubre–diciembre de 2026 queda reservado para la confirmación final."],
+];
+document.getElementById("supuestos").innerHTML = SUP.map(([a, b]) => `<li><b>${a}:</b> ${b}</li>`).join("");
+</script>
