@@ -416,3 +416,17 @@
   - Costos: SL mediano a 0,16 % (A) / 0,21 % (TL) del precio. Comisión de 0,01 % por lado ya da A −0,10 R y TL −0,06 R.
     La ventaja aguanta ~2 USD (A) y ~3 USD (TL) por BTC de spread + deslizamiento de ida y vuelta. Pendiente: medir el
     spread real de Variational.
+
+## Pendiente de las "trendlines" del trader (2026-11-01)
+- Pedido de Juan: medir el ángulo de las trendlines del trader. En las 17 capturas de septiembre (sin la del 1-oct,
+  reserva) se marcaron 29 rectas amarillas punteadas y se ajustaron sobre los píxeles (`src/trader_trendlines.py`,
+  residuo mediano 0,5 px); precio y hora por OCR de los ejes (tesseract; el eje de tiempo de sus capturas no es lineal:
+  se interpola entre etiquetas). Bug corregido en el camino: si el OCR no leía la primera etiqueta, el eje quedaba
+  corrido un día; ahora las etiquetas de día fijan la fecha.
+- Hallazgo: NO son trendlines. Son la diagonal de la herramienta Long/Short de TradingView (entrada → borde derecho de la
+  caja): 12 de 28 arrancan a ≤ 35 USD del precio de una tarjeta de esa captura, quedan dentro de las cajas verde/roja y
+  varias terminan en el mismo punto (4 rectas el 28-sep 13:37 UTC, junto a un cierre suyo de las 13:39 UTC).
+- Pendientes (28): ángulo en pantalla mediana 34° (9°–67°; 23 entre 20° y 50° por el autoescalado de TradingView);
+  normalizado (1 ATR = 10 velas) mediana 32° (6°–62°, CV 0,46): no hay un grado en común. Mediana 0,19 % por hora,
+  0,062 ATR por vela, 8,2 h de la entrada al borde de la caja. `reports/trader_sep/trendlines.md`.
+- Subproducto: el final de cada diagonal da el precio y la hora donde termina su caja (salida o fin del dibujo).
