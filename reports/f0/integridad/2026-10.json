@@ -1,0 +1,220 @@
+{
+ "klines_1m": {
+  "esperados": 44640,
+  "presentes": 43200,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-10-28": 1440
+  }
+ },
+ "mark_1m": {
+  "esperados": 44640,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-10-28": 1440,
+   "2026-10-29": 1440
+  },
+  "desacople": {
+   "max_pct": 0.1592,
+   "min_>0.1%": 9,
+   "min_>0.5%": 0
+  }
+ },
+ "index_1m": {
+  "esperados": 44640,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-10-28": 1440,
+   "2026-10-29": 1440
+  }
+ },
+ "premium_1m": {
+  "esperados": 44640,
+  "presentes": 41760,
+  "duplicados": 0,
+  "fuera_de_rango": 0,
+  "faltantes_por_dia": {
+   "2026-10-28": 1440,
+   "2026-10-29": 1440
+  }
+ },
+ "metrics_5m": {
+  "filas": 8928,
+  "duplicados": 0,
+  "saltos_distintos_de_5m": 0,
+  "nulos_oi": 0
+ },
+ "ids": {
+  "n": 31576859,
+  "min_id": 3471091150,
+  "max_id": 3503629128,
+  "ids_con_contenido_distinto": 0,
+  "saltos_agg_id": 1,
+  "ids_faltantes": 961120,
+  "saltos_trade_id": 286932,
+  "filas_duplicadas_descartadas": 0,
+  "huecos": [
+   {
+    "ids": 961120,
+    "desde_utc": "2026-10-27T23:59:59.473000+00:00",
+    "hasta_utc": "2026-10-29T00:00:00.006000+00:00"
+   }
+  ],
+  "fuente": "monthly (diarios incompletos)",
+  "ids_faltantes_vs_mes_anterior": 0
+ },
+ "fuera_de_grilla": [
+  0,
+  0
+ ],
+ "bars_1s": {
+  "filas": 2422563
+ },
+ "ordenes_grandes": {
+  "filas": 615559,
+  "piso_usd": 100000
+ },
+ "reconstruccion_1m": {
+  "minutos_comparados": 43173,
+  "minutos_solo_klines_con_volumen": 27,
+  "minutos_solo_aggtrades": 0,
+  "minutos_high_low_close_distinto": 114,
+  "minutos_open_distinto": 1349,
+  "minutos_volumen_distinto": 4354,
+  "minutos_count_distinto": 14223,
+  "rachas_corrimiento_borde": 361,
+  "rachas_residuales": 5899,
+  "residual_total_btc": -17.344,
+  "residual_total_trades": 19912,
+  "residuales": [
+   {
+    "desde_utc": "2026-10-27T00:02:00+00:00",
+    "minutos": 1,
+    "dv_btc": -16.692,
+    "dn": -426
+   },
+   {
+    "desde_utc": "2026-10-27T00:30:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.652,
+    "dn": -36
+   },
+   {
+    "desde_utc": "2026-10-30T10:04:00+00:00",
+    "minutos": 8,
+    "dv_btc": 0.005,
+    "dn": 8
+   },
+   {
+    "desde_utc": "2026-10-30T10:13:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.005,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-01T19:54:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.003,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-01T19:56:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.003,
+    "dn": 0
+   },
+   {
+    "desde_utc": "2026-10-02T01:26:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.003,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-02T01:28:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.003,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2026-10-04T10:18:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.003,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-04T10:21:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.003,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2026-10-07T10:13:00+00:00",
+    "minutos": 7,
+    "dv_btc": 0.003,
+    "dn": 8
+   },
+   {
+    "desde_utc": "2026-10-07T10:21:00+00:00",
+    "minutos": 5,
+    "dv_btc": -0.003,
+    "dn": 3
+   },
+   {
+    "desde_utc": "2026-10-07T18:31:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.003,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-07T18:33:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.003,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2026-10-09T00:02:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.003,
+    "dn": 1
+   },
+   {
+    "desde_utc": "2026-10-09T00:04:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.003,
+    "dn": -1
+   },
+   {
+    "desde_utc": "2026-10-14T07:08:00+00:00",
+    "minutos": 1,
+    "dv_btc": 0.003,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2026-10-14T07:10:00+00:00",
+    "minutos": 4,
+    "dv_btc": -0.003,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2026-10-13T17:52:00+00:00",
+    "minutos": 2,
+    "dv_btc": 0.002,
+    "dn": 2
+   },
+   {
+    "desde_utc": "2026-10-13T17:55:00+00:00",
+    "minutos": 1,
+    "dv_btc": -0.002,
+    "dn": -1
+   }
+  ],
+  "volumen_total_klines_btc": 3958270.98,
+  "volumen_total_aggtrades_btc": 3956972.846
+ },
+ "segundos_proceso": 201.5
+}

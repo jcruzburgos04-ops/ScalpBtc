@@ -252,10 +252,23 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame, id_previo: int | None = None)
         # Se descarta el mensual antes de cargar los diarios para no tener dos meses en memoria.
         integ["ids_monthly_descartado"] = ids
         con.execute("DROP TABLE a")
-        ids = cargar_aggtrades(con, [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes, solo_daily=True)], "a")
-        ids["fuente"] = "daily"
-        if problemas(ids) > problemas(integ["ids_monthly_descartado"]):
-            raise ValueError(f"{mes}: los diarios tienen más problemas que el mensual")
+        try:
+            ids = cargar_aggtrades(con, [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes, solo_daily=True)], "a")
+            ids["fuente"] = "daily"
+            if problemas(ids) > problemas(integ["ids_monthly_descartado"]):
+                raise ValueError(f"{mes}: los diarios tienen más problemas que el mensual")
+        except requests.HTTPError as e:
+            # falta algún diario (p. ej. 2026-10-28 no está publicado en ningún formato): se vuelve al mensual
+            # con sus huecos, que quedan anotados en integ["ids"]["huecos"]
+            if e.response is None or e.response.status_code != 404:
+                raise
+            print(f"  {mes}: falta un diario ({e.response.url.rsplit('/', 1)[-1]}); se usa el mensual con sus huecos")
+            for f in RAW.glob("*.csv"):
+                f.unlink()
+            con.execute("DROP TABLE IF EXISTS a")
+            ids = cargar_aggtrades(con, [csv_de_zip(z) for z in zips_del_mes("aggTrades", "", mes)], "a")
+            ids["fuente"] = "monthly (diarios incompletos)"
+            integ.pop("ids_monthly_descartado")
     if id_previo is not None:
         ids["ids_faltantes_vs_mes_anterior"] = ids["min_id"] - id_previo - 1
     integ["ids"] = ids
@@ -270,10 +283,10 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame, id_previo: int | None = None)
     con.execute("ALTER TABLE a DROP price; ALTER TABLE a DROP quantity; ALTER TABLE a DROP first_trade_id;")
 
     ini_mes = int(dt.datetime.fromisoformat(mes + "-01").replace(tzinfo=dt.timezone.utc).timestamp())
-    b = con.execute(f"""SELECT t//1000 s, arg_min(p, id) o, max(p) h, min(p) l, arg_max(p, id) c,
+    b = pl.from_arrow(con.execute(f"""SELECT t//1000 s, arg_min(p, id) o, max(p) h, min(p) l, arg_max(p, id) c,
             sum(q) v, coalesce(sum(q) FILTER (WHERE buy), 0) vb, count(*) n_agg, sum(ntr) n_tr,
             min(t%1000) ms_first, max(t%1000) ms_last
-        FROM a GROUP BY 1 ORDER BY 1""").pl()
+        FROM a GROUP BY 1 ORDER BY 1""").to_arrow_table()).sort("s")  # DuckDB 2.x: sin .pl() y sin garantía de orden
     enc = b.select(
         dt=pl.col("s").diff().fill_null(pl.col("s").first() - ini_mes).cast(pl.Int32),
         do=(pl.col("o") - pl.col("c").shift(1)).fill_null(pl.col("o").first()).cast(pl.Int32),
@@ -289,9 +302,9 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame, id_previo: int | None = None)
     integ["bars_1s"] = {"filas": b.height}
 
     # órdenes a mercado reconstruidas: aggTrades con el mismo ms y el mismo lado
-    o = con.execute(f"""SELECT t, buy, sum(q) q, min(p) pmin, max(p) pmax, count(*) n_agg,
+    o = pl.from_arrow(con.execute(f"""SELECT t, buy, sum(q) q, min(p) pmin, max(p) pmax, count(*) n_agg,
             FROM a GROUP BY t, buy
-        HAVING sum(p*q) >= {PISO_ORDEN_USD * ESCALA_P * ESCALA_Q} ORDER BY t""").pl()
+        HAVING sum(p*q) >= {PISO_ORDEN_USD * ESCALA_P * ESCALA_Q} ORDER BY t""").to_arrow_table()).sort("t", "buy")  # DuckDB 2.x: sin .pl() y sin garantía de orden
     o = o.select(ts=pl.col("t"), buy=pl.col("buy"), q=pl.col("q").cast(pl.Int32),
                  pmin=pl.col("pmin").cast(pl.Int32), dp=(pl.col("pmax") - pl.col("pmin")).cast(pl.Int32),
                  n_agg=pl.col("n_agg").cast(pl.Int32))
@@ -300,8 +313,8 @@ def proc_aggtrades(mes: str, klines: pl.DataFrame, id_previo: int | None = None)
     integ["ordenes_grandes"] = {"filas": o.height, "piso_usd": PISO_ORDEN_USD}
 
     # velas 1m reconstruidas vs klines oficiales
-    m = con.execute("""SELECT (t//60000)*60000 open_time, arg_min(p, id) o, max(p) h, min(p) l, arg_max(p, id) c,
-            sum(q) v, sum(q) FILTER (WHERE buy) vb, sum(ntr) n FROM a GROUP BY 1""").pl()
+    m = pl.from_arrow(con.execute("""SELECT (t//60000)*60000 open_time, arg_min(p, id) o, max(p) h, min(p) l, arg_max(p, id) c,
+            sum(q) v, sum(q) FILTER (WHERE buy) vb, sum(ntr) n FROM a GROUP BY 1""").to_arrow_table()).sort("open_time")  # DuckDB 2.x: sin .pl() y sin garantía de orden
     con.close()
     k = klines.select("open_time",
                       ko=(pl.col("open") * ESCALA_P).round().cast(pl.Int64), kh=(pl.col("high") * ESCALA_P).round().cast(pl.Int64),

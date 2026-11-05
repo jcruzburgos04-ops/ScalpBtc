@@ -430,3 +430,22 @@
   normalizado (1 ATR = 10 velas) mediana 32° (6°–62°, CV 0,46): no hay un grado en común. Mediana 0,19 % por hora,
   0,062 ATR por vela, 8,2 h de la entrada al borde de la caja. `reports/trader_sep/trendlines.md`.
 - Subproducto: el final de cada diagonal da el precio y la hora donde termina su caja (salida o fin del dibujo).
+
+## Reserva · octubre 2026 (medido 2026-11-05, recordatorio programado)
+- Datos: Binance no publicó el 28-oct en ningún formato (mensual sin ese día, diario 404, la API directa no es accesible
+  desde el contenedor): 30 de 31 días. `f0_descarga.py` ahora vuelve al mensual con su hueco anotado si falta un diario.
+- Bug encontrado y corregido: con DuckDB 2.x (contenedor nuevo) `.pl()` ya no existe y la exportación no respeta el
+  ORDER BY. La primera pasada dejó las barras de 1 s de octubre desordenadas (se codifican como diferencias entre filas):
+  el motor no encontraba el fill y A daba 100 patas (333 señales "sin_fill"). Se ordena explícitamente después de
+  exportar y se reprocesó octubre; control: septiembre reproduce exacto el backtest guardado (498 patas, mismo R).
+  Ningún otro mes se procesó con la DuckDB nueva.
+- `src/medir_reserva.py AAAA-MM`: abre solo ese mes de la reserva y corre las reglas congeladas sin tocarlas.
+  `b2_final.py` anunciaba un modo de medición por meses que no estaba implementado; se mide desde este script con
+  `b2_final.preparar` y `b2_final.SALIDA`.
+- Resultados octubre (`reports/reserva/2026-10.md`), sin comisiones:
+  | Estrategia | Trades | Gana | R medio [IC 95 %] | Test |
+  |---|---|---|---|---|
+  | B2 final | 72 | 18 % | +0,148 [−0,246; +0,596] | +0,064, gana 13 % |
+  | A congelada (EMA 45m + TP 3R + 50 % en +1R) | 427 | 57 % | +0,173 [+0,034; +0,313] | +0,080, gana 52 % |
+  | A + TP nivel opuesto, sin parcial | 385 | 28 % | +0,309 [−0,003; +0,610] | +0,136, gana 23 % |
+  Ninguna posición de A cruzó el hueco del 28-oct. Un mes: IC anchos; se sigue con noviembre y diciembre.
